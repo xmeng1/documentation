@@ -1,0 +1,92 @@
+:sourcesdir: ../../../../source
+
+[[users]]
+==== 用户
+
+译者注 — 这里很多英文是界面上内容的描述，所以在翻译时，界面元素保留了很多英文以及对应的中文翻译。
+
+每个系统用户都会有对应的 `sec$User` 实例，包含唯一登录名，密码 hash 值，访问组引用和角色列表，还有其它属性。用户管理功能在 *Administration* > *Users screen* 界面：
+
+image::security_user_browser.png[align="center"]
+
+除了标准的 create - 创建，update - 更新，和 delete - 删除 动作，还支持以下动作：
+
+* *Copy* – 复制，基于当前所选用户快速创建新用户。新用户与所选用户拥有相同的访问组和角色集合。在用户编辑界面可以进一步修改它们。
+
+* *Copy settings* – 复制设置。复制用户界面设置到其它一或多个用户。这些设置包括<<gui_Table_presentations,表格展示>>，<<gui_SplitPanel,分隔面板>>分隔符位置，<<gui_Filter,过滤器>>和<<folders_pane,搜索文件夹>>。
+
+* *Change password* – 为所选用户修改密码。
+
+* *Reset passwords* – 为所选用户做以下操作：
+
+** 在 *Reset passwords for selected users* 重置密码对话框，如果没有选择 *Generate new passwords* - 生成新密码标记，会给所选用户设置上 *Change password at next logon* 下次登录修改密码的标记。有这类标记的用户下次登录成功后，会被要求修改密码。
++
+[TIP]
+====
+用户想要修改密码的话，需要有 `sec$User.changePassword` 界面的权限。在配置<<roles,角色>>的时候需要注意这一点，尤其是给用户分配 *Denying- 拒绝* 权限的时候。角色编辑界面中，`sec$User.changePassword` 界面的设置在 *Other screens* 其它界面节点内。
+====
+
+** 如果选择了 *Generate new passwords flag*  生成新密码标记，系统会随机生成密码显示给系统管理员。这些密码可以导出到 XLS 文件然后发送给相关的用户。并且，*Change password at next logon* 下次登录修改密码的标记也会被设置，保证用户下次登录时修改密码。
+
+** 如果设置了 *Generate new passwords* 的同时也设置了 *Send emails with generated passwords* 将密码发送到邮件标记，自动生成的一次性密码会被直接发送给对应的用户，系统管理员不会看到。邮件发送是异步的，所以需要一个特定的计划任务，参考 <<email_sending_methods>> 章节。
++
+--
+密码重置邮件的模板可以修改。可以在 *core* 模块创建本地化模板， https://github.com/cuba-platform/cuba/blob/master/modules/core/src/com/haulmont/cuba/security/app/email/reset-password-subject.gsp[reset-password-subject.gsp] 和 https://github.com/cuba-platform/cuba/blob/master/modules/core/src/com/haulmont/cuba/security/app/email/reset-password-body.gsp[reset-password-body.gsp] 可以做为例子。需要本地化模板时，创建 locale(语种)结尾的文件， https://github.com/cuba-platform/cuba/tree/master/modules/core/src/com/haulmont/cuba/security/app/email[platform] 可以作为参考。
+
+
+模板是基于 Groovy `SimpleTemplateEngine` 语法，所以支持 Groovy blocks，例如：
+
+[source, plain]
+----
+include::{sourcesdir}/security/reset-password-body.gsp[]
+----
+
+这些模板的数据绑定包括 `user`，`password` 和 `persistence` 变量。也可以使用任何 middleware 中 的 Spring beans（前提是 import `AppBeans`，能在 `AppBeans.get()` 方法中使用）。
+
+需要覆盖模板的话，在 `core` 模块的 `app.properties` 中指定以下属性：
+
+[source, xml]
+----
+cuba.security.resetPasswordTemplateBody = <relative path to your file>
+cuba.security.resetPasswordTemplateSubject = <relative path to your file>
+----
+
+生产环境中，可以在<<conf_dir,配置目录>>放置模板, 将属性配置到 `local.app.properties` 文件。
+--
+
+用户编辑界面描述如下：
+
+image::security_user_editor.png[align="center"]
+
+* *Login* – 必输项，唯一登录名。
+
+* *Group* – <<groups,访问组>> 。
+
+* *Last name*, *First name*, *Middle name* – 用户全名的各部分。
+
+* *Name* – 基于上述 name 自动生成的用户的全名。生成的规则定义在应用程序属性 <<cuba.user.fullNamePattern,cuba.user.fullNamePattern>> 中，全名也可以手动修改设置。
+
+* *Position* – 职位。
+
+* *Language* – 语言，用户选择的界面语言。如果要禁止用户选择语言，使用应用程序属性 <<cuba.localeSelectVisible,cuba.localeSelectVisible>>。
+
+* *Time Zone* – <<timeZone,时区>> ，显示、输入时期时使用的时区。
+
+* *Email* – 电子邮件。
+
+* *Active* – 如果没有设置，用户则不能登录系统。
+
+* *Permitted IP Mask* – IP 地址掩码，定义用户可以从哪些 IP 地址登录。
++
+掩码是逗号分隔的 IP 地址列表。IPv4 和 IPv6 地址都支持。IPv4 地址应该包含四部分数字用“.”分隔。IPv6 分 8 部分，每部分是 4 个 16 进制码，以冒号分隔。可以使用 "*" 符号来匹配任何值。同一次只支持一种 IP 地址类型(IPv4 或 IPv6)。
++
+例子： `++192.168.*.*++`
+
+* *Roles* – <<roles,用户角色列表>>。
+
+* *Substituted Users* – <<user_substitution,可被替代的用户>>列表。
+
+include::users/user_substitution.adoc[]
+
+include::users/timeZone.adoc[]
+

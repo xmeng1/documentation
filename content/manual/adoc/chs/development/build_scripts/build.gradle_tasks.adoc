@@ -1,0 +1,43 @@
+:sourcesdir: ../../../../source
+
+[[build.gradle_tasks]]
+==== 构建任务
+
+_Tasks - 任务_ 是 Gradle 的可执行单元。任务可以在插件内定义或者在构建脚本中定义。以下是一些 CUBA 特定的任务，任务的参数可以通过 `build.gradle` 来配置。
+
+include::build.gradle_tasks/build.gradle_buildInfo.adoc[]
+
+include::build.gradle_tasks/build.gradle_buildUberJar.adoc[]
+
+include::build.gradle_tasks/build.gradle_buildWar.adoc[]
+
+include::build.gradle_tasks/build.gradle_buildWidgetSet.adoc[]
+
+include::build.gradle_tasks/build.gradle_createDb.adoc[]
+
+include::build.gradle_tasks/build.gradle_debugWidgetSet.adoc[]
+
+include::build.gradle_tasks/build.gradle_deploy.adoc[]
+
+include::build.gradle_tasks/build.gradle_deployThemes.adoc[]
+
+include::build.gradle_tasks/build.gradle_deployWar.adoc[]
+
+include::build.gradle_tasks/build.gradle_restart.adoc[]
+
+include::build.gradle_tasks/build.gradle_setupTomcat.adoc[]
+
+include::build.gradle_tasks/build.gradle_start.adoc[]
+
+include::build.gradle_tasks/build.gradle_startDb.adoc[]
+
+include::build.gradle_tasks/build.gradle_stop.adoc[]
+
+include::build.gradle_tasks/build.gradle_stopDb.adoc[]
+
+include::build.gradle_tasks/build.gradle_tomcat.adoc[]
+
+include::build.gradle_tasks/build.gradle_updateDb.adoc[]
+
+include::build.gradle_tasks/build.gradle_zipProject.adoc[]
+

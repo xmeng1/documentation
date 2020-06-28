@@ -1,0 +1,147 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_TextArea]]
+====== 文本区
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-textarea" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/TextArea.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`TextArea` 是多行文本编辑字段。
+
+该组件对应的 XML 名称： `textArea`
+
+`TextArea` 的功能大部分与 <<gui_TextField,TextField>> 组件相同，同时具有以下特有属性:
+
+[[gui_TextArea_cols_rows]]
+* `cols` 和 `rows` 设置文本的行数和列数：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/textarea_1.xml[]
+---- 
++
+`width` 和 `height` 的值优先于 `cols` 和 `rows` 的值。
+
+[[gui_TextArea_wordwrap]]
+* `wordWrap` - 将此属性设置为 `false` 以关闭自动换行。
++
+`TextArea` 支持在其父 `TextInputField` 接口中定义的 `TextChangeListener`。文本变化事件在输入时按顺序异步处理，不会阻塞输入。
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/textarea_5.java[]
+----
+
+image::gui_TextArea_2.png[align="center"]
+
+[[gui_TextArea_textchangeeventmode]]
+
+* `textChangeEventMode` 定义文本的变化被发送到服务器并触发服务端事件的方式。有 3 种预定义的事件模式：
+
+** `LAZY` （默认） - 文件输入暂停时触发事件。暂停时间可以通过 `setTextChangeTimeout()` 或者<<gui_TextArea_textchangetimeout, textChangeTimeout>> 属性修改。即使用户在输入文本时没有发生暂停，也会在可能发生的 `ValueChangeEvent` 之前强制触发文本更改事件。
+
+** `TIMEOUT` - 超时后触发事件。如果在超时周期内进行了多次更改，则将周期内自最后一次更改后发生的更改发送到服务端。可以使用 `setTextChangeTimeout()` 或者<<gui_TextArea_textchangetimeout, textChangeTimeout>> 属性设置超时时长。
++
+如果在超时期限之前发生 `ValueChangeEvent`，则在它之前触发 `TextChangeEvent`，条件是文本内容自上一个 `TextChangeEvent` 以来已经发生改变。
+
+** `EAGER` - 对于文本内容的每次更改，都会立即触发事件，通常是由按键触发。请求是独立且一个接一个地顺序处理。文本变化事件以异步方式与服务器交互，因此可以在处理事件请求的同时继续输入。
+
+[[gui_TextArea_textchangetimeout]]
+
+* `textChangeTimeout` 当<<gui_TextArea_textchangeeventmode, textChangeEventMode>> 是 `LAZY` 或 `TIMEOUT` 时，定义编辑文本时暂停的时间或者超时时间。
+
+TextArea 样式::
++
+--
+Web Client 使用 Halo-based 主题时，在 XML 描述或者界面控制器中可以使用 `stylename` 属性给 `TextArea` 组件设置预定义的样式：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/textarea_3.xml[]
+----
+
+如果使用编程的方式设置样式，可以选择一个前缀为 `TEXTFIELD_` 的 `HaloTheme` class 常量：
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/textarea_4.java[]
+----
+
+[[gui_textarea_align-center]]
+* `align-center` - 使文本在文本区中居中显示。
+
+[[gui_textarea_align-right]]
+* `align-right` - 使文本在文本区中居右显示。
+
+[[gui_textarea_borderless]]
+* `borderless` - 移除文本区的边框和背景。
+--
+
+'''
+
+textArea 的属性::
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_TextField_caseConversion,caseConversion>> -
+<<gui_TextArea_cols_rows,cols>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_TextField_conversionErrorMessage,conversionErrorMessage>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_TextField_datatype,datatype>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_attr_inputPrompt,inputPrompt>> -
+<<gui_TextField_maxLength,maxLength>> -
+<<gui_attr_property,property>> -
+<<gui_attr_required,required>> -
+<<gui_attr_requiredMessage,requiredMessage>> -
+<<gui_attr_responsive,responsive>> -
+<<gui_TextArea_cols_rows,rows>> -
+<<gui_attr_settingsEnabled,settingsEnabled>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_TextArea_textchangeeventmode,textChangeEventMode>> -
+<<gui_TextArea_textchangetimeout,textChangeTimeout>> -
+<<gui_TextField_trim,trim>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>> -
+<<gui_TextArea_wordwrap,wordWrap>>
+
+textArea 的预定义样式::
+<<gui_textarea_align-center,align-center>> -
+<<gui_textarea_align-right,align-right>> -
+<<gui_textarea_borderless,borderless>> -
+<<gui_attr_stylename_huge,huge>> -
+<<gui_attr_stylename_large,large>> -
+<<gui_attr_stylename_small,small>> -
+<<gui_attr_stylename_tiny,tiny>>
+
+API::
+<<gui_TextField_TextChangeListener,addTextChangeListener>> -
+<<gui_api_addValueChangeListener,addValueChangeListener>> -
+<<gui_validator,addValidator>> -
+<<gui_api_commit,commit>> -
+<<gui_api_discard,discard>> -
+<<gui_api_isModified,isModified>> -
+<<gui_api_contextHelp,setContextHelpIconClickHandler>>
+
+'''
+

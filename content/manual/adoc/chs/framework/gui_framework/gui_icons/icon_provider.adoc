@@ -1,0 +1,142 @@
+:sourcesdir: ../../../../../source
+
+[[icon_provider]]
+===== 使用其它字体库中的图标
+
+为了增强主题扩展，可能需要创建图标并将其嵌入到字体中，以及使用一些外部图标库。
+
+. 在 *web* 模块中，为新图标创建实现 `com.vaadin.server.FontIcon` 接口的 `enum` 类：
++
+[source, java]
+----
+include::{sourcesdir}/gui/add_icons_enum.java[]
+----
+
+. 向主题扩展添加新样式。建议在主题扩展的主文件夹中创建一个特定的子文件夹 `fonts`，例如 `modules/web/themes/halo/com.company.demo/fonts`。将样式和字体文件放在特有的子文件夹中，例如 `fonts/icomoon`。
++
+字体文件由以下扩展名表示：
++
+** `.eot`,
++
+** `.svg`,
++
+** `.ttf`,
++
+** `.woff`.
++
+本例中使用了一个开源字体集 `icomoon`，由 4 个联合使用的文件组成：`icomoon.eot` 、 `icomoon.svg` 、 `icomoon.ttf` 、`icomoon.woff`。
+
+. 创建一个包含 `@font-face` 样式和一个图标样式 CSS 类的文件。下面是 `icomoon.scss` 文件的示例，其中 `IcoMoon` css 类名对应于 `FontIcon#getFontFamily` 方法返回的值：
+
++
+[source, css]
+----
+include::{sourcesdir}/gui/add_icons_icomoon.scss[]
+----
+
+. 在 `halo-ext.scss` 文件或其它主题扩展文件中添加对上述包含字体样式的文件的引用。
++
+[source, css]
+----
+include::{sourcesdir}/gui/add_icons_halo-ext.scss[]
+----
+
+. 然后创建新的<<icon_set,图标集>>，这是一个实现 `Icons.Icon` 接口的枚举：
++
+[source, java]
+----
+include::{sourcesdir}/gui/IcoMoonIcon.java[]
+----
+
+. 创建新的 `IconProvider`.
++
+--
+为了管理自定义图标集，CUBA 框架提供了由 `IconProvider` 和 `IconResolver` 组成的机制。
+
+`IconProvider` 是一个标记接口，只存在于 *web* 模块中，可以通过图标路径提供资源（`com.vaadin.server.Resource`）。
+
+`IconResolver` bean 获取实现 `IconProvider` 接口的所有 bean，并遍历它们以找到可以为图标提供资源的 bean。
+
+要使用这种机制，应该创建 `IconProvider` 的实现：
+
+[source, java]
+----
+include::{sourcesdir}/gui/IcoMoonIconProvider.java[]
+----
+
+这里我们用 `@Order annotation` 注解显式地为这个 bean 指定顺序。
+--
+
+. 在应用程序属性文件中注册自定义图标集：
++
+[source, plain]
+----
+cuba.iconsConfig = +com.company.demo.gui.icons.IcoMoonIcon
+----
+
+现在，在界面 XML 描述中可以直接引用图标的类和 `枚举` 元素 ：
+
+[source, xml]
+----
+include::{sourcesdir}/gui/add_icons_usage.xml[]
+----
+
+或者在 Java 控制器中：
+
+[source, java]
+----
+include::{sourcesdir}/gui/add_icons_usage.java[]
+----
+
+这样新图标会添加到按钮上：
+
+image::add_icons.png[align="center"]
+
+覆盖图标集的图标::
++
+--
+图标集机制可以覆盖其它图标集中的图标。为此，应该创建并注册一个具有相同图标（枚举值）但不同图标路径（`source`）的新图标集（枚举）。在下面的示例中，创建了一个新的图标枚举 `MyIcon` ，用于覆盖 `CubaIcon` 图标集中的标准图标。
+
+. 默认图标集：
++
+[source, java]
+----
+include::{sourcesdir}/gui/CubaIcon.java[]
+----
+
+. 新图标集：
++
+[source, java]
+----
+include::{sourcesdir}/gui/MyIcon.java[]
+----
+
+. 在 `web-app.properties` 中注册的新图标集：
++
+[source, plain]
+----
+cuba.iconsConfig = +com.company.demo.gui.icons.MyIcon
+----
+
+现在，新的 *OK* 图标将代替标准图标而被使用：
+
+[source, java]
+----
+include::{sourcesdir}/gui/overridden_icon.java[]
+----
+
+如果需要忽略重新定义的图标，仍然可以通过使用标准图标的路径而不是选项名称来使用标准图标：
+
+[source, xml]
+----
+<button caption="Created" icon="icons/create.png"/>
+----
+
+或者
+
+[source, java]
+----
+button.setIcon(CubaIcon.CREATE_ACTION.source());
+----
+--
+

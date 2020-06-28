@@ -1,0 +1,160 @@
+:sourcesdir: ../../../../source
+
+[[roles_example]]
+==== 配置角色
+
+下面是权限配置的快速参考，以配置访问 *Administration - 管理* 功能为例。
+比如，只开放<<entity_log,实体日志>>功能，在相应部分设置提到的权限。
+
+推荐至少提供 `sys$FileDescriptor` 实体的只读权限，因为这个实体在平台很多地方都会用到：邮件、附件、日志等。
+
+Users - 用户::
++
+--
+<<users,User>> 实体可以在数据模型中用来做关联引用实体。需要在查询组件或者下拉框组件使用用户实体，只需要设置 `sec$User` 实体的权限就足够。
+
+如果需要创建或者编辑 `User` 实体，还需要设置以下权限：
+
+* 实体: `sec$User`, `sec$Group`; (可选) `sec$Role`, `sec$UserRole`, `sec$UserSubstitution`.
+
+[TIP]
+====
+读取 `sec$UserSubstitution` 实体的权限对<<user_substitution,代替用户>>功能是至关重要的。
+====
+
+* 界面: *Users* 菜单项, `sec$User.edit`, `sec$Group.lookup`; (可选) `sec$Group.edit`, `sec$Role.edit`, `sec$Role.lookup`, `sec$User.changePassword`, `sec$User.copySettings`, `sec$User.newPasswords`, `sec$User.resetPasswords`, `sec$UserSubstitution.edit`.
+--
+
+Access Groups - 访问组::
++
+--
+创建或者管理用户<<groups,访问组>>以及安全限制。
+
+* 实体: `sec$Group`, `sec$Constraint`, `sec$SessionAttribute`, `sec$LocalizedConstraintMessage`.
+
+* 界面: *Access Groups* 菜单项, `sec$Group.lookup`, `sec$Group.edit`, `sec$Constraint.edit`, `sec$SessionAttribute.edit`, `sec$LocalizedConstraintMessage.edit`.
+--
+
+Dynamic Attributes - 动态属性::
++
+--
+访问额外的实体非持久化<<dynamic_attributes,属性>>。
+
+* 实体: `sys$Category`, `sys$CategoryAttribute`, 以及数据模型需要的其它实体。
+
+* 界面: *Dynamic Attributes* 菜单项, `sys$Category.edit`, `sys$CategoryAttribute.edit`, `dynamicAttributesConditionEditor`, `dynamicAttributesConditionFrame`.
+--
+
+User Sessions - 用户会话::
++
+--
+查看<<userSession,用户会话>>数据。
+
+* 实体: `sec$User`, `sec$UserSessionEntity`.
+
+* 界面: *User Sessions* 菜单项, `sessionMessageWindow`.
+--
+
+Locks - 锁::
++
+--
+设置实体的<<pessimistic_locking,悲观锁>>。
+
+* 实体: `sys$LockInfo`, `sys$LockDescriptor`, 以及数据模型需要的其它实体。
+
+* 界面: *Locks* 菜单项, `sys$LockDescriptor.edit`.
+--
+
+External Files - 外部文件::
++
+--
+访问应用的<<file_storage,文件存储>>。
+
+* 实体: `sys$FileDescriptor`.
+
+* 界面: *External Files* 菜单项; (可选) `sys$FileDescriptor.edit`.
+--
+
+Scheduled Tasks - 定时任务::
++
+--
+创建和管理<<scheduled_tasks,定时任务>>。
+
+* 实体: `sys$ScheduledTask`, `sys$ScheduledExecution`.
+
+* 界面: *Scheduled Tasks* 菜单项, `sys$ScheduledExecution.browse`, `sys$ScheduledTask.edit`.
+--
+
+Entity Inspector - 实体探查::
++
+--
+从<<entity_inspector,实体探查>>动态生成的界面中操作应用对象实体。
+
+* 实体: 数据模型需要的实体。
+
+* 界面: *Entity Inspector* 菜单项, `entityInspector.edit`, 以及数据模型需要的其它实体。
+--
+
+Entity Log - 实体日志::
++
+--
+<<entity_log,记录>>实体变化。
+
+* 实体: `sec$EntityLog`, `sec$User`, `sec$EntityLogAttr`, `sec$LoggedAttribute`, `sec$LoggedEntity`, 以及数据模型需要的其它实体。
+
+* 界面: *Entity Log* 菜单项.
+--
+
+User Session Log - 用户会话日志::
++
+--
+查看用户登入登出或者<<userSession_log,用户会话>>的历史数据。
+
+* 实体: `sec$SessionLogEntry`.
+
+* 界面: *User Session Log* 菜单项.
+--
+
+Email History - 邮件历史::
++
+--
+查看从应用发出的<<email_sending,电子邮件>>。
+
+* 实体: `sys$SendingMessage`, `sys$SendingAttachment`, `sys$FileDescriptor` (邮件附件需要).
+
+* 界面: *Email History* 菜单项, `sys$SendingMessage.attachments`.
+--
+
+Server Log - 服务器日志::
++
+--
+查看并下载应用的<<logging,日志文件>>。
+
+* 实体: `sys$FileDescriptor`.
+
+* 界面: *Server Log* 菜单项, `serverLogDownloadOptionsDialog`.
+
+* 特殊功能: `下载日志文件`
+--
+
+Screen Profiler - 界面资料::
++
+--
+应用界面的使用量和使用时间的统计数据。
+
+* 实体: `sec$User`, `sys$ScreenProfilerEvent`.
+
+* 界面: *Screen Profiler* 菜单项.
+--
+
+Reports - 报表::
++
+--
+需要运行报表，参考 https://doc.cuba-platform.com/reporting-latest/[报表生成器] 插件。
+
+* 实体: `report$Report`, `report$ReportInputParameter`, `report$ReportGroup`.
+
+* 界面: `report$inputParameters`, `commonLookup`, `report$Report.run`,  `report$showChart` (如果包含图表模板)。
+--
+
+

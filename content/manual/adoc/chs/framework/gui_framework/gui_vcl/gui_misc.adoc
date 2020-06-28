@@ -1,0 +1,15 @@
+:sourcesdir: ../../../../../source
+
+[[gui_misc]]
+===== 其它
+
+本章介绍了跟可视化组件相关的一些通用组件。
+
+include::gui_misc/uiComponents.adoc[]
+
+include::gui_misc/gui_formatter.adoc[]
+
+include::gui_misc/gui_presentations.adoc[]
+
+include::gui_misc/gui_validator.adoc[]
+

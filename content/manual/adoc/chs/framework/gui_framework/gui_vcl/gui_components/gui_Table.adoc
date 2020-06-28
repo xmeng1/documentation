@@ -1,0 +1,703 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_Table]]
+====== 表格
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-table" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/Table.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`Table` 组件以表格的方式展示信息，对数据进行排序 、管理表格列和表头，并对选中的行执行操作。
+
+image::gui_table.png[align="center"]
+
+组件对应的 XML 名称： `table`
+
+在界面 XML 描述中定义组件的示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/table_1.xml[]
+---- 
+
+在上面的示例中，`data` 元素定义<<gui_collection_container,集合数据容器>>，它使用 <<jpql,JPQL>> 查询 `Order` 实体。`table` 元素定义数据容器，而 `columns` 元素定义哪些实体属性用作表格列。
+
+`table` 元素:
+[[gui_Table_rows]]
+* `rows` – 如果使用 <<gui_attr_datasource,datasource>> 属性来做数据绑定，则必须设置此元素。
++
+每行可以在左侧的附加列中有一个图标。在界面控制器中创建 `ListComponent.IconProvider` 接口的实现，并将其设置给表格：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/tableIconProvider_1.java[]
+----
+
+[[gui_Table_columns]]
+* `columns` – 定义表格列的必须元素。
++
+--
+[[gui_Table_columns_includeAll]]
+** `includeAll` – `includeAll` – 加载 <<gui_data_containers,dataContainer>> 或 <<datasources,datasource>> 中定义的 <<views,view>> 的所有属性。
++
+在下面的例子中，我们显示了 `customersDc` 中使用视图的所有属性。如果视图包含系统属性，也同样会显示。
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/gui_Table_columns_includeAll.xml[]
+----
++
+如果实体的视图包含引用属性，该属性会按照其<<namePattern_annotation,实例名称>>进行展示。如果需要展示一个特别的属性，则需要在视图和 `column` 元素中定义：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/gui_Table_columns_includeAll_related.xml[]
+----
++
+如果未指定视图，`includeAll` 会加载给定实体及其祖先的所有属性。
+
+[[gui_Table_columns_exclude]]
+** `exclude` – 英文逗号分隔的属性列表，这些属性不会被加载到表格。
++
+在下面的例子中，我们会显示除了 `name` 和 `order` 之外的所有属性：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/gui_Table_columns_exclude.xml[]
+----
+--
++
+每个列都在嵌套的 `column` 元素中描述，`column` 元素具有以下属性：
++
+--
+
+[[gui_Table_column_id]]
+** `id` − 必须属性，包含列中要显示的实体属性的名称。可以是来自数据容器的实体的属性，也可以是关联实体的属性（使用 "." 来指定属性在对象关系图中的路径）。例如：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/tableId_1.xml[]
+---- 
+
+[[gui_Table_column_caption]]
+** `caption` − 包含列标题的可选属性。如果不指定，将显示<<entity_localization,本地化属性名称>>。
+
+[[gui_Table_column_collapsed]]
+** `collapsed` − 可选属性；当设置为 `true` 时默认隐藏列。当表格的 `columnControlVisible` 属性不是 `false` 时，用户可以通过表格右上角的菜单中的按钮 image:gui_table_columnControl.png[] 控制列的可见性。默认情况下，`collapsed` 是 `false`。
+
+[[gui_Table_column_expandRatio]]
+** `expandRatio` − 可选属性；指定每列的延展比例。比例值需大于或等于 0。如果至少有一列设置了该值，则会忽略其它隐式的值，只考虑显式设置的值。如果同时设置了<<gui_Table_column_width,width>>和 `expandRatio`，应用程序会出错。
+
+[[gui_Table_column_width]]
+** `width` − 可选属性，控制默认列宽。只能是以像素为单位的数值。
+
+[[gui_Table_column_align]]
+** `align` − 可选属性，用于设置单元格的文本对齐方式。可选值：`LEFT` 、 `RIGHT` 、 `CENTER`。默认为 `LEFT`。
+
+[[gui_Table_column_editable]]
+** `editable` − 可选属性，允许编辑表中的相应列。为了使列可编辑，整个表的 <<gui_Table_editable,editable>> 属性也应设置为 `true`。不支持在运行时更改此属性。
+
+[[gui_Table_column_sortable]]
+** `sortable` − 可选属性，用于禁用列的排序。整个表的 <<gui_Table_sortable,sortable>> 属性为 `true` 此属性有效（默认为 `true`）。
+
+[[gui_Table_column_sort]]
+** `sort` − 可选属性，用于设置表格使用指定的列进行排序的初始化顺序，可选值：
+
+*** `ASCENDING` – 顺序。
+*** `DESCENDING` – 倒序。
+
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/table_sort.xml[]
+----
+
+[TIP]
+====
+注意：如果 <<gui_attr_settingsEnabled,settingsEnabled>> 是 `true`，表格可以按照用户的设置排序。
+====
+
+[WARNING]
+====
+每次只能按照一列排序，所以下面的示例会抛出异常：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/table_sort_exception.xml[]
+----
+
+另外，如果对某列同时设置了 `sort` 和 `sortable="false"` 属性，会导致应用程序出错。
+====
+
+[[gui_Table_column_maxTextLength]]
+** `maxTextLength` – 可选属性，允许限制单元格中的字符数。如果实际值和最大允许字符数之间的差异不超过 10 个字符，则多出来的字符不会被隐藏。用户可以点击可见部分来查看完整的文本。例如一列的字符数限制为 10 个字符：
++
+image::gui_table_column_maxTextLength.png[align="center"]
+
+[[gui_Table_column_link]]
+** `link` - 如果设置为 `true`，则允许列中显示指向实体编辑器的链接。对于基本类型的列，`link` 属性也可以设置为 true; 在这种情况下，将打开主实体编辑器。这个方法可用于简化导航：用户能够通过单击一些关键属性快速地打开实体编辑器。
+
+[[gui_Table_column_linkScreen]]
+** `linkScreen` - 设置单击 `link` 属性为 `true` 的列中的链接时打开的界面的标识符。
+
+[[gui_Table_column_linkScreenOpenType]]
+** `linkScreenOpenType` - 设置界面打开模式（`++THIS_TAB++` 、 `++NEW_TAB++` 或者 `DIALOG`）。
+
+[[gui_Table_column_linkInvoke]]
+** `linkInvoke` -  单击链接时调用控制器方法而不是打开界面。
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/table_4.java[]
+----
+
+[[gui_Table_column_captionProperty]]
+** `captionProperty` - 指定一个要显示在列中的实体属性名称，而不是显示 <<gui_Table_column_id,id>> 指定的实体属性值。例如，如果有一个包含 `name` 和 `orderNo` 属性的实体 `Priority`，则可以定义以下列：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/tableColumnCaptionProperty_1.xml[]
+----
++
+此时，列中将会显示 `Priority` 实体的 `name` 属性，但是列的排序是根据 `Priority` 实体的 `orderNo` 属性。
+
+[[gui_Table_column_generator]]
+** 可选的 `generator` 属性包含指向界面控制器中方法，该方法可创建一个可视化组件显示在表格单元格中：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/table_generator.xml[]
+----
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/table_generator.java[]
+----
++
+它可以用来为 <<gui_Table_addGeneratedColumn,addGeneratedColumn()>> 方法提供一个 `Table.ColumnGenerator` 的实现
+
+** `column` 元素可能包含一个嵌套的<<gui_formatter,formatter>>元素，它允许以不同于<<datatype,Datatype>>的标准格式显示属性值：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/tableFormatter_1.xml[]
+----
+--
+
+[[gui_Table_rowsCount]]
+* `rowsCount` − 可选元素，为表格添加 `RowsCount` 组件；此组件能够分页加载表格数据。可以使用<<gui_data_loaders,数据加载器>>的 `setMaxResults()` 方法限制数据容器中的记录数来定义分页的大小。这个方法通常是由链接到表格数据加载器的<<gui_Filter,过滤器>>组件来执行的。如果表格没有通用过滤器，则可以直接从界面控制器调用此方法。
++
+`RowsCount` 组件还可以显示当前数据容器查询的记录总数，而无需提取这些记录。当用户单击 *?* 图标时，它会调用 `com.haulmont.cuba.core.global.DataManager#getCount` 方法，执行与当前查询条件相同的数据库查询，不过会使用 `++COUNT(*)++` 聚合函数代替查询列。然后显示检索到的数字，代替 *?* 图标。
++
+`RowsCount` 组件的 `autoLoad` 属性如果设置为 `true`，启用自动加载行数。可以在 XML 描述中设置：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/datagrid_rowscount_1.xml[]
+----
++
+另外，在界面控制器中也可以通过 `RowsCount` API 启用或禁用该功能：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/datagrid_rowscount_2.java[]
+----
+
+[[gui_Table_actions]]
+* `actions` − 可选元素，用于描述和表格相关的<<gui_Action,操作>>。除了自定义的操作外，该元素还支持以下在 `com.haulmont.cuba.gui.actions.list` 里定义<<std_list_actions,标准操作>>：`create` 、 `edit` 、 `remove` 、 `refresh` 、 `add` 、 `exclude` 、 `excel`。
+
+[[gui_Table_buttonsPanel]]
+* 可选元素，在表格上方添加一个 <<gui_ButtonsPanel,ButtonsPanel>> 容器来显示操作按钮。
+
+`table` 属性:
+
+[[gui_Table_emptyStateMessage]]
+* `emptyStateMessage` 属性可以在没有加载数据、设置了空项或者使用了空的数据容器时设置提示消息。该属性通常与<<gui_Table_emptyStateLinkMessage,emptyStateLinkMessage>>属性一起使用。消息需要提示表格为空的原因，示例：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/gui_Table_emptyStateMessage.xml[]
+----
++
+`emptyStateMessage` 属性支持从<<message_packs,消息包>>加载消息。如果不想显示消息，则可以不设置该字段。
+
+[[gui_Table_emptyStateLinkMessage]]
+* `emptyStateLinkMessage` 属性可以在没有加载数据、设置了空项或者使用了空的数据容器时设置链接提示消息。 该属性通常与<<gui_Table_emptyStateMessage,emptyStateMessage>>属性一起使用。消息需要描述如何操作才能填补表格数据，示例：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/gui_Table_emptyStateLinkMessage.xml[]
+----
++
+image::gui_table_emptyState.png[align="center"]
++
+`emptyStateLinkMessage` 属性支持从<<message_packs,消息包>>加载消息。如果不想显示消息，则可以不设置该字段。
++
+处理链接点击事件，可以用<<gui_Table_setEmptyStateLinkClickHandler,setEmptyStateLinkClickHandler>>或者订阅对应的事件：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/table_EmptyStateLinkClickHandler.java[]
+----
+
+[[gui_Table_multiselect]]
+* `multiselect` 属性可以为表格行设置多选模式。如果 `multiselect` 为 `true`，用户可以按住 *Ctrl* 或 *Shift* 键在表格中选择多行。默认情况下关闭多选模式。
+
+[[gui_Table_sortable]]
+* `sortable` 属性可以对表中的数据进行排序。默认情况下，它设置为 `true` 。如果允许排序，单击列标题在列名称右侧将显示图标 image:gui_sortable_down.png[] / image:gui_sortable_up.png[]。可以使用<<gui_Table_column_sortable, sortable>>属性禁用特定列的排序。
++
+根据是否将所有记录放在了一页上来使用不同的方式进行排序。如果所有记录在一页，则在内存中执行排序而不需要数据库查询。如果数据有多页，则通过发送具有相应 `ORDER BY` 条件的新的查询请求在数据库中执行排序。
++
+一个表格中的列可能包含本地属性或实体链接。例如：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/tableSortable_1.xml[]
+----
++
+在后一种情况下，数据排序是根据关联实体的 `@NamePattern` 注解中定义的属性进行的。如果实体中没有这个注解，则仅仅在内存中对当前页的数据进行排序。
++
+如果列引用了非持久化实体属性，则数据排序将根据 `@MetaProperty` 注解的 `related()` 参数中定义的属性执行。如果未指定相关属性，则仅仅在内存中对当前页的数据进行排序。
++
+如果表格链接到一个嵌套的<<gui_property_containers,属性容器>>，这个属性容器包含相关实体的集合。这个集合属性必须是有序类型（`List` 或 `LinkedHashSet`）才能使表格支持排序。如果属性的类型为 `Set`，则 `sortable` 属性不起作用，并且用户无法对表格进行排序。
++
+如果需要，也可以提供<<gui_data_comp_sort,自定义的排序实现>>。
+
+[[gui_Table_presentations]]
+* `presentations` 属性控制<<gui_presentations,展示设置>>。默认情况下，该值为 `false`。如果属性值为 `true`，则会在表格的右上角添加相应的图标 image:gui_presentation.png[]。
+
+[[gui_Table_columnControlVisible]]
+* 如果 `columnControlVisible` 属性设置为 `false`，则用户无法使用位于表头的右侧的下拉菜单按钮 image:gui_table_columnControl.png[] 隐藏列，image:gui_table_columnControl.png[] 按钮位于表头的右侧。当前显示的列在菜单中标记为选中状态。可以显示表中的所有列（`Select all`）或者隐藏除了第一列之外的所有列（`Deselect all`），第一列不能隐藏，否则表格不能正确显示。
+
+image::gui_table_columnControl_all.png[align="center"]
+
+[[gui_Table_reorderingAllowed]]
+* 如果 `reorderingAllowed` 属性设置为 `false`，则用户不能通过用鼠标拖动来更改列顺序。
+
+[[gui_Table_columnHeaderVisible]]
+* 如果 `columnHeaderVisible` 属性设置为 `false`，则该表没有列标题。
+
+[[gui_Table_showSelection]]
+* 如果 `showSelection` 属性设置为 `false`，则不突出显示当前行。
+
+[[gui_Table_allowPopupMenu]]
+* `contextMenuEnabled` 属性启用右键菜单。默认情况下，此属性设置为 `true`。右键菜单中会列出表格操作（如果有的话）和 *System Information* 菜单项（如果用户具有 `cuba.gui.showInfo` <<permissions,权限>>），通过 *System Information* 菜单项可查看选中实体的详细信息。
+
+[[gui_Table_multiLineCells]]
+* 将 `multiLineCells` 设置为 `true` 可以让包含多行文本的单元格显示多行文本。在这种模式下，浏览器会一次加载表格中当前页的所有行，而不是延迟加载表格的可见部分。这就要求在 Web 客户端中适当的滚动。默认值为“false”。
+
+[[gui_Table_aggregatable]]
+* `aggregatable` 属性启用表格行的聚合运算。支持以下操作：
++
+--
+
+** `SUM` – 计算总和
+
+** `AVG` – 计算平均值
+
+** `COUNT` – 计算总数
+
+** `MIN` – 找到最小值
+
+** `MAX` – 找到最大值
+
+[[gui_Table_column_aggregation]]
+聚合列的 `aggregation` 元素应该设置 `type` 属性，在这个属性中设置聚合函数。默认情况下，聚合列仅支持数值类型，例如 `Integer`、`Double`、`Long` 和 `BigDecimal`。聚合表格值显示在表格顶部的附加行中。这是一个定义聚合表示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/tableAggregatable_1.xml[]
+---- 
+
+[[gui_Table_column_aggregation_editable]]
+`aggregation` 元素可以包含 `editable` 属性。设置该属性为 `true` 与 <<gui_Table_AggregationDistributionProvider,setAggregationDistributionProvider()>> 方法一起使用，开发者可以实现算法用来在表格不同行之间分发数据。
+
+[[gui_Table_column_aggregation_strategyClass]]
+`aggregation` 元素还可以包含 `strategyClass` 属性，指定一个实现 `AggregationStrategy` 接口的类（参阅下面以编程方式设置聚合策略的示例）。
+
+[[gui_Table_column_aggregation_valueDescription]]
+`valueDescription` 属性定义一个提示，当用户的光标悬浮在聚合值上时通过弹出框展示这个提示。对于上面列出的运算（`SUM`、`AVG`、`COUNT`、`MIN`、`MAX`），提示弹窗已经默认开启。
+
+[[gui_Table_column_aggregation_formatter]]
+可以指定不同于 <<datatype,Datatype>> 标准格式的<<gui_formatter,格式化器>>显示聚合值：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/tableAggregatable_2.xml[]
+---- 
+
+[[gui_Table_aggregationStyle]]
+`aggregationStyle` 属性允许指定聚合行的位置：`TOP` 或 `BOTTOM`。默认情况下使用 `TOP`。
+
+除了上面列出的操作之外，还可以自定义聚合策略，通过实现 `AggregationStrategy` 接口并将其传递给 `AggregationInfo` 实例中 `Table.Column` 类的 `setAggregation()` 方法。例如：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/tableAggregationStrategy_1.java[]
+----
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/tableAggregationStrategy_2.java[]
+---- 
+--
+
+[[gui_Table_editable]]
+* `editable` 属性可以将表格转换为即时编辑模式。在这种模式下，具有 `editable = true` 属性的列显示用于编辑相应实体属性的组件。
++
+根据相应实体属性的类型自动选择每个可编辑列的组件类型。例如，对于字符串和数字属性，应用程序将使用 <<gui_TextField,TextField>>；对于 `Date` 将使用 <<gui_DateField,DateField>>；对于列表将使用 <<gui_LookupField,LookupField>>；对于指向其它实体的链接将使用 <<gui_PickerField,PickerField>>。
++
+对于 `Date` 类型的可编辑列，还可以定义 `dateFormat` 或 `resolution` 属性，类似于为 <<gui_DateField,DateField>> 的属性。
++
+可以为显示链接实体的可编辑列定义 <<gui_attr_optionsContainer,optionsContainer>> 和 <<gui_attr_captionProperty,captionProperty>> 属性。如果设置了 `optionsContainer` 属性，应用程序将使用 <<gui_LookupField,LookupField>> 而不是 <<gui_PickerField,PickerField>>。
++
+可以使用 `Table.addGeneratedColumn()` 方法实现单元格的自定义配置（包括编辑） - 见下文。
+
+[[gui_Table_stylename]]
+* 在具有基于 Halo-based 主题的 Web 客户端中，`stylename` 属性可以在 XML 描述中或者界面控制器中为 `Table` 组件设置预定义样式：
++
+--
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/table_2.xml[]
+----
+
+当以编程方式设置样式时，需要选择 `HaloTheme` 类的一个以 `TABLE_` 为前缀的常量：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/table_3.java[]
+----
+
+表格样式:
+
+[[gui_table_borderless]]
+* `borderless` - 不显示表格的外部边线。
+
+[[gui_table_compact]]
+* `compact` - 减少表格单元格内的空白区域。
+
+[[gui_table_no-header]]
+* `no-header` - 隐藏表格的列标题。
+
+[[gui_table_no-horizontal-lines]]
+* `no-horizontal-lines` - 删除行之间的水平分隔线。
+
+[[gui_table_no-stripes]]
+* `no-stripes` - 删除交替的行颜色。
+
+[[gui_table_no-vertical-lines]]
+* `no-vertical-lines` - 删除列之间的垂直分隔线。
+
+[[gui_table_small]]
+* `small` - 使用小字体并减少表格单元格内的空白区域。
+--
+
+`Table` 接口的方法:
+
+[[gui_Table_ColumnCollapseListener]]
+* 可以使用 `addColumnCollapsedListener` 方法和 `ColumnCollapsedListener` 接口的实现跟踪列的可视化状态。
+
+[[gui_Table_getSelected]]
+* `getSelected()` 、 `getSingleSelected()` 返回表格中的选定行对应的实体实例。可以通过调用 `getSelected()` 方法来获得集合。如果未选择任何内容，则程序将返回空集。如果禁用了 `multiselect`，应该使用 `getSingleSelected()` 方法返回一个选定实体，如果没有选择任何内容则返回 `null`。
+
+[[gui_Table_SelectionListener]]
+* `addSelectionListener()` 可以跟踪表格选中行的变化，示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gui_Table_SelectionListener.java[]
+----
++
+也可以通过订阅相应的事件来跟踪选中行的变化：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gui_Table_SelectionListener_event.java[]
+----
++
+可以使用<<gui_api_UserOriginated,isUserOriginated()>> 方法跟踪 `SelectionEvent` 事件的来源。
+
+
+[[gui_Table_addGeneratedColumn]]
+* `addGeneratedColumn()` 方法允许在列中自定义数据的表现方式。它需要两个参数：列的标识符和 `Table.ColumnGenerator` 接口的实现。如果标识符可以匹配 XML 描述中为表格列设置的标识符 - 在这种情况下，插入新列代替 XML 中定义的列。如果标识符与任何列都不匹配，则会在右侧添加新列。
++
+--
+[[gui_Table_generateCell]]
+对于表的每一行将调用 `Table.ColumnGenerator` 接口的 `generateCell()` 方法。该方法接受在相应行中显示的实体实例作为参数。`generateCell()` 方法应该返回一个可视化组件，该组件将显示在单元格中。
+
+使用组件的示例：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/tableColumnGenerator_1.java[]
+---- 
+
+在上面的示例中，表中 `color` 列中的所有单元格都显示了 <<gui_LookupPickerField,LookupPickerField>> 组件。组件应将它的值保存到相应的行中的实体的 `color` 属性中。
+
+`getInstanceContainer()` 方法返回带有当前实体的容器，只能在绑定组件（创建于生成表格单元格时）和数据的时候使用。
+
+如果要显示动态文本，请使用特殊类 `Table.PlainTextCell` 而不是 <<gui_Label,Label>> 组件。它将简化渲染过程并使表格运行更快。
+
+如果 `addGeneratedColumn()` 方法接收到的参数是未在 XML 描述中声明的列的标识符，则新列的标题将设置如下：
+
+[source, java]
+----
+carsTable.getColumn("colour").setCaption("Colour");
+----
+
+还可以考虑使用 XML 的 <<gui_Table_column_generator,generator>> 属性做更具声明性的设置方案。
+--
+
+[[gui_Table_requestFocus]]
+* `requestFocus()` 方法允许将焦点设置在某一行的具体的可编辑字段上。需要两个参数：表示行的实体实例和列的标识符。请求焦点的示例如下：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/table_requestFocus_1.java[]
+----
+
+[[gui_Table_scrollTo]]
+* `scrollTo()` 方法允许将表格滚动到具体行。需要一个参数：表示行的实体实例。
++
+滚动条的示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/table_scrollTo_1.java[]
+----
+
+[[gui_Table_CellClickListener]]
+* 如果需要在单元格中显示自定义内容并且在用户单击单元格的时候能收到通知，可以使用 `setClickListener()` 方法实现这些功能。`CellClickListener` 接口的实现接收选中实体和列标识符作为参数。这些单元格的内容将被包装在一个 span 元素中，这个 span 元素带有 `cuba-table-clickable-cell` 样式，可以利用该样式来定义单元格外观。
++
+使用 `CellClickListener` 的示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gui_Table_CellClickListener.java[]
+----
+
+[[gui_Table_AggregationDistributionProvider]]
+
+* 可以使用 `setAggregationDistributionProvider()` 方法指定 `AggregationDistributionProvider`，定义在表格行间分发聚合值的规则。如果用户在聚合单元格输入值，会根据自定义的算法将值分发到贡献至该聚合值的单元格。只支持 `TOP` 聚合样式。如果要使得聚合单元格可编辑，需要使用 xml 中 `aggregation` 元素的<<gui_Table_column_aggregation_editable, editable>>属性。
++
+当创建 provider 时，应当使用 `AggregationDistributionContext<E>` 对象，包含分发聚合值所需的数据：
++
+** `Column column` 合计或分组聚合值变更的列；
+** `Object value` − 新的聚合值；
+** `Collection<E> scope` − 一组实体，会受到聚合值的影响；
+** `boolean isTotalAggregation` 显示合计聚合值或者分组聚合值。
++
+作为示例，我们考虑一个展示预算的表格。用户创建预算种类，并设置每种预算在收入中需要分成的百分比。下一步，用户在聚合单元格设置收入的总额，然后会按照不同的种类分发。
++
+界面 XML 描述中表格的配置示例：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/table_aggregation_distribution.xml[]
+----
++
+界面控制器示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/table_aggregation_distribution.java[]
+----
+
+[[gui_Table_getAggregationResults]]
+* `getAggregationResults()` 方法返回一个<<gui_Table_aggregatable,聚合>>值的映射（map），键值为表格列的标识符，值为聚合值。
+
+[[gui_Table_setStyleProvider]]
+* `setStyleProvider()` 方法可以设置表格单元格显示样式。该方法接受 `Table.StyleProvider` 接口的实现类作为参数。表格的每一行和每个单元分别调用这个接口的 `getStyleName()` 方法。如果某一行调用该方法，则第一个参数包含该行显示的实体实例，第二个参数为 `null`。如果单元格调用该方法，则第二个参数包含单元格显示的属性的名称。
++
+设置样式的示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/table_setStyleProvider_1.java[]
+----
++
+然后应该在应用程序主题中设置的单元格和行样式。有关创建主题的详细信息，请参阅 <<gui_themes>>。对于 Web 客户端，新样式在 `styles.scss` 文件中。在控制器中定义的样式名称，以及表格行和列的前缀标识符构成 CSS 选择器。例如：
++
+[source, css]
+----
+include::{sourcesdir}/gui_vcl/table_setStyleProvider_2.css[]
+---- 
+
+[[gui_Table_addPrintable]]
+* `addPrintable()` 当通过 `excel` <<standard_actions,标准操作>>或直接使用 `ExcelExporter` 类导出数据到 XLS 文件时，此方法可以给列中数据设置自定义展现。该方法接收的两个参数为列标识符和为列提供的 `Table.Printable` 接口实现。例如：
+
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/table_addPrintable_1.java[]
+---- 
++
+`Table.Printable` 接口的 `getValue()` 方法应该返回在表格单元格中显示的数据。返回的数据不一定是字符串类型，该方法可以返回其它类型的值，比如数字或日期，它们将在 XLS 文件中以相应的类型展示。
++
+如果生成的列需要在输出到 XLS 时带有格式，则应该使用 `addGeneratedColumn()` 方法，传递一个 `Table.PrintableColumnGenerator` 接口的实现作为参数。XLS 文档中单元格的值在这个接口的 `getValue()` 方法中定义：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/table_addPrintable_2.java[]
+---- 
++
+如果没有以某种方式为生成的列定义 `Printable` 描述，那么该列将显示相应实体属性的值，如果没有关联的实体属性，则不显示任何内容。
+
+[[gui_Table_setItemClickAction]]
+*  `setItemClickAction()` 方法能够定义一个双击表格行时将执行的<<gui_Action,操作>>。如果未定义此操作，表格将尝试按以下顺序在其操作列表中查找适当的操作：
+
+** 由 `shortcut` 属性指定给 Enter 键的操作
+
+** `edit` 操作
+
+** `view` 操作
++
+如果找到此操作，并且操作具有 `enabled=true` 属性，则执行该操作。
+
+[[gui_Table_setEnterPressAction]]
+* `setEnterPressAction()` 方法可以定义按下 Enter 键时执行的<<gui_Action,操作>>。如果未定义此操作，则表将尝试按以下顺序在其操作列表中查找适当的操作：
++
+--
+** 由 `setItemClickAction()` 方法定义的动作
+
+** 由 `shortcut` 属性指定给 Enter 键的操作
+
+** `edit` 操作
+
+** `view` 操作
+
+如果找到此操作，并且操作具有 `enabled=true` 属性，则执行该操作。
+--
+
+[[gui_Table_setEmptyStateLinkClickHandler]]
+* `setEmptyStateLinkClickHandler` 提供一个处理器，当点击<<gui_Table_emptyStateLinkMessage,空状态链接消息>>之后会调用：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/table_setEmptyStateLinkClickHandler.java[]
+----
+
+`Table` 的展示可以使用带 `$cuba-table-*` 前缀的 SCSS 变量进行自定义。可以在创建一个 <<web_theme_extension,主题扩展>> 或者一个 <<web_theme_creation,自定义主题>> 之后在可视化编辑器里修改这些变量的值。
+
+'''
+
+table 的属性::
+<<gui_attr_align,align>> -
+<<gui_Table_aggregatable,aggregatable>> -
+<<gui_Table_aggregationStyle,aggregationStyle>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_Table_columnControlVisible,columnControlVisible>> -
+<<gui_Table_columnHeaderVisible,columnHeaderVisible>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_Table_allowPopupMenu,contextMenuEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_Table_editable,editable>> -
+<<gui_Table_emptyStateLinkMessage,emptyStateLinkMessage>> -
+<<gui_Table_emptyStateMessage,emptyStateMessage>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_id,id>> -
+<<gui_Table_multiLineCells,multiLineCells>> -
+<<gui_Table_multiselect,multiselect>> -
+<<gui_Table_presentations,presentations>> -
+<<gui_Table_reorderingAllowed,reorderingAllowed>> -
+<<gui_attr_settingsEnabled,settingsEnabled>> -
+<<gui_Table_showSelection,showSelection>> -
+<<gui_Table_sortable,sortable>> -
+<<gui_Table_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_attr_textSelectionEnabled,textSelectionEnabled>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+table 的元素::
+<<gui_Table_actions,actions>> -
+<<gui_Table_buttonsPanel,buttonsPanel>> -
+<<gui_Table_columns,columns>> -
+<<gui_Table_rows,rows>> -
+<<gui_Table_rowsCount,rowsCount>>
+
+<<gui_Table_columns,columns>> 元素的属性::
+<<gui_Table_columns_includeAll, includeAll>> -
+<<gui_Table_columns_exclude, exclude>>
+
+<<gui_Table_columns,column>> 元素的属性::
+<<gui_Table_column_align,align>> -
+<<gui_Table_column_caption,caption>> -
+<<gui_Table_column_captionProperty,captionProperty>> -
+<<gui_Table_column_collapsed,collapsed>> -
+<<gui_DateField_dateFormat,dateFormat>> -
+<<gui_Table_column_editable,editable>> -
+<<gui_Table_column_expandRatio,expandRatio>> -
+<<gui_Table_column_generator,generator>> -
+<<gui_Table_column_id,id>> -
+<<gui_Table_column_link,link>> -
+<<gui_Table_column_linkInvoke,linkInvoke>> -
+<<gui_Table_column_linkScreen,linkScreen>> -
+<<gui_Table_column_linkScreenOpenType,linkScreenOpenType>> -
+<<gui_Table_column_maxTextLength,maxTextLength>> -
+<<gui_attr_optionsDatasource,optionsDatasource>> -
+<<gui_DateField_resolution,resolution>> -
+<<gui_Table_column_sort,sort>> -
+<<gui_Table_column_sortable,sortable>> -
+<<gui_attr_visible,visible>> -
+<<gui_Table_column_width,width>>
+
+<<gui_Table_columns,column>>的元素::
+<<gui_Table_column_aggregation,aggregation>> -
+<<gui_Table_column_aggregation_formatter,formatter>>
+
+<<gui_Table_column_aggregation,aggregation>>的属性::
+<<gui_Table_column_aggregation_editable,editable>> -
+<<gui_Table_column_aggregation_strategyClass,strategyClass>> -
+<<gui_Table_column_aggregation,type>> -
+<<gui_Table_column_aggregation_valueDescription,valueDescription>>
+
+<<gui_Table_rows,rows>>的属性::
+<<gui_attr_datasource,datasource>>
+
+table 的预定义样式::
+<<gui_table_borderless,borderless>> -
+<<gui_table_compact,compact>> -
+<<gui_table_no-header,no-header>> -
+<<gui_table_no-horizontal-lines,no-horizontal-lines>> -
+<<gui_table_no-stripes,no-stripes>> -
+<<gui_table_no-vertical-lines,no-vertical-lines>> -
+<<gui_table_small,small>>
+
+API::
+<<gui_Table_addGeneratedColumn,addGeneratedColumn>> -
+<<gui_Table_addPrintable,addPrintable>> -
+<<gui_Table_ColumnCollapseListener,addColumnCollapseListener>> -
+<<gui_Table_SelectionListener,addSelectionListener>> -
+<<gui_api_settings,applySettings>> -
+<<gui_Table_generateCell,generateCell>> -
+<<gui_Table_getAggregationResults,getAggregationResults>> -
+<<gui_Table_getSelected,getSelected>> -
+<<gui_Table_requestFocus,requestFocus>> -
+<<gui_api_settings,saveSettings>> -
+<<gui_Table_scrollTo,scrollTo>> -
+<<gui_Table_AggregationDistributionProvider,setAggregationDistributionProvider>> -
+<<gui_Table_CellClickListener,setClickListener>> -
+<<gui_Table_setEmptyStateLinkClickHandler,setEmptyStateLinkClickHandler>> -
+<<gui_Table_setEnterPressAction,setEnterPressAction>> -
+<<gui_Table_setItemClickAction,setItemClickAction>> -
+<<gui_Table_setStyleProvider,setStyleProvider>>
+
+'''
+

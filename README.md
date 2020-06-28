@@ -32,6 +32,10 @@ In order to produce HTML from AsciiDoc, we use [Asciidoctor](https://asciidoctor
 
         gem install asciidoctor-pdf
         gem install prawn-gmagick 
+5. Non-Lating language such as chs:
+
+        gem install asciidoctor-pdf-cjk-kai_gen_gothic
+        asciidoctor-pdf-cjk-kai_gen_gothic-install
 
 `prawn-gmagick` should depend on the `graphicsmagick`, so need to install it such as use brew on Mac `rew install graphicsmagick`
 This package is used to convert some PNG images, or will get some WARN message like:

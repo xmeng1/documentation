@@ -1,0 +1,189 @@
+:sourcesdir: ../../../../../../source
+
+[[screen_layout_rules_positioning]]
+====== 组件位置
+
+[[screen_layout_rules_size]]
+尺寸类型::
++
+--
+<<gui_vcl,组件>>的大小：<<gui_attr_width,width>> 和 <<gui_attr_height,height>>，可以是以下几种类型：
+
+* 基于内容 - `AUTO`
+* 固定值（像素） - `10px`
+* 相对值（百分比） - `100%`
+
+image::cookbook/screen_layout_rules_1.png[align="center"]
+--
+
+[[screen_layout_rules_size_auto]]
+适应内容的尺寸::
++
+--
+组件将占用足够的空间以适应其内容。
+
+例如:
+
+* 对于 <<gui_Label,Label>>，大小由文本长度确定。
+* 对于<<gui_layouts,容器>>，大小由容器内所有组件的尺寸总和确定。
+
+[source, xml]
+.XML
+----
+<label width=”AUTO”/>
+----
+
+[source, java]
+.Java
+----
+label.setWidth(Component.AUTO_SIZE);
+----
+
+根据内容调整尺寸的组件将在界面布局初始化期间或内容尺寸更改时调整其尺寸。
+
+image::cookbook/screen_layout_rules_2.png[align="center"]
+--
+
+[[screen_layout_rules_size_fixed]]
+固定大小::
++
+--
+固定大小表示组件的尺寸在运行时不会改变。
+
+[source, xml]
+.XML
+----
+<vbox width=”320px” height=”240px”/>
+----
+
+[source, java]
+.Java
+----
+vbox.setWidth(”320px”);
+----
+
+image::cookbook/screen_layout_rules_3.png[align="center"]
+--
+
+[[screen_layout_rules_size_relative]]
+相对大小::
++
+--
+相对大小表示组件将按可用空间百分比来占用空间。
+
+[source, xml]
+.XML
+----
+<label width=”100%”/>
+----
+
+[source, java]
+.Java
+----
+label.setWidth(”50%”);
+----
+
+使用相对尺寸的组件会响应可用空间大小的变化，在界面上调整其实际大小。
+
+image::cookbook/screen_layout_rules_4.png[align="center"]
+--
+
+[[screen_layout_rules_container]]
+容器特性::
++
+--
+默认情况下，没有 <<gui_attr_expand,expand>> 属性的容器为所有内部嵌套的组件提供相等的空间。除了：<<gui_BoxLayout_flowBox,flowBox>> 和 <<gui_HtmlBoxLayout,htmlBox>>。
+
+例如:
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/screen_layout_rules_container.xml[]
+----
+
+image::cookbook/screen_layout_rules_7.png[align="center"]
+
+默认情况下，组件和容器的宽度和高度取决于其中的内容。一些容器有不同的默认尺寸：
+
+[options="header"]
+|===============
+|容器                               |宽   |高
+|<<gui_BoxLayout_vbox,VBox>>       |100% |AUTO
+|<<gui_GroupBoxLayout,GroupBox>>   |100% |AUTO
+|<<gui_BoxLayout_flowBox,FlowBox>> |100% |AUTO
+|===============
+
+根 *layout* 元素是一个垂直布局的容器（`VBox`），它的宽度和高度都是 100％。弹窗模式下的高度可以是 `AUTO`。
+
+<<gui_TabSheet,TabSheet>> 中的标签页是 VBox 容器。
+
+`GroupBox` 组件包含 `VBox` 或 `HBox`，具体取决于其 <<gui_GroupBox_orientation,orientation>> 属性值。
+
+自适应大小的容器示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/screen_layout_rules_container_2.xml[]
+----
+
+image::cookbook/screen_layout_rules_8.png[align="center"]
+
+具有相对尺寸的容器示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/screen_layout_rules_container_3.xml[]
+----
+
+image::cookbook/screen_layout_rules_9.png[align="center"]
+
+这里，`layout`，以及 `vbox` ( 或 `hbox` )，为所有内部嵌套组件提供相等的空间，`groupBox` 的高度为 100％。除此之外，`groupBox` 的宽度默认为 100％并占用所有可用空间。
+--
+
+[[screen_layout_rules_component]]
+组件特性::
++
+--
+建议为 <<gui_Table,Table>> 和 <<gui_Tree,Tree>> 设置绝对高度或相对高度。否则，如果行或节点太多，表和树会无限大。
+
+<<gui_ScrollBoxLayout,ScrollBox>> 必须具有固定或相对的（而不是 AUTO）宽度和高度。SrcollBox 内的组件，如果放置在滚动方向上，则不能有相对尺寸。
+
+以下示例展示了水平和垂直 `ScrollBox` 容器的正确用法。如果两个方向都需要滚动，则必须为组件设置 `height` 和 `width`（AUTO 或绝对值）。
+
+image::cookbook/screen_layout_rules_5.png[align="center"]
+--
+
+[[screen_layout_rules_expand]]
+扩展(expand)选项::
++
+--
+容器的 <<gui_attr_expand,expand>> 属性用来指定会被赋于最大可用空间的组件。
+
+指定为 `expand` 的组件在组件扩展方向上（对于 `VBox` 是垂直方向，对于 `HBox` 是水平方向）会占用其容器的所有剩余空间。更改容器大小时，这种组件会相应地调整自身大小。
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/screen_layout_rules_expand.xml[]
+----
+
+image::cookbook/screen_layout_rules_6.png[align="center"]
+
+`expand` 在对组件的扩展上也只是相对有效，例如，下面示例中宽度固定的 groupBox 不能横向扩展：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/screen_layout_rules_expand_2.xml[]
+----
+
+image::cookbook/screen_layout_rules_10.png[align="center"]
+
+在下面示例中，使用了一个起辅助作用的 <<gui_Label,Label>>（spacer）元素。由于将其指定为 `expand`，所以这个空标签占用了容器中剩余的所有空间。
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/screen_layout_rules_expand_3.xml[]
+----
+
+image::cookbook/screen_layout_rules_11.png[align="center"]
+--
+

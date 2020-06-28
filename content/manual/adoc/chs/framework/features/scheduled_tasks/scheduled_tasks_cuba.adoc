@@ -1,0 +1,23 @@
+:sourcesdir: ../../../../../source
+
+[[scheduled_tasks_cuba]]
+===== CUBA 计划任务
+
+*CUBA* 计划任务机制用于有计划地执行中间件中任意 Spring bean 方法。此机制的目标与上述标准 *Spring Framework* 调度程序的区别在于：
+
+* 能够在应用程序运行过程中时配置任务而无需重启服务。
+
+* 在中间件集群中协调单例任务的执行，提供以下功能：
+
+** 可有效地防止任务同时执行。
+
+** 按优先级将任务绑定到服务。
+
+_单例（singleton）_ 任务指在同一时刻只允许在一个服务上执行的任务。例如，从队列中读取并发送电子邮件的任务。
+
+include::scheduled_tasks_cuba/scheduled_tasks_cuba_reg.adoc[]
+
+include::scheduled_tasks_cuba/scheduled_tasks_cuba_control.adoc[]
+
+include::scheduled_tasks_cuba/scheduled_tasks_cuba_impl.adoc[]
+

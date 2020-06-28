@@ -1,0 +1,21 @@
+:sourcesdir: ../../../../../source
+
+[[entity_annotations]]
+===== 实体注解
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/annotation/package-summary.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+本节介绍平台支持的实体类和属性的所有注解。
+
+其中，<<jpa, JPA>> 的注解需要 `javax.persistence` 包依赖，框架中<<metadata_framework,元数据>>管理和其它机制则会使用 `com.haulmont.*` 包中的注解。
+
+在本手册中，如果注解的标识是一个简单的类名，那么指的是 `com.haulmont.*` 包中的框架类之一。
+
+include::entity_annotations/entity_class_annotations.adoc[]
+
+include::entity_annotations/entity_attr_annotations.adoc[]
+

@@ -1,0 +1,159 @@
+:sourcesdir: ../../../../../source
+
+[[jsComponent]]
+===== 通用 JavaScriptComponent
+
+++++
+<div class="manual-since-container">
+    <a href="http://files.cuba-platform.com/cuba/release-notes/7.0/" class="since-btn" target="_blank">
+        <span class="since-btn-caption">最低版本</span><span class="since-btn-version">7.0</span>
+    </a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=java-script-component" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+`JavaScriptComponent` 是个简单的 UI 组件，通过它可以使用任何纯 JavaScript 组件，并且这个 JavaSctipt 组件不需要对应的 Vaadin 实现。因此，通过这个组件可以很容易地在基于 CUBA 的项目中集成任何纯 JavaScript 组件。
+
+该组件可以在界面的 XML 描述中以声明的方式定义，因此可以在 XML 中配置动态属性和 JavaScript 依赖。
+
+该组件的 XML 名称： `jsComponent`。
+
+定义依赖::
++
+--
+可以为该组件定义一个依赖列表（JavaScript、CSS）。依赖可以从以下源获取：
+
+* <<using_webjars,WebJar 资源>> - 以 `webjar://` 开头。
+* VAADIN 目录下的文件 - 以 `vaadin://` 开头。
+* Web 资源 - 以 `http://` 或 `https://` 开头。
+
+如果依赖的类型不能从扩展中得知，需要在 XML 的 `type` 属性中指定类型或者传递 `DependencyType` 枚举值给 `addDependency()` 方法。
+
+在 XML 中定义依赖的示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui/js_component/jsComponent_1.xml[]
+----
+
+以编程方式添加依赖的示例：
+
+[source, java]
+----
+include::{sourcesdir}/gui/js_component/jsComponent_1.java[]
+----
+--
+
+定义初始化函数::
++
+--
+该组件需要一个初始化函数。此函数的名称用来查找 JavaScript 组件连接器（connector）的入口（见下例）。
+
+[WARNING]
+====
+初始化函数的名称在一个 WEB 浏览器窗口内必须唯一。
+====
+
+函数名称可以通过 `setInitFunctionName()` 方法传递给组件：
+
+[source, java]
+----
+include::{sourcesdir}/gui/js_component/jsComponent_2.java[]
+----
+--
+
+定义 JavaScript 连接器（connector）::
++
+--
+要使用 `JavaScriptComponent` 来包装 JavaScript 库，需要定义 JavaScript 连接器，其功能主要是初始化 JavaScript 组件并且处理服务端和 JavaScript 代码之间的通信。
+
+连接器函数中可以使用下面的方法：
+
+* `this.getElement()` 返回组件的 HTML DOM 元素。
+* `this.getState()` 返回与服务端同步的带有当前状态的共享状态对象。
+--
+
+组件功能::
++
+--
+`JavaScriptComponent` 组件有下列功能：
+
+* 设置一个状态对象，该对象可以在客户端层的 JavaScript 连接器中使用，并且可以通过组件状态的 `data` 字段访问，示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/js_component/jsComponent_3.java[]
+----
+
+* 注册一个函数，该函数可以在 JavaScript 中使用提供的名称进行调用，示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/js_component/jsComponent_4.java[]
+----
++
+[source, js]
+----
+this.valueChanged(values);
+----
+
+* 调用命名的函数，该函数由连接器的 JavaScript 代码添加到包装的对象中。
++
+[source, java]
+----
+include::{sourcesdir}/gui/js_component/jsComponent_5.java[]
+----
++
+[source, js]
+----
+include::{sourcesdir}/gui/js_component/jsComponent_6.js[]
+----
+--
+
+[[jsComponent_example]]
+JavaScriptComponent 使用示例::
++
+--
+本节介绍如何在基于 CUBA 的应用中集成第三方 JavaScript 库，使用 https://quilljs.com/ 的 Quill 富文本编辑器作为例子。请按照下面的步骤集成。
+
+. 在 *web* 模块添加以下依赖：
++
+[source, groovy]
+----
+compile('org.webjars.npm:quill:1.3.6')
+----
+
+. 在 web 模块的 `web/VAADIN/quill` 目录内创建 `quill-connector.js` 文件。
+
+. 在此文件内，添加连接器的实现：
++
+[source, js]
+----
+include::{sourcesdir}/gui/js_component/jsComponent_7.js[]
+----
+
+. 创建一个界面，包含以下 `jsComponent` 定义：
++
+[source, xml]
+----
+include::{sourcesdir}/gui/js_component/jsComponent_8.xml[]
+----
+
+. 添加下面的界面控制器实现：
++
+[source, java]
+----
+include::{sourcesdir}/gui/js_component/jsComponent_9.java[]
+----
+
+执行结果，界面中可以看到 Quill 富文本编辑器：
+
+image::jsComponent_example.png[align="center"]
+
+另一个集成自定义 JavaScript 组件的例子可以参阅 <<js_library_sample,>>。
+--

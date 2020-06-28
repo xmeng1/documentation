@@ -1,0 +1,18 @@
+:sourcesdir: ../../../source
+
+[[spring.xml]]
+=== spring.xml
+
+这个类型的文件为每个应用程序 <<app_tiers,block>> 配置 *Spring Framework* 的主容器。
+
+项目的 `spring.xml` 文件路径通过 <<cuba.springContextConfig,cuba.springContextConfig>> 应用程序属性指定。
+
+大多数主容器的配置都通过 bean 的注解完成（比如 `@Component`, `@Service`, `@Inject` 等等），因此项目中 spring.xml 的唯一必须部分就是定义 `context:component-scan` 元素，用来指定查找注解类的基本 Java 包名。示例：
+
+[source, xml]
+----
+<context:component-scan base-package="com.sample.sales"/>
+----
+
+其它的配置取决于容器配置的 block 本身，比如为 Middleware block 配置 <<jmx_beans,JMX-beans>>，或者为客户端 block 配置<<service_import,服务导入>>。
+

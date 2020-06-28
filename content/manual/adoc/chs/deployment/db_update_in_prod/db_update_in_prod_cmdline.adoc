@@ -1,0 +1,53 @@
+:sourcesdir: ../../../../source
+
+[[db_update_in_prod_cmdline]]
+==== 从命令行初始化和更新数据库
+
+可以使用平台的中间层 block 中包含的 `com.haulmont.cuba.core.sys.utils.DbUpdaterUtil` 类通过命令行运行数据库创建和更新脚本。在启动时，应指定以下参数：
+
+* `dbType` – <<dbms_types,数据库类型>>，可选值： postgres、mssql、oracle、mysql。
+
+* `dbVersion` – <<dbms_version,DBMS 版本>> (可选参数)。
+
+* `dbDriver` - JDBC 驱动程序类名(可选参数)。如果没有提供，将根据 `dbType` 确定合适的驱动程序类名。
+
+* `dbUser` – 数据库用户名。
+
+* `dbPassword` – 数据库用户密码
+
+* `dbUrl` – 连接数据库的 URL。对数据库的初始化来说，这里指定的数据库应该是空库，初始化程序不会自动清空数据库。
+
+* `scriptsDir` – 以标准目录结构包含脚本的文件夹的绝对路径。通常，这是应用程序提供的<<db_dir,数据库脚本目录>>。
+
+* 可用的命令：
+
+** `create` – 初始化数据库。
+
+** `check` – 显示所有未执行的更新脚本。
+
+** `update` – 更新数据库。
+
+运行 `DbUpdaterUtil` 的 Linux 脚本示例：
+
+[source, bash]
+----
+include::{sourcesdir}/database/dbupdate.sh[]
+----
+
+
+此脚本用于与本地 PostgreSQL 服务器上运行的名为 `mydb` 的数据库一起使用。此脚本应位于 Tomcat 服务的 `bin` 文件夹中，并且应该以 `{username}` 、 `{password}` 和 `{command}` 参数启动，例如：
+
+[source]
+----
+./dbupdate.sh cuba cuba123 update
+----
+
+
+脚本执行进度显示在控制台中。如果发生任何错误，则上一章节中针对自动更新机制所描述的操作在这里同样适用。
+
+
+[WARNING]
+====
+从命令行更新数据库时，会启动现有的 Groovy 脚本，但只会执行其主要部分。由于缺少服务的上下文，脚本的 `PostUpdate` 部分会被忽略同时输出相应信息到控制台。
+====
+

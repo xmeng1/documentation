@@ -1,0 +1,52 @@
+:sourcesdir: ../../../../../source
+
+[[polymer_build_and_structure]]
+===== 构建系统和项目结构
+Polymer 客户端构建链会使用以下工具：
+
+* https://nodejs.org/en/[Node.js]
+* https://bower.io/[bower]
+* https://github.com/Polymer/polymer-cli[polymer-cli]
+
+默认 Gradle 会处理这些工具的安装和调用。但是也可以直接使用这些工具，参考<<polymer_tools,使用原生 Polymer 工具>>。
+
+Polymer 2.x 和相应的原生元素都是用 ES6 标准编写的，因此需要一个额外的编译步骤（ES6 → ES5 ttps://polymer-library.polymer-project.org/2.0/docs/es6[编译]）来适应老的浏览器。
+
+[WARNING]
+====
+Polymer 客户端的默认 preset 是 `es6-unbundled`。意味着如果需要适配老浏览器进行生产环境部署，这个需要改为 `es5-bundled`。
+====
+
+修改构建 preset，打开 `polymer.json` 文件，修改 `builds` 属性内容，示例：
+
+[source,json]
+----
+  "builds": [
+    {
+      "preset": "es5-bundled",
+      "basePath": "/app-front/",
+      "addServiceWorker": false
+    }
+  ]
+----
+
+可以在 `polymer.json` 中设置多个 preset 或者自定义构建流程。参考 https://polymer-library.polymer-project.org/2.0/toolbox/build-for-production[Polymer 网站] 了解更多关于 preset 的信息以及编译选项。
+
+如果需要将特殊的 preset 编译结果部署到 Tomcat，需要修改 `build.gradle` 内的 `deploy` 任务：
+
+[source,groovy]
+----
+    task deploy(type: Copy, dependsOn: [assemble, deployUnbundled]) {
+        from file('build/es5-unbundled')
+        into "$cuba.tomcat.dir/webapps/$frontAppDir"
+    }
+----
+
+注意，`es6-bundled` → `es5-unbundled` 需要在 `polymer.json` 和 `build.gradle` 两处进行修改。
+
+include::polymer_build_and_structure/polymer_directory_structure.adoc[]
+
+include::polymer_build_and_structure/polymer_hot_deploy.adoc[]
+
+include::polymer_build_and_structure/polymer_tools.adoc[]
+

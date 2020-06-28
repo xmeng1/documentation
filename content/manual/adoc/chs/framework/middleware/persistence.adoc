@@ -1,0 +1,36 @@
+:sourcesdir: ../../../../source
+
+[[persistence]]
+==== 持久化接口
+
+`Persistence` 接口是<<orm,ORM>>层数据存储功能的入口。
+
+该接口有以下方法：
+
+* `createTransaction()` 、 `getTransaction()` – 获取管理<<transactions,事务>>的接口。该方法可以接受一个<<data_store,数据存储>>名称作为参数。如果不指定数据存储名称，则使用主数据存储。
+
+* `callInTransaction()` 、 `runInTransaction()` - 在新的事务中执行指定操作，操作可以有返回值，也可以没有。该方法可以接受一个<<data_store,数据存储>>名称作为参数。如果不指定数据存储，则使用主数据存储。
+
+* `isInTransaction()` – 检查当前是否有活动的事务。
+
+* `getEntityManager()` – 返回绑定到当前事务的<<entityManager,EntityManager>>实例。该方法可以接受一个<<data_store,数据存储>>名称作为参数。如果不指定数据存储，则使用主数据存储。
+
+* `isSoftDeletion()` – 检查是否启用了<<soft_deletion,软删除>>模式。
+
+* `setSoftDeletion()` – 启用或禁用软删除模式。设置此属性会影响所有新创建的 `EntityManager` 实例。默认启用软删除。
+
+* `getDbTypeConverter()` – 返回主数据存储或其它数据存储的<<dbTypeConverter,DbTypeConverter>>实例。
+
+* `getDataSource()` – 返回主数据存储或附加数据存储的 `javax.sql.DataSource` 实例。
++
+[WARNING]
+====
+对于通过 `getDataSource().getConnection()` 方法获得的所有 `javax.sql.Connection` 对象，在使用连接后，应在 `finally` 中调用 `close()` 方法。否则，连接不会被重新放回连接池。随着时间的推移连接池将溢出，应用程序将无法执行数据库查询。
+====
+
+* `getTools()` – 返回 `PersistenceTools` 接口的实例（见下文）。
+
+include::persistence/persistenceTools.adoc[]
+
+include::persistence/dbTypeConverter.adoc[]
+

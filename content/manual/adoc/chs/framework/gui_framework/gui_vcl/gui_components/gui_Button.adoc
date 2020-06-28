@@ -1,0 +1,205 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_Button]]
+====== 按钮
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-button" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/Button.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+当用户点击一个按钮，就会执行一个操作。
+
+image::Button.png[align="center"]
+
+该组件对应的 XML 名称： `button`
+
+按钮上可以有标题、图标、或者两者皆有。下面这个图列举了一些不同类型的按钮。
+
+image::gui_buttonTypes.png[align="center"]
+
+下面是从<<message_packs,本地化消息包>>获取文本显示到按钮和提示上的例子：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/button_1.xml[]
+---- 
+
+按钮上的标题是用 <<gui_attr_caption,caption>> 属性来设置，弹出提示用 <<gui_attr_description,description>> 来设置。
+
+[[gui_Button_disableOnClick]]
+如果 `disableOnClick` 属性设置成 `true` 这个按钮在点击之后就会变成不可点击的状态，主要用来防止多次（意外的）点击这个按钮。之后可以通过调用 `setEnabled(true)` 把按钮恢复成可点击状态。
+
+<<gui_attr_icon,icon>> 属性定义了图标的位置或者<<icon_set,图标集>>中的名称。详细信息请参看<<gui_icons,图标>>。
+
+创建带有图标的按钮的例子：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/button_2.xml[]
+----
+
+[[gui_Button_invoke]]
+按钮的主要功能是在点击的时候执行一个动作（action）。点击之后调用的控制器方法可以通过 `invoke` 属性来定义。这个属性的值需要是控制器的方法名，这个方法需要满足下面的条件：
+
+* 方法应该是 `public`。
+
+* 方法返回值是 `void`。
+
+* 方法不能有任何参数, 或者只能有一个 `Component` 组件类型的参数。 如果方法带有 `Component` 参数, 那么这个组件就是调用此方法的按钮实例。
+
+以下是按钮调用 `someMethod` 的例子：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/button_3.xml[]
+---- 
+
+在界面控制器里需要定义名称为 `someMethod` 的方法：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/button_4.java[]
+---- 
+
+[[gui_Button_action]]
+如果设置了 `action` 属性，那么就会忽略 `invoke` 属性。`action` 属性包含了按钮中相应<<gui_Action,操作>>的名称。
+
+带有 `action` 属性的按钮的例子:
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/button_5.xml[]
+---- 
+
+实现了 `Component.ActionsHolder` 接口的组件中的任何操作都可以指定给按钮。<<gui_Table,表格>>、 <<gui_GroupTable,分组表格>>、 <<gui_TreeTable,树形表格>>、 <<gui_Tree,树>>中的操作都可以指定给按钮。有两种添加操作的方法，一种是在 XML 描述中以声明的方式添加，另一种是在界面控制器里以编程的方式添加，这两种方式没有区别。不管使用哪种方式，在使用操作的时候，组件的名称和操作的标识符必须定义在 `action` 属性中，并且它们之间用 `.` 分隔。比如，下面的例子中，将 `coloursTable` 的 `create` 操作指定给一个按钮：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/button_6.xml[]
+---- 
+
+按钮的操作也可以通过编程创建，方法是在界面控制器中创建继承自<<baseAction,BaseAction>>的类。
+
+[TIP]
+====
+如果给 `Button` 定义了 `Action` 实例，那么按钮会从操作获取以下属性：<<gui_attr_caption,caption>>、<<gui_attr_description,description>>、<<gui_attr_icon,icon>>、<<gui_attr_enable,enable>>、<<gui_Button_shortcut,shortcut>>、<<gui_attr_visible,visible>>。其中 `caption` 、 `description` 和 `icon` 属性只有在 `Button` 本身没有设置时才会使用操作的对应属性，其它的 `Action` 的属性比 `Button` 的相同属性有更高的优先级。
+
+如果 `操作` 的属性在其被指定给 `Button` 之后发生了改变, 那么 `Button` 的相应属性也会跟着改变，也就是说按钮监听 `操作` 的变化。这种情况下，如果操作的 `caption` 、 `description` 和 `icon` 改变的话，即便按钮本身也定义了这些属性，这些属性还是会跟随操作的属性变化而变化。
+====
+
+[[gui_Button_shortcut]]
+`shortcut` 属性用来为按钮指定一个快捷键组合，使用字符串来定义。可选的功能键为：`ALT`、`CTRL`、`SHIFT`，使用 "-" 与其他键分隔。示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/button_8.xml[]
+----
+
+[[gui_Button_stylenames]]
+按钮样式::
++
+--
+`primary` 属性用来将按钮设置为高亮显示，默认情况下，如果这个按钮调用的操作的<<actions_primary,primary>>属性为 `true`，这个按钮会被设置为高亮显示。
+
+[source, xml]
+----
+<button primary="true"
+        invoke="foo"/>
+----
+
+这个高亮样式在 Hover 主题中是默认开启的；如果希望在 Halo-based 主题中使用 primary 样式，可以通过设置 `$cuba-highlight-primary-action`  <<web_theme_extension_common,样式变量>>为 `true` 来开启。
+
+image::actions_primary.png[align="center"]
+
+接下来，在使用了 Halo-based 主题的 Web Client 里，可以通过 `stylename` 属性来给按钮组件设置一些预定义的样式，可以通过 XML 或者编程的方法设置：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/button_7.xml[]
+----
+
+如果使用编程的方式来设置样式, 可以直接用 `HaloTheme` 主题类里面的以 `BUTTON_` 开头的一些主题常量：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/button.java[]
+----
+
+[[gui_button_borderless]]
+* `borderless` - 无边框的按钮。
+
+[[gui_button_borderless-colored]]
+* `borderless-colored` - 无边框但是具有彩色按钮标题。
+
+[[gui_button_danger]]
+* `danger` - 当按钮的操作比较危险时可以使用的一种警示按钮，比如会导致数据丢失或者其它不可撤消的操作。
+
+[[gui_button_friendly]]
+* `friendly` - 当按钮的操作比较安全的时候可以用的一种友好的按钮，比如不会导致数据丢失或者其它不可撤消的操作。
+
+[[gui_button_icon-align-right]]
+* `icon-align-right` - 将按钮的图标对齐在按钮名称的右侧。
+
+[[gui_button_icon-align-top]]
+* `icon-align-top` - 将按钮的图标放到按钮标题的上方。
+
+[[gui_button_icon-only]]
+* `icon-only` - 只显示按钮的图标，并且把按钮调整成正方形。
+
+[[gui_button_primary]]
+* `primary` - 主要的操作按钮，比如用户在填写表单时按下回车键的操作按钮。尽量少用，一般来说一个界面只有一个主要(primary)按钮。
+
+[[gui_button_quiet]]
+* `quiet` - "安静的" 按钮，跟 `borderless` 很像，只有在光标悬浮到这个按钮上面才会有样式变化。
+
+`Button` 的展示可以使用带 `$cuba-button-*` 前缀的 SCSS 变量进行自定义。可以在创建一个 <<web_theme_extension,主题扩展>> 或者一个 <<web_theme_creation,自定义主题>> 之后在可视化编辑器里修改这些变量的值。
+
+--
+
+'''
+
+按钮的属性::
+<<gui_Button_action,action>> -
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_css,css>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_Button_disableOnClick,disableOnClick>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_Button_invoke,invoke>> -
+<<gui_Button_shortcut,shortcut>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+按钮预定义的样式::
+<<gui_button_borderless,borderless>> -
+<<gui_button_borderless-colored,borderless-colored>> -
+<<gui_button_danger,danger>> -
+<<gui_button_friendly,friendly>> -
+<<gui_attr_stylename_huge,huge>> -
+<<gui_button_icon-align-right,icon-align-right>> -
+<<gui_button_icon-align-top,icon-align-top>> -
+<<gui_button_icon-only,icon-only>> -
+<<gui_attr_stylename_large,large>> -
+<<gui_button_primary,primary>> -
+<<gui_button_quiet,quiet>> -
+<<gui_attr_stylename_small,small>> -
+<<gui_attr_stylename_tiny,tiny>>
+
+'''
+

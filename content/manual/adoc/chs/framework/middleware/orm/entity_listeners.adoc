@@ -1,0 +1,88 @@
+:sourcesdir: ../../../../../source
+
+[[entity_listeners]]
+===== 实体监听器
+
+_实体监听器_ 目的在于响应<<app_tiers,中间层>>上的实体实例的生命周期事件。
+
+监听器是一个实现 `com.haulmont.cuba.core.listener` 包中的一个或多个接口的类。监听器将根据所实现的接口对相应的事件做出响应。
+
+BeforeDetachEntityListener::
++
+--
+`onBeforeDetach()` 方法在事务提交时对象从 <<entityManager,EntityManager>> 分离之前调用。
+
+此监听器可用于将非持久化实体属性发送到客户端层之前填充它们。
+--
+
+BeforeAttachEntityListener::
++
+--
+`onBeforeAttach()` 方法在执行了 `EntityManager.merge()` 操作后，对象附加到持久化上下文之前调用。
+
+例如，可以使用此监听器在将持久化实体属性保存到数据库之前填充它们。
+--
+
+BeforeInsertEntityListener::
+`onBeforeInsert()` 方法在将记录插入数据库之前调用。可以使用此方法中当前可用的 `EntityManager` 执行所有类型的操作。
+
+AfterInsertEntityListener::
+`onAfterInsert()` 方法在将记录插入数据库之后但在事务提交之前调用。此方法不允许修改当前持久化上下文，但是，可以使用 <<queryRunner,QueryRunner>> 实现对数据库的更改。
+
+BeforeUpdateEntityListener::
+`onBeforeUpdate()` 方法在记录更新到数据库中之前调用。可以使用此方法中当前可用的 `EntityManager` 执行所有类型的操作。
+
+AfterUpdateEntityListener::
+`onAfterUpdate()` 方法在将记录插入数据库之后但在事务提交之前调用。此方法不允许修改当前持久化上下文，但是，可以使用 <<queryRunner,QueryRunner>> 实现对数据库的更改。
+
+BeforeDeleteEntityListener::
+
+`onBeforeDelete()` 方法在从数据库中删除记录之前调用（在<<soft_deletion,软删除>>的情况下是在更新记录之前）。可以使用此方法中当前可用的 `EntityManager` 执行所有类型的操作。
+AfterDeleteEntityListener::
+`onAfterDelete()` 方法从数据库中删除记录后（在<<soft_deletion,软删除>>的情况下是在更新记录之后），但在事务提交之前调用。此方法不允许修改当前持久化上下文，但是，可以使用 `QueryRunner` 实现对数据库的更改。
+
+实体监听器必须是<<managed_beans,Spring Bean>>，因此可以在字段和 setters 方法上使用注入。对于特定类的所有实例，一种类型的监听器只会创建一个实例，因此监听器应该是无状态的。
+
+需要知道，对于 `BeforeInsertEntityListener`，框架只会保证传入监听器的根实体为<<entity_states,托管状态>>。该实体内对象关系图中其它对象的引用可能是 _游离（detached）_ 状态。所以如果需要更新这些对象，需要用 `EntityManager.merge()` 方法，或者使用 `EntityManager.find()` 来访问其所有属性。示例：
+
+[source, java]
+----
+include::{sourcesdir}/middleware/entitylisteners_1.java[]
+----
+
+除了 `BeforeAttachEntityListener` 之外，所有的监听器都在一个数据库事务中工作。也就是说，如果在监听器中抛出异常，当前事务会被回退，所有数据库的改动也会被丢弃。
+
+如果需要在事务提交成功之后做一些操作，可以使用 Spring 的 `TransactionSynchronization` 回调函数在事务完成之后执行任务。示例：
+
+[source, java]
+----
+include::{sourcesdir}/middleware/entitylisteners_3.java[]
+----
+
+[[entity_listeners_registration]]
+注册实体监听器::
++
+--
+
+可以通过两种方式为实体指定实体监听器：
+
+* 静态方式 – 监听器的 bean 名称列在实体类的 <<listeners_annotation,@Listeners>> 注解中。
++
+[source, java]
+----
+include::{sourcesdir}/middleware/entitylisteners_2.java[]
+----
+
+* 动态方式 – 将监听器的 bean 名称传递给 `EntityListenerManager`  bean 的 `addListener()` 方法。这种方法可以为应用程序组件中的实体添加监听器。在下面的例子中，为框架定义的 `User` 实体添加了一个监听器，监听器由 `sample_UserEntityListener` bean 实现：
++
+[source, java]
+----
+include::{sourcesdir}/middleware/entitylisteners_4.java[]
+----
+
+如果为一个实体声明了几个相同类型的监听器，有来自实体类及其父类的注解，还有动态添加的，则将按以下顺序调用它们：
+
+. 对于每个被继承对象，从最远的父级对象开始，首先调用动态添加的监听器，然后是静态分配的监听器。
+. 父类的调用完之后，首先调用给实体类动态添加的监听器，然后调用静态分配的。
+--
+

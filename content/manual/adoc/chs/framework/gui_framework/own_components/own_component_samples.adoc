@@ -1,0 +1,29 @@
+:sourcesdir: ../../../../../source
+
+[[own_component_samples]]
+===== 创建自定义可视化组件
+
+如<<own_components>>部分所述，可以在项目中扩展标准的可视化组件集。有以下几种方式：
+
+. 集成 Vaadin 扩展。许多第三方 Vaadin 组件作为扩展发布，可从 `https://vaadin.com/directory` 获取。
+
+. 集成 JavaScript 组件。可以使用 JavaScript 库创建 Vaadin 组件。
+
+. 使用 GWT 编写组件的客户端部分来创建新的 Vaadin 组件。
+
+此外，可以将生成的 Vaadin 组件集成到 CUBA 通用 UI 中，以便能够在界面 XML 描述中以声明的方式使用它并绑定到数据容器。
+
+集成的最后一步是在 Studio WYSIWYG 布局编辑器中支持新组件。
+
+本节提供了使用上述所有方法创建新可视化组件的示例。集成通用 UI 和提供 Studio 中的支持对于所有方法都是相同的，因此这方面的内容仅在基于 Vaadin 扩展创建新组件的章节进行了描述。
+
+include::own_component_samples/vaadin_addon_sample.adoc[]
+
+include::own_component_samples/vaadin_addon_sample_gui.adoc[]
+
+include::own_component_samples/js_library_sample.adoc[]
+
+include::own_component_samples/gwt_component_sample.adoc[]
+
+include::own_component_samples/own_component_in_studio.adoc[]
+

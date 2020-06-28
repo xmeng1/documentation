@@ -1,0 +1,21 @@
+:sourcesdir: ../../../../../../source
+
+[[config_interface_default_values]]
+====== 默认值
+
+可以为配置接口定义的属性指定默认值。如果未在存储位置（数据库或 `*app.properties` 文件）中设置该属性，则将返回这里定义的默认值而不是 `null`。
+
+可以使用 `@Default` 注解将默认值指定为字符串，或使用 `com.haulmont.cuba.core.config.defaults` 包中的其它注解将默认值指定为其它特定类型：
+
+[source, java]
+----
+include::{sourcesdir}/common/configinterface_6.java[]
+----
+
+实体的默认值是 `++{entity_name}-{id}-{optional_view_name}++` 格式的字符串，例如：
+
+[source, java]
+----
+include::{sourcesdir}/common/configinterface_7.java[]
+----
+

@@ -1,0 +1,33 @@
+:sourcesdir: ../../../../source
+
+[[unsupported_browser_page]]
+==== 不支持浏览器的界面
+
+如果应用程序不支持某个版本的浏览器，用户将会看到一个带有通知消息的标准界面，通知消息会建议升级浏览器并提供推荐的浏览器列表。
+
+用户只有升级了浏览器才能继续使用应用系统。
+
+.不支持浏览器界面
+image::unsupported_browser_page.png[align="center", width=800,height=600]
+
+可以修改或者本地化默认界面的内容。如果需要本地化该界面，可以在 *web* 模块的<<main_message_pack,主消息包>>中使用以下键值：
+
+* `unsupportedPage.captionMessage` – 通知消息标题；
+* `unsupportedPage.descriptionMessage` – 通知消息描述；
+* `unsupportedPage.browserListCaption` – 浏览器列表的标题；
+* `unsupportedPage.chromeMessage` – Chrome 浏览器的信息；
+* `unsupportedPage.firefoxMessage` – Firefox 浏览器的信息；
+* `unsupportedPage.safariMessage` – Safari 浏览器的信息；
+* `unsupportedPage.operaMessage` – Opera 浏览器的信息；
+* `unsupportedPage.edgeMessage` – Edge 浏览器的信息；
+* `unsupportedPage.explorerMessage` – Explorer 浏览器的信息。
+
+另外，整个界面也可以用自定义的模板替换：
+
+. 创建一个新的 `*.html` 文件模板。
+. 在 `web-app.properties` 文件中，使用 `cuba.web.unsupportedPagePath` 应用程序属性设置新模板的路径：
++
+[source, properties]
+----
+cuba.web.unsupportedPagePath = /com/company/sample/web/sys/unsupported-page-template.html
+----

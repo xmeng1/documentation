@@ -1,0 +1,18 @@
+:sourcesdir: ../../../../../../source
+
+[[query_from_selected]]
+====== 级联查询（Sequential Queries）
+
+`DataManager` 可以从之前的请求的结果中再次选择数据。此功能被<<gui_Filter,通用过滤器>>用在连续使用过滤器的场景。
+
+该机制的工作原理如下：
+
+* 如果提供一个定义了 `prevQueries` 和 `queryKey` 属性的 `LoadContext`，`DataManager` 将执行先前的查询并将检索到的实体的标识符保存在 `SYS_QUERY_RESULT` 表中（对应于 `sys$QueryResult` 实体），保存时会根据用户会话和查询会话的 `queryKey` 分隔记录集。
+
+* 修改当前查询以便与前一个查询的结果组合，这样能得到按照 AND 组合两个查询条件的结果。
+
+* 之后重复该过程。在这种情况下，逐渐减少的之前的结果集会被从 `SYS_QUERY_RESULT` 表中删除并重填。
+
+已经终止的用户会话在 `SYS_QUERY_RESULT` 表中留下的历史查询结果会被定期清理。这是由 `QueryResultsManagerAPI` bean 的 `deleteForInactiveSessions()` 方法完成的，该方法由 `cuba-spring.xml` 中定义的 Spring 调度程序调用。
+默认情况下，每 10 分钟执行一次，但可以使用 *core* 模块的 `cuba.deleteOldQueryResultsInterval` 应用程序属性按需要设置不同的时间间隔（以毫秒为单位）。
+

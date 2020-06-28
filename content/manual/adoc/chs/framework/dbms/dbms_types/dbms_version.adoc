@@ -1,0 +1,32 @@
+:sourcesdir: ../../../../../source
+
+[[dbms_version]]
+===== DBMS 版本
+
+除了 <<cuba.dbmsType,cuba.dbmsType>> 应用程序属性外，还有一个可选的<<cuba.dbmsVersion,cuba.dbmsVersion>>属性。数据库版本属性影响对 `DbmsFeatures` 、`SequenceSupport` 、 `DbTypeConverter` 的接口实现的选择，同时也影响对数据库初始化和更新脚本的搜索。
+
+这些集成接口实现类的名称结构如下：`<Type><Version><Name>`。这里 `Type` 是 `cuba.dbmsType` 属性的值（大写），`Version` 是 `cuba.dbmsVersion` 的值，`Name` 是接口名称。类的包必须与接口的包一致。如果这个名称的类不可用，则会尝试查找名称中不带版本的类：`<Type><Name>`。如果这样的类也不存在，则会抛出异常。
+
+例如，在平台中定义了 `com.haulmont.cuba.core.sys.persistence.Mssql2012SequenceSupport` 类。如果在项目中指定了以下属性，则此类会生效：
+
+[source, properties]
+----
+cuba.dbmsType = mssql
+cuba.dbmsVersion = 2012
+----
+
+对于<<db_scripts,数据库初始和更新脚本>>的搜索，`<type>-<version>` 目录优先于 `type` 目录。这意味着 `<type>-<version>` 目录中的脚本会代替 `<type>` 目录中具有相同名称的脚本。`<type>-<version>` 目录还可以包含一些具有唯一名称的脚本；它们也会被添加到公共的脚本集中以供执行。脚本按照路径排序，从 `<type>` 或 `<type>-<version>` 目录的第一个子目录开始，即不管脚本在哪个的目录（是否有版本）。
+
+例如，对于 Microsoft SQL Server 2012 之前和之后版本的数据库，其初始化脚本应如下所示：
+
+[source, properties]
+----
+modules/core/db/init/
+   mssql/
+       10.create-db.sql
+       20.create-db.sql
+       30.create-db.sql
+   mssql-2012/
+       10.create-db.sql 
+----
+

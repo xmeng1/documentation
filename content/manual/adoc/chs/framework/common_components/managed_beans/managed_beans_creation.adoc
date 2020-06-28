@@ -1,0 +1,29 @@
+:sourcesdir: ../../../../../source
+
+[[managed_beans_creation]]
+===== 创建 Spring bean
+
+如需创建 Spring bean，只需要在 Java 类添加 `@org.springframework.stereotype.Component` 注解。示例：
+[source, java]
+----
+include::{sourcesdir}/common/managedbean_1.java[]
+----
+
+建议为 bean 分配一个唯一的名称，按照 `++{project_name}_{class_name}++` 格式，并且用常量 `NAME` 定义。
+
+[TIP]
+====
+`@javax.annotation.ManagedBean` 注解也可以用来定义 bean，但是在部署应用至某些应用服务器的时候有可能会出问题。因此，建议只使用 Spring 框架的 `@Component` 注解。
+====
+
+Bean 的类定义需要放在 <<spring.xml,spring.xml>> 文件的 `context:component-scan` 元素指定的扫描目录树下。对于上面例子中的 bean，`spring.xml` 需要包含元素：
+
+[source, xml]
+----
+include::{sourcesdir}/common/managedbean_2.xml[]
+----
+
+也就是说，扫描此应用程序 block 中带注解的 bean 会从包的 `com.sample.sales` 目录开始。
+
+Spring bean 可以在任何<<app_tiers,层>>创建。
+

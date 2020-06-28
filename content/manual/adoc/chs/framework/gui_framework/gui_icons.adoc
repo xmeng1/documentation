@@ -1,0 +1,24 @@
+:sourcesdir: ../../../../source
+
+[[gui_icons]]
+==== 图标
+
+用于<<gui_Action,操作>>和可视化组件（如<<gui_Button,Button>>）的<<gui_attr_icon,icon>>属性的图像文件，可以被添加到主题扩展中。
+
+
+例如，要向 Halo 主题扩展添加图标，必须将图像文件添加到<<web_theme_extension>>部分描述的 `modules/web/themes/halo` 目录中（建议创建子文件夹）：
+
+[source, plain]
+----
+themes/
+  halo/
+    icons/
+      cool-icon.png
+----
+
+在以下章节中，我们将了解如何在可视化组件中使用图标以及如何从任意字体库添加图标。
+
+include::gui_icons/icon_set.adoc[]
+
+include::gui_icons/icon_provider.adoc[]
+

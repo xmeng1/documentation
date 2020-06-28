@@ -1,0 +1,38 @@
+:sourcesdir: ../../../../source
+
+[[system_authentication]]
+==== 系统身份验证
+
+执行用户请求时，中间件程序代码始终可以通过<<userSessionSource,UserSessionSource>>接口访问当前用户的信息。这是可能的，因为当从客户端层收到请求时，会自动为当前线程设置相应的<<securityContext,SecurityContext>>对象。
+
+但是，在某些情况下当前线程与任何系统用户都没有关联，例如，从<<scheduled_tasks_spring,定时任务>>或通过 JMX 接口调用 bean 的方法时。如果 bean 修改数据库中的实体，则需要实施更改的用户的信息，即身份验证。
+
+这种身份验证称为“系统身份验证”，因为它不需要用户参与 - 应用程序中间层只是创建或使用现有的用户会话，为当前线程设置相应的 `SecurityContext` 对象。
+
+可以使用以下方法为代码块提供系统身份验证：
+
+* 使用 `com.haulmont.cuba.security.app.Authentication` bean:
++
+[source, java]
+----
+include::{sourcesdir}/middleware/auth_1.java[]
+----
+
+* 在 bean 的方法上添加 `@Authenticated` 注解:
++
+[source, java]
+----
+include::{sourcesdir}/middleware/auth_2.java[]
+----
+
+第二种情况通过 `AuthenticationInterceptor` 对象隐式使用 `Authentication` bean，该对象拦截所有 `@Authenticated` 注解 bean 方法。
+
+在上面的示例中，将代表一个用户创建用户会话，该用户的登录名在<<cuba.jmxUserLogin,cuba.jmxUserLogin>>应用程序属性中指定。如果需要代表另一个用户进行身份验证，请将所需用户的登录名传递给第一种变体的 `begin()` 方法。
+
+[WARNING]
+====
+如果当前线程在执行 `Authentication.begin()` 时已分配了激活的用户会话，则不会进行替换。因此代码将使用现有会话执行，随后调用 `end()` 方法将不会清空线程里的会话。
+
+例如，如果 bean 与用户当前连接的 Web 客户端 block 位于同一 JVM 中，则执行内置<<jmx_console,JMX console>>的 Web 客户端对 JMX bean 方法的调用将使用当前登录的用户的信息，而忽略系统身份验证。
+====
+

@@ -1,0 +1,21 @@
+:sourcesdir: ../../../../../../source
+
+[[datasource_custom_class]]
+====== 自定义实现类
+
+[WARNING]
+====
+这是旧版本的 API。对于从 7.0 开始的新 API，请参阅 <<gui_data>>。
+====
+
+如果需要实现使用自定义方法来加载实体，可以创建自定义的数据源类，从 `CustomCollectionDatasource`，`CustomGroupDatasource`, 或者 `CustomHierarchicalDatasource` 继承，然后实现 `getEntities()` 方法。
+
+示例：
+
+[source, java]
+----
+include::{sourcesdir}/gui/datasources_5.java[]
+---- 
+
+还可以通过声明的方式创建自定义数据源，在数据源的 XML 元素中，通过 `datasourceClass` 属性指定自定义的类名即可。通过 `DsBuilder` 类采用编程的方式创建的话，使用 `setDsClass()` 方法来指定自定义类，或者在 `build*()` 方法中将类以参数的形式传入。
+

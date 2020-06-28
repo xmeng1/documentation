@@ -1,0 +1,43 @@
+:sourcesdir: ../../../source
+
+[[web.xml]]
+=== web.xml
+
+`web.xml` 是 Java web 应用程序的标准描述文件。需要为 Middleware、web 客户端以及 Web Portal 客户端 block 创建此文件。
+
+在一个应用程序项目中，`web.xml` 文件在相应<<app_modules,模块>>的 `web/WEB-INF` 目录。
+
+* Middleware block（*core* 项目模块）的 `web.xml` 文件有如下内容：
++
+--
+[source, xml]
+----
+include::{sourcesdir}/config_files/web_1.xml[]
+----
+
+`context-param` 元素定义了当前 web 应用程序 `ServletContext` 对象的初始化参数。<<app_components,应用程序组件>>列表定义在 `appComponents` 参数，<<app_properties_files,应用程序属性文件>>列表定义在 `appPropertiesConfig` 参数。
+
+`listener` 元素定义了实现 `ServletContextListener` 接口的监听类。Middleware block 使用 `AppContextLoader` 类作为监听器。这个类初始化了 <<appContext,AppContext>>。
+
+然后是 Servlet 描述，包括 `RemotingServlet` 类，对于 Middleware block 来说，这是必须的。这个 servlet 可以通过 `++/remoting/*++` URL 来访问，跟远程访问容器相关联，参考 <<remoting-spring.xml,>>。
+--
+
+* Web 客户端 block（*web* 项目模块）的 `web.xml` 文件有如下内容：
++
+--
+[source, xml]
+----
+include::{sourcesdir}/config_files/web_2.xml[]
+----
+
+在 `context-param` 元素中，定义了<<app_components,应用程序组件>>列表和<<app_properties_files,应用程序属性文件>>列表。
+
+Web 客户端 block 使用 `WebAppContextLoader` 类作为 `ServletContextListener`。
+
+`JSR356WebsocketInitializer` 是支持 WebSockets 协议需要的监听器。
+
+`CubaApplicationServlet` 提供了基于 Vaadin 框架实现的<<gui_framework,通用用户界面>>。
+
+`CubaDispatcherServlet` 为 Spring MCV 控制器初始化了一个额外的 Spring context。这个 context 通过 <<dispatcher-spring.xml,>> 文件来配置。
+--
+

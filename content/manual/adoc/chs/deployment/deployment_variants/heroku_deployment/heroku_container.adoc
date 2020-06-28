@@ -1,0 +1,89 @@
+:sourcesdir: ../../../../../source
+
+[[heroku_container]]
+===== 部署容器至 Heroku
+
+按照<<docker_deployment>>章节介绍的内容配置单一 UberJAR。创建 Heroku 账号然后安装 Heroku CLI，可以参考<<heroku_war_deployment,部署 WAR 至 Heroku>> 章节。
+
+用以下命令创建应用程序并且连接数据库
+
+[source, plain]
+----
+heroku create cuba-sales-docker --addons heroku-postgresql:hobby-dev
+----
+
+等这个任务完成之后需要在 `jetty-env.xml` 文件中配置 Heroku 创建的数据库连接的用户名和密码。
+
+. 浏览器打开 https://dashboard.heroku.com 。
+. 选择创建的项目，打开 *Resources* 标签页，选择数据库。
+. 在新打开的窗口中，打开 *Settings* 标签页并且点击 *View Credentials* 按钮。
+
+image::heroku-db.png[Db,1200,1000]
+
+[[jetty-env]]
+切换到 IDE 打开 `jetty-env.xml` 文件。修改 URL（host 和数据库名称），用户名和密码。从网页拷贝用户名和密码到这个文件。
+
+[source, xml]
+----
+include::{sourcesdir}/deployment/jetty-env.xml[]
+----
+
+执行以下 Gradle 任务创建单一 Uber JAR：
+
+[source, plain]
+----
+gradle buldUberJar
+----
+
+另外，需要对 `Dockerfile` 进行一些修改。首先，如果使用的是 Heroku 的免费账号，需要限制应用程序使用的内存大小；然后需要从 Heroku 获得应用程序的端口号并添加到镜像中。
+
+修改后的 `Dockerfile` 示例：
+
+[source, plain]
+----
+### Dockerfile
+
+FROM openjdk:8
+
+COPY . /usr/src/cuba-sales
+
+CMD java -Xmx512m -Dapp.home=/usr/src/cuba-sales/home -jar /usr/src/cuba-sales/app.jar -port $PORT
+----
+
+通过下面的命令设置 Git：
+
+[source, plain]
+----
+git init
+heroku git:remote -a cuba-sales-docker
+git add .
+git commit -am "Initial commit"
+----
+
+登录容器仓库，是 Heroku 存储镜像的地址：
+
+[source, plain]
+----
+heroku container:login
+----
+
+接下来，构建镜像并推送到容器仓库：
+
+[source, plain]
+----
+heroku container:push web
+----
+
+这里 `web` 是应用程序的处理类型（process type）。当执行这个命令的时候，Heroku 默认会使用当前目录的 `Dockerfile` 来构建镜像，然后把镜像推送到 Heroku。
+
+当部署流程完成后，可以通过浏览器打开类似这样的 URL https://cuba-sales-docker.herokuapp.com/app 访问应用。
+
+或者可以通过 Heroku dashboard 的 *Open app* 按钮打开应用。
+
+打开运行中应用的第三种方式是使用如下命令（链接最后需要添加 `app`， https://cuba-sales-docker.herokuapp.com/app ）：
+
+[source, plain]
+----
+heroku open
+----
+

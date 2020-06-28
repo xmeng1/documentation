@@ -1,0 +1,106 @@
+:sourcesdir: ../../../../source
+
+[[datasources]]
+==== 数据源（历史版本）
+
+[WARNING]
+====
+这是旧版本 API。从 v7.0 开始的新数据 API 请参考 <<gui_data>>。
+====
+
+数据源为数据感知组件提供数据。
+
+可视化组件本身并不访问 Middleware 中间件：它们从关联的数据源中获得实体实例。还有，如果多个可视化组件需要相同的一组实例，此时一个数据源可以跟多个可视化组件关联工作。
+
+* 当用户在组件中改变一个值的时候，这个新的值会被设置到数据源中实体的对应属性。
+
+* 当实体属性的值在代码中被修改，新的值会展示到可视化组件中。
+
+* 用户输入可以通过两种方式监听，一种是<<datasource_listeners,数据源监听器>>，另一种是组件的值监听器 - 这两个监听器会按照顺序接收到事件。
+
+* 需要在应用代码中读写属性的值，推荐使用数据源，而不是组件本身。以下是一个读取属性值的示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/datasources_1.java[]
+---- 
++
+从这个例子可以看出，通过组件获取实体属性值并不是那么直接。在第一个通过组件获取值的例子中，除了需要做类型转换之外，还需要通过一个字符串来指定 <<gui_FieldGroup,FieldGroup>> 中的 `id`。第二个例子更加安全和直接，但是需要知道<<screen_controller_injection,注入>>的控件的准确类型。最后一个例子就最简单了。如果实例是从数据源通过 `getItem()` 方法获取到，则可以直接读取和修改里面的属性值。
+
+数据源也会跟踪内部包含的实体的改动，之后可以将改动后的实体实例发送回中间件从而保存在数据库。
+
+[WARNING]
+====
+典型的场景中，一个可视化组件通常跟数据源中实体的一个直接属性进行绑定。比如上面的例子中，组件绑定到 `Order` 实体的 `customer` 属性。
+
+但是组件也可以跟关联实体的一个属性进行绑定，比如 `customer.name`。在这种情况下，这个组件会显示 `name` 属性的值，但是当用户更改值的时候，数据源监听器不会被调用而且改动也不会被保存。因此，只有在用来做数据展示的时候，绑定组件到实体的第二级属性才有意义。比如在<<gui_Label,标签>>，<<gui_Table,表格>>的列, 或者在<<gui_TextField,文本控件>>中当 `editable = false` 不让编辑的时候。
+====
+
+以下介绍数据源的基础接口。
+
+.数据源接口
+image::Datasources.png[align="center"]
+
+* http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/data/Datasource.html[Datasource] 是一个简单的数据源，用来绑定一个实体实例。实例通过 `setItem()` 方法设置，通过 `getItem()` 方法访问。
++
+`DatasourceImpl` 类是这种数据源的标准实现，这个类会用在比如说实体的<<screen_edit,编辑界面>>，作为主数据源。
+
+* http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/data/CollectionDatasource.html[CollectionDatasource] 是一个绑定实体实例集合的数据源。数据集合会通过调用 `refresh()` 方法加载，实例的主键可以通过 `getItemIds()` 方法访问。`setItem()` 方法只能设置集合中“当前”的实例，并且通过 `getItem()` 方法获取这个实例（比如，跟当前选中的表格中一行对应的实例）。
++
+根据具体实现决定加载数据集合的方式。最典型的方式是通过 <<dataManager,DataManager>> 从 Middleware 加载；这样的话，使用 `setQuery()`，`setQueryFilter()` 来组建 JPQL 查询。
++
+`CollectionDatasourceImpl` 类是这种数据源的标准实现，使用在带有实体列表的界面。
+
+** http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/data/GroupDatasource.html[GroupDatasource] 是 `CollectionDatasource` 的子类型，用来跟 <<gui_GroupTable,GroupTable>> 组件一起工作。
++
+这种数据源的标准实现是 `GroupDatasourceImpl` 类。
+
+** http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/data/HierarchicalDatasource.html[HierarchicalDatasource] 是 `CollectionDatasource` 的子类型，用来跟 <<gui_Tree,Tree>> 和 <<gui_TreeTable,TreeTable>> 组件一起工作。
++
+这种数据源的标准实现是 `HierarchicalDatasourceImpl` 类。
+
+* http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/data/NestedDatasource.html[NestedDatasource] 是一个用来绑定实体中关联到实体的属性加载对应的实例的数据源。这样的话，那个绑定父实体的数据源可以通过 `getMaster()` 方法访问；包含这个数据源对应实例的那个父属性的<<metaProperty,元属性>>可以通过 `getProperty()` 方法访问。
++
+比如一个 `Order` 实例包含了指向 `Customer` 实例的引用，`Order` 实例通过 `dsOrder` 数据源绑定。然后，如需绑定 `Customer` 实例到可视化组件，只需创建以 `dsOrder` 为父数据源的 `NestedDatasource`，并且创建 meta property 指向 `Order.customer` 属性。
+
+** http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/data/PropertyDatasource.html[PropertyDatasource] 是 `NestedDatasource` 的子类型，用来跟单实例或者没有嵌套关系的关联实体集合绑定。
++
+标准实现：跟单实例绑定 - `PropertyDatasourceImpl`。跟集合绑定 - `CollectionPropertyDatasourceImpl`, `GroupPropertyDatasourceImpl`, `HierarchicalPropertyDatasourceImpl`。跟集合绑定的数据源同时还实现了 `CollectionDatasource` 接口，但是 `CollectionDatasource` 接口中一些不相关、不支持的方法比如 `setQuery()` 会直接抛出 `UnsupportedOperationException` 异常。
+
+** http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/data/EmbeddedDatasource.html[EmbeddedDatasource] 是 `NestedDatasource` 的子类型，包含了一个嵌套实体的实例。
++
+标准实现是 `EmbeddedDatasourceImpl` 类。
+
+* http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/data/RuntimePropsDatasource.html[RuntimePropsDatasource] 是个特殊的数据源，用来操作实体的<<dynamic_attributes,动态属性>>。
+
+一般情况下，数据源在<<screen_xml,界面描述文件>>的 `dsContext` 部分声明。
+
+[[datasource_auto_refresh]]
+CollectionDatasource 自动刷新::
++
+--
+当界面打开时，连接到集合数据源的可视化组件促使数据源加载数据。结果会使得<<gui_Table,表格>>在界面打开之后马上就能显示数据而不需要用户的任何特定的操作。如果需要阻止数据源集合的自动加载，可以设置界面参数 `DISABLE_AUTO_REFRESH` 为 `true`，一种是在界面的 `init()` 方法中设置，另一种是通过调用者代码传递。这个界面参数定义在 `WindowParams` 枚举类型内，所以可以通过下面方式设置：
+
+[source, java]
+----
+@Override
+public void init(Map<String, Object> params) {
+    WindowParams.DISABLE_AUTO_REFRESH.set(params, true);
+}
+----
+
+在这种情况下，界面的集合数据源只有当它们的 `refresh()` 方法被调用时才会加载数据。可以通过应用代码调用或者当用户在<<gui_Filter,过滤器>>组件点击 *Search* 按钮时触发。
+--
+
+include::datasources/datasource_creation.adoc[]
+
+include::datasources/datasource_query.adoc[]
+
+include::datasources/value_datasources.adoc[]
+
+include::datasources/datasource_listeners.adoc[]
+
+include::datasources/dsContext.adoc[]
+
+include::datasources/dataSupplier.adoc[]
+

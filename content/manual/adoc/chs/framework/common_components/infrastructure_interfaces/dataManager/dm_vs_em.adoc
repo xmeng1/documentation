@@ -1,0 +1,47 @@
+:sourcesdir: ../../../../../../source
+
+[[dm_vs_em]]
+====== DataManager 与 EntityManager
+
+<<dataManager,DataManager>>和<<entityManager,EntityManager>>都可以用于实体的 CRUD 操作。这两个接口之间存在以下差异：
+
+|===
+|DataManager |EntityManager
+
+|DataManager 在中间层和客户端<<app_tiers,层>>都可用。
+|EntityManager 仅在中间层可用。
+
+|DataManager 是一个单例 bean。它可以通过 `AppBeans.get()` 注入或获取。
+|应该通过<<persistence,Persistence>>接口获取 EntityManager 的引用。
+
+|DataManager 定义了一些使用<<entity_states,游离>>实体的高级方法： `load()`、`loadList()`、`reload()`、`commit()`。
+|EntityManager 与标准的 `javax.persistence.EntityManager` 非常相似。
+
+|DataManager 在保存实体是可以进行 <<bean_validation,bean 验证>>。
+|EntityManager 不进行 bean 验证。
+
+|===
+
+实际上，DataManager 委托给<<data_store,DataStore>>实现，因此下面列出的 DataManager 功能仅适用于处理关系型数据库中的实体最常见的情况：
+
+|===
+|DataManager |EntityManager
+
+|DataManager 始终在内部启动新的<<transactions,事务>>。在中间层，如果需要实现复杂的事务行为，可以使用 <<transactionalDataManager,TransactionalDataManager>>。
+|在使用 EntityManager 之前，必须先打开一个事务。
+
+|DataManager 根据<<views,视图>>加载 _部分_ 实体。也有一些例外，详细信息请参阅<<dm_partial_entities,这里>>。
+|EntityManager 加载所有本地属性。如果指定了视图，则仅影响引用属性。详情请参阅<<em_partial_entities,这里>>。
+
+|DataManager 仅执行 JPQL 查询。此外，它有单独的加载实体的方法：`load()`、`loadList()`; 加载标量值和聚合值的方法： `loadValues()`。
+|EntityManager 可以运行任何 JPQL 或原生（SQL）查询。
+
+|在客户端层调用时，DataManager 会检查<<dm_security,安全>>限制。
+|EntityManager 不会应用安全限制。
+
+|===
+
+在客户端层处理数据时，只有一个选择 - `DataManager`。在中间件层，当需要在事务内部实现某些原子逻辑或者 `EntityManager` 接口更适合该任务时，请使用 `TransactionalDataManager`。通常来说，在中间件上两者都可以使用。
+
+如果需要在客户端层克服 `DataManager` 的一些限制，可创建自己的<<services,服务>>并使用 `TransactionalDataManager` 或 `EntityManager` 来处理数据。在服务中，可以使用<<security,Security>>接口检查权限，并以持久化实体、非持久化实体或任意值的形式将数据返回到客户端。
+

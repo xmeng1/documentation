@@ -1,0 +1,108 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_HtmlBoxLayout]]
+====== HTML 盒子布局
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=html-box" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/HtmlBoxLayout.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`HtmlBoxLayout` 是一个可以在 HTML 模板中定义组件位置的容器。布局模板包含在一个<<gui_themes,主题>>中。
+
+[TIP]
+====
+不要将 `HtmlBoxLayout` 用于动态内容或嵌入 JavaScript 代码，如需要的话，请使用 <<gui_BrowserFrame,BrowserFrame>>。
+====
+
+该组件的 XML 名称：`htmlBox`
+
+下面是一个使用 `htmlBox` 的简单界面的例子。
+
+image::gui_htmlBox_1.png[align="center"]
+
+界面的 XML 描述：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/htmlBox_1.xml[]
+----
+
+`htmlBox` 的属性:
+
+[[gui_htmlBox_template]]
+* `template` 属性定义了一个位于主题的 `layouts` 子目录中的 HTML 文件的名称。在创建模板之前，应该创建<<web_theme_extension,主题扩展>>或<<web_theme_creation,自定义主题>>。
++
+--
+例如，如果使用 Halo 主题并且 `template` 属性是 `my_template`，
+那么模板文件应该是 `modules/web/themes/halo/layouts/my_template.html`。
+
+HTML 模板的内容在 `modules/web/themes/halo/layouts/sample.html` 文件中：
+
+[source, html]
+----
+include::{sourcesdir}/gui_vcl/htmlBox_2.html[]
+----
+
+模板应包含带有 `location` 属性的 `<div>` 元素。这些元素将显示 XML 描述中定义的有相应标识符的 CUBA 组件。
+
+`modules/web/themes/halo/com.company.application/halo-ext.scss` 文件的内容如下（要创建文件请参阅 <<web_theme_extension>> ）：
+
+[source, css]
+----
+include::{sourcesdir}/gui_vcl/htmlBox_3.scss[]
+----
+--
+
+[[gui_htmlBox_templateContents]]
+* `templateContents` 属性设置了模板的内容，用于直接定义布局。
++
+--
+例如:
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/htmlBox_4.xml[]
+----
+--
+
+'''
+
+htmlBox 的属性::
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_id,id>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_htmlBox_template,template>> -
+<<gui_htmlBox_templateContents,templateContents>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+API::
+<<gui_api_add,add>> -
+<<gui_api_getComponent,getComponent>> -
+<<gui_api_getComponentNN,getComponentNN>> -
+<<gui_api_getComponents,getComponents>> -
+<<gui_api_getOwnComponent,getOwnComponent>> -
+<<gui_api_getOwnComponents,getOwnComponents>> -
+<<gui_api_remove,remove>> -
+<<gui_api_removeAll,removeAll>>
+
+'''
+

@@ -1,0 +1,26 @@
+:sourcesdir: ../../../../../source
+
+[[main_message_pack]]
+===== 主语言消息包
+
+
+每个标准的应用程序 <<app_tiers,block>> 都应该有它自己的 _主(main)_ 消息包。对于客户端层的 block，主消息包包含主菜单条目和常用的 ui 元素名称（例如，*ok* 和 *cancel* 按钮的名称）。主程序包还决定所有应用程序模块（包括中间层）的<<datatype,数据类型>>转换格式。
+
+<<cuba.mainMessagePack,cuba.mainMessagePack>> 应用程序属性用于指定主消息包。其属性值可以是单个包或由空格分隔的包名列表。例如：
+
+[source, properties]
+----
+cuba.mainMessagePack=com.haulmont.cuba.web com.abc.sales.web
+----
+
+
+在这种情况下，列表第二个包的消息将覆盖第一个包中的消息。因此，可以在应用程序项目覆盖<<app_components,应用程序组件>>中定义的消息。
+
+
+通过在项目的主消息包中指定新消息也可以覆盖 CUBA 基础项目中已存在的消息。
+
+[source, plain]
+----
+com.haulmont.cuba.gui.backgroundwork/backgroundworkprogress.timeoutmessage = overridden error message
+----
+

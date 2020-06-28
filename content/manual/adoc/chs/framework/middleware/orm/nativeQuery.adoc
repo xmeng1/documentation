@@ -1,0 +1,42 @@
+:sourcesdir: ../../../../../source
+
+[[nativeQuery]]
+===== 执行 SQL 查询
+
+ORM 允许执行返回个别字段列表或实体实例的 SQL 查询。为此，通过调用 `EntityManager.createNativeQuery()` 方法创建 `Query` 或 `TypedQuery` 对象。
+
+如果选择了个别列，则结果列表中每行的类型为 `Object[]`。例如：
+
+[source, java]
+----
+include::{sourcesdir}/middleware/sqlquery_1.java[]
+----
+
+如果选择了单个列或聚合函数，结果列表将直接包含这些值：
+
+[source, java]
+----
+include::{sourcesdir}/middleware/sqlquery_3.java[]
+----
+
+如果要生成的实体类型与查询语句一起传递给 `EntityManager.createNativeQuery()`，则返回 `TypedQuery` 对象，并且 ORM 尝试将查询结果映射到相应的实体属性。例如：
+
+[source, java]
+----
+include::{sourcesdir}/middleware/sqlquery_2.java[]
+----
+
+在使用 SQL 时需要注意，对应于 `UUID` 类型的实体属性的列将以 `UUID` 类型或 `String` 类型返回，具体取决于所使用的 DBMS：
+
+* *HSQLDB* – `String`
+* *PostgreSQL* – `UUID`
+* *Microsoft SQL Server* – `String`
+* *Oracle* – `String`
+* *MySQL* – `String`
+
+此类型的参数也应该以 `UUID` 或字符串格式传递，具体取决于 DBMS。要确保代码不依赖于 DBMS 细节，请使用 `DbTypeConverter` ，它提供了在 Java 对象与 JDBC 参数和结果之间转换数据的方法。
+
+原生查询语句支持位置和命名参数。位置参数在查询语句中以 ? 标记，后而跟从 1 开始的参数序号。命名参数用数字符号（#）标记。请参阅上面的示例。
+
+与当前持久化上下文相关的返回实体的 SQL 查询和修改查询（`update` 、 `delete`）的行为类似于上面描述的<<query,JPQL 查询>>。
+

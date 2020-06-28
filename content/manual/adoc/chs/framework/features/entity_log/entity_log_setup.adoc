@@ -1,0 +1,37 @@
+:sourcesdir: ../../../../../source
+
+[[entity_log_setup]]
+===== 配置实体日志
+
+配置实体日志的最简单方法是使用 *Administration > Entity Log > Setup* 应用程序界面。
+
+如果要将配置包含在<<db_scripts,数据库初始化脚本>>中，还可以通过在数据库中添加一些记录来配置实体日志。
+
+使用 `LoggedEntity` 实体和 `LoggedAttribute` 实体配置日志记录，分别对应于数据库的 *SEC_LOGGED_ENTITY* 表和 *SEC_LOGGED_ATTR* 表。
+
+`LoggedEntity` 定义了需要记录日志的实体类型。`LoggedEntity` 具有以下属性：
+
+* `name` ( *NAME* 列) – 实体<<metaClass,元类>>名称，例如 `sales_Customer`。
+
+* `auto` ( *AUTO* 列) – 定义当使用 `auto = true` 参数调用 EntityLogAPI 时（即通过<<entity_listeners,实体监听器>>调用）系统是否应记录变更。
+
+* `manual` ( *MANUAL* 列) – 定义当使用 `auto = false` 参数调用 `EntityLogAPI` 时系统是否应记录更改。
+
+`LoggedAttribute` 定义要记录的实体属性，并包含指向 `LoggedEntity` 的链接和属性名称。
+
+要为某个实体配置日志记录，应将相应的配置项添加到 *SEC_LOGGED_ENTITY* 和 *SEC_LOGGED_ATTR* 表中。例如，使用以下语句将记录 `Customer` 实体的 `name` 和 `grade` 属性的更改：
+
+[source, sql]
+----
+insert into SEC_LOGGED_ENTITY (ID, CREATE_TS, CREATED_BY, NAME, AUTO, MANUAL)
+values ('25eeb644-e609-11e1-9ada-3860770d7eaf', now(), 'admin', 'sales_Customer', true, true);
+
+insert into SEC_LOGGED_ATTR (ID, CREATE_TS, CREATED_BY, ENTITY_ID, NAME)
+values (newid(), now(), 'admin', '25eeb644-e609-11e1-9ada-3860770d7eaf', 'name');
+
+insert into SEC_LOGGED_ATTR (ID, CREATE_TS, CREATED_BY, ENTITY_ID, NAME)
+values (newid(), now(), 'admin', '25eeb644-e609-11e1-9ada-3860770d7eaf', 'grade');
+----
+
+默认情况下会激活日志记录机制。如果要停止它，请设置 `app-core.cuba:type=EntityLog` JMX bean 的 `Enabled` 属性为 `false`，然后调用其 `invalidateCache()` 方法。或者，将<<cuba.entityLog.enabled,cuba.entityLog.enabled>>应用程序属性设置为 `false` 并重新启动服务。
+

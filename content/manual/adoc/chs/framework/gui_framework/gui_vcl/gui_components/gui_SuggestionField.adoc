@@ -1,0 +1,195 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_SuggestionField]]
+====== 建议字段
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=datasource-suggestionfield" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/SuggestionField.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`SuggestionField` 组件用于根据用户输入的字符串搜索一些值。它与 <<gui_SuggestionPickerField,SuggestionPickerField>> 的不同之处在于它可以使用任何类型的选项：例如，实体、字符串或枚举值，并且没有操作按钮。选项列表是根据应用程序开发人员定义的逻辑在后端加载。
+
+
+image::gui_suggestionField_1.png[align="center"]
+
+该组件的 XML 名称： `suggestionField`
+
+`suggestionField` 的属性:
+
+[[gui_suggestionField_asyncSearchDelayMs]]
+* `asyncSearchDelayMs` - 设置最后一次按键操作和执行异步搜索之前需要的延迟。
+
+[[gui_suggestionField_minSearchStringLength]]
+* `minSearchStringLength` - 设置执行建议搜索需要的最小字符串长度。
+
+[[gui_suggestionField_popupWidth]]
+* `popupWidth` - 设置建议选项弹出框的宽度。
++
+可选项：
++
+** `auto` - 弹出框的宽度等于建议选项的最大长度，即自适应，
++
+** `parent` - 弹出框的宽度等于主组件的宽度，
++
+** 绝对（比如 `"170px"`）或相对（比如 `"50%"`）值。
+
+[[gui_suggestionField_suggestionsLimit]]
+* `suggestionsLimit` - 设置可显示的建议选项的最大数量。
+
+`suggestionField` 的元素：
+
+[[gui_suggestionField_query]]
+* `query` - 用于定义获取建议值的可选元素。`query` 元素有以下属性： 
++
+--
+[[gui_suggestionField_query_entityClass]]
+** `entityClass`（必须） - 实体类的完全限定名。
+
+[[gui_suggestionField_query_view]]
+** `view` - 可选属性，指定用于加载查询实体的<<views,视图>>。
+
+[[gui_suggestionField_query_escapeValueForLike]]
+** `escapeValueForLike` - 允许搜索关键字中包含特殊符号：`%` 、 `\` 等。默认值为 `false`。
+
+
+[[gui_suggestionField_query_searchStringFormat]]
+** `searchStringFormat` - 搜索字符串格式，一个 Groovy 字符串，可以使用任何有效的 Groovy 字符串表达式。
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/suggestionField_2.xml[]
+----
+
+如果未定义查询，则必须使用 `SearchExecutor` 提供选项列表，以编程方式分配（见下文）。
+--
+
+[[gui_suggestionField_SearchExecutor]]
+大部分情况下，给组件设置 `SearchExecutor` 就足够了。`SearchExecutor` 是一个包含单个方法的功能接口：`List<E> search(String searchString，Map <String,Object> searchParams)`：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/suggestionField.java[]
+----
+
+`SearchExecutor` 可以返回任何类型的选项，例如实体、字符串或枚举值。
+
+* 实体：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/suggestionField_4.java[]
+----
+
+* 字符串：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/suggestionField_5.java[]
+----
+
+* 枚举：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/suggestionField_6.java[]
+----
+
+* `OptionWrapper` 用于需要将任何类型的值与其字串表示分离的情况下：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/suggestionField_7.java[]
+----
+
+[WARNING]
+====
+`search()` 方法在后台线程中执行，因此它无法访问可视化组件或可视化组件使用的数据源。可直接调用 <<dataManager,DataManager>> 或中间件服务；或处理并返回预先加载到界面的数据。
+====
+
+`searchString` 参数可用于使用用户输入的字符串过滤候选值。也可以使用 `escapeForLike()` 方法来搜索包含特殊符号的值：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/suggestionField_9.java[]
+----
+
+[[gui_suggestionField_OptionsStyleProvider]]
+* `OptionsStyleProvider` 允许为 `suggestionField` 的建议选项中的每一项指定单独的样式名。
+
++
+--
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/suggestionField_8.java[]
+----
+--
+
+`SuggestionField` 的展示可以使用带 `$cuba-suggestionfield-*` 前缀的 SCSS 变量进行自定义。可以在创建一个 <<web_theme_extension,主题扩展>> 或者一个 <<web_theme_creation,自定义主题>> 之后在可视化编辑器里修改这些变量的值。
+
+'''
+
+suggestionField 的属性::
+<<gui_attr_align,align>> -
+<<gui_suggestionField_asyncSearchDelayMs,asyncSearchDelayMs>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_captionProperty,captionProperty>> -
+<<gui_attr_colspan,colspan>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_attr_inputPrompt,inputPrompt>> -
+<<gui_suggestionField_minSearchStringLength,minSearchStringLength>> -
+<<gui_suggestionField_popupWidth,popupWidth>> -
+<<gui_attr_property,property>> -
+<<gui_attr_required,required>> -
+<<gui_attr_requiredMessage,requiredMessage>> -
+<<gui_attr_responsive,responsive>> -
+<<gui_attr_rowspan,rowspan>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_suggestionField_suggestionsLimit,suggestionsLimit>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+suggestionField 的元素::
+<<gui_suggestionField_query,query>>
+
+query 元素的属性::
+<<gui_suggestionField_query_entityClass,entityClass>> -
+<<gui_suggestionField_query_escapeValueForLike,escapeValueForLike>> -
+<<gui_suggestionField_query_searchStringFormat,searchStringFormat>> -
+<<gui_suggestionField_query_view,view>>
+
+suggestionField 预定义样式::
+<<gui_attr_stylename_huge,huge>> -
+<<gui_attr_stylename_large,large>> -
+<<gui_attr_stylename_small,small>> -
+<<gui_attr_stylename_tiny,tiny>>
+
+API::
+<<gui_api_addValueChangeListener,addValueChangeListener>> -
+<<gui_api_contextHelp,setContextHelpIconClickHandler>> -
+<<gui_LookupField_setOptionCaptionProvider,setOptionCaptionProvider>> -
+<<gui_suggestionField_OptionsStyleProvider,setOptionsStyleProvider>>
+
+'''
+

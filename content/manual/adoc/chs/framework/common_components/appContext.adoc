@@ -1,0 +1,42 @@
+:sourcesdir: ../../../../source
+
+[[appContext]]
+==== 应用程序上下文(AppContext)
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/sys/AppContext.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`AppContext` 是一个系统类，它在其静态字段中存储对每个应用程序<<app_tiers,block>>的某些公共组件的引用，包括：
+
+* Spring 框架的 `ApplicationContext`。
+* 从 `app.properties` 文件加载的<<app_properties,应用程序属性>>集合。
+* `ThreadLocal` 变量，存储<<securityContext,SecurityContext>>实例。
+* 应用程序生命周期监听器的集合（ `AppContext.Listener` ）。
+
+启动应用程序时，使用加载器类初始化 `AppContext`，对于每个应用程序<<app_tiers,block>>：
+
+* 中间件加载器 – `AppContextLoader`
+* Web 客户端加载器 – `WebAppContextLoader`
+* Web 门户加载器 – `PortalAppContextLoader`
+
+`AppContext` 可以在应用程序代码中用于以下任务：
+
+*  在属性值不能通过<<config_interfaces,配置接口>>访问时，获取存储在 `app.properties` 文件中的<<app_properties,应用程序属性>>值。
+
+* 将 `SecurityContext` 传递给新的执行线程，请参阅<<authentication>>。
+
+* 注册监听器，在完全初始化之后或应用程序终止之前触发，例如：
++
+[source, java]
+----
+include::{sourcesdir}/common/appcontext_1.java[]
+----
++
+[WARNING]
+====
+请注意，在应用程序启动和关闭时执行代码的推荐方法是使用<<app_lifecycle_events>>。
+====
+

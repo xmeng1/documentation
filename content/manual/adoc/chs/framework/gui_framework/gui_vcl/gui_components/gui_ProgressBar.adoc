@@ -1,0 +1,85 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_ProgressBar]]
+====== 进度条
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=standard-progressbar" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/ProgressBar.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`ProgressBar` 组件用于显示需要长时间处理的任务的进度。
+
+image::gui_progressBar.png[align="center"]
+
+该组件的 XML 名称： `progressBar`
+
+下面是该组件与<<background_tasks,后台任务>>机制一起使用的示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/progressbar_1.xml[]
+----
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/progressbar_2.java[]
+----
+
+<1> 一些比较耗时的任务
+
+`BackgroundTask.progress()` 方法在 UI 线程中被执行，在这个方法里给 `ProgressBar` 组件设置当前的进度值。组件值应该是从 `0.0` 到 `1.0` 的 `double` 类型的数值。
+
+可以使用 `ValueChangeListener` 跟踪 `ProgressBar` 值的变化。可以使用 <<gui_api_UserOriginated,isUserOriginated()>> 方法跟踪 `ValueChangeEvent` 的来源。
+
+[[gui_ProgressBar_indeterminate]]
+如果正在运行的处理无法发送有关进度的信息，则可以显示表示不确定状态的指示符。将 `indeterminate` 设置为 `true` 以显示不确定状态。默认为 `false`。例如：
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/progressbar_3.xml[]
+----
+[[gui_ProgressBar_indeterminate-circle]]
+默认情况下，不定进度条显示为水平状态条。要改为显示螺旋状的进度条，可以设置属性 `stylename="indeterminate-circle"`。
+[[gui_ProgressBar_point]]
+要使进度条指示器显示为在进度条上移动的点（而不是增长条），请使用 `point` 预定义样式：
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/progressbar_4.java[]
+----
+
+'''
+
+progressBar 的属性::
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_id,id>> -
+<<gui_ProgressBar_indeterminate,indeterminate>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+progressBar 的预定义样式::
+<<gui_ProgressBar_indeterminate-circle,indeterminate-circle>> -
+<<gui_ProgressBar_point,point>>
+
+API::
+<<gui_api_addValueChangeListener,addValueChangeListener>>
+
+'''
+

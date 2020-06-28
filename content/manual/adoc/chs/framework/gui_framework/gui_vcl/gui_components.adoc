@@ -1,0 +1,244 @@
+:sourcesdir: ../../../../../source
+
+[[gui_components]]
+===== 可视化组件
+
+[cols="<.^1,<.^4", frame="none", grid="none", grid="none", width="60%"]
+|===
+
+| *菜单*|
+
+| <<gui_AppMenu,应用程序菜单>>| image:gui_AppMenu.png[pdfwidth=2.5in]
+
+| <<gui_SideMenu,侧边菜单>>| image:gui_sidemenu.png[pdfwidth=2.5in]
+
+| |
+
+| *按钮*|
+
+| <<gui_Button,按钮>>| image:Button.png[pdfwidth=2.5in]
+
+| <<gui_PopupButton,弹窗按钮>>| image:PopupButton.png[pdfwidth=2.5in]
+
+| <<gui_LinkButton,链接按钮>>| image:LinkButton.png[pdfwidth=2.5in]
+
+| |
+
+| *文本*|
+
+| <<gui_Label,标签>>| image:gui_label.png[pdfwidth=2.5in]
+
+| |
+
+| *文本输入*|
+
+| <<gui_TextField,文本控件>>| image:gui_textField_data.png[pdfwidth=2.5in]
+
+| <<gui_PasswordField,密码控件>>| image:gui_PasswordField.png[pdfwidth=2.5in]
+
+| <<gui_MaskedField,掩码控件>>| image:gui_MaskedField.png[pdfwidth=2.5in]
+
+| <<gui_TextArea,文本区>>| image:gui_TextArea.png[pdfwidth=2.5in]
+
+| <<gui_ResizableTextArea,可调大小文本区>>| image:gui_textField_resizable.png[pdfwidth=2.5in]
+
+| <<gui_RichTextArea,富文本区>>| image:gui_RichTextArea.png[pdfwidth=2.5in]
+
+| <<gui_SourceCodeEditor, 源码编辑器>>| image:gui_SourceCodeEditor_1.png[pdfwidth=2.5in]
+
+| |
+
+| *日期输入*|
+
+| <<gui_DateField,日期时间组件>>| image:gui_dateField.png[pdfwidth=2.5in]
+
+| <<gui_DatePicker,日期选择器>>| image:gui_datepicker_mini.png[pdfwidth=2.5in]
+
+| <<gui_TimeField,时间组件>>| image:gui_timeField.png[pdfwidth=2.5in]
+
+| |
+
+| *选择*|
+
+| <<gui_CheckBox,复选框>>| image:CheckBox.png[pdfwidth=2.5in]
+
+| <<gui_CheckBoxGroup,复选框组>>| image:gui_CheckBoxGroup.png[pdfwidth=2.5in]
+
+| <<gui_LookupField,下拉框>>| image:LookupField.png[pdfwidth=2.5in]
+
+| <<gui_LookupPickerField,下拉选择器>>| image:LookupPickerField.png[pdfwidth=2.5in]
+
+| <<gui_OptionsGroup,选项组>>| image:gui_optionsGroup.png[pdfwidth=2.5in]
+
+| <<gui_OptionsList,选项列表>>| image:gui_optionsList.png[pdfwidth=2.5in]
+
+| <<gui_PickerField,选择器控件>>| image:PickerField.png[pdfwidth=2.5in]
+
+| <<gui_RadioButtonGroup,单选按钮组>>| image:gui_RadioButtonGroup.png[pdfwidth=2.5in]
+
+| <<gui_SearchPickerField,搜索选择器控件>>| image:gui_searchPickerField.png[pdfwidth=2.5in]
+
+| <<gui_SuggestionPickerField,建议选择器控件>>| image:gui_suggestionPickerField_1.png[pdfwidth=2.5in]
+
+| <<gui_TwinColumn,双列>>| image:TwinColumn.png[pdfwidth=2.5in]
+
+| |
+
+| *上传*|
+
+| <<gui_FileUploadField,文件上传控件>>| image:Upload.png[pdfwidth=2.5in]
+
+| <<gui_FileMultiUploadField,多文件上传控件>>
+
+|
+
+| *表格和树*|
+
+| <<gui_DataGrid,数据网格>>| image:gui_dataGrid.png[pdfwidth=2.5in]
+
+| <<gui_Table,表格>>| image:gui_table.png[pdfwidth=2.5in]
+
+| <<gui_GroupTable,分组表格>>| image:gui_groupTable.png[pdfwidth=2.5in]
+
+| <<gui_TreeDataGrid,树形数据网格>>| image:gui_TreeDataGrid.png[pdfwidth=2.5in]
+
+| <<gui_TreeTable,树形表格>>| image:gui_treeTable.png[pdfwidth=2.5in]
+
+| <<gui_Tree,树>>| image:gui_Tree.png[pdfwidth=2.5in]
+
+| |
+
+| *其它*|
+
+| <<gui_BrowserFrame,浏览器框架>>| image:gui_browserFrame.png[pdfwidth=2.5in]
+
+| <<gui_BulkEditor,批量编辑器>>| image:gui_invoiceBulkEdit.png[pdfwidth=2.5in]
+
+| <<gui_Calendar,日历控件>>| image:gui_calendar_1.png[pdfwidth=2.5in]
+
+| <<gui_CapsLockIndicator,大小写锁定提示器>>| image:gui_capsLockIndicator.png[pdfwidth=2.5in]
+
+| <<gui_ColorPicker,颜色选择器>>| image:gui_color_picker.png[pdfwidth=2.5in]
+
+| <<gui_FieldGroup,字段组>>| image:gui_fieldGroup.png[pdfwidth=2.5in]
+
+| <<gui_Filter,过滤器>>| image:gui_filter_mini.png[pdfwidth=2.5in]
+
+| <<gui_Form,表单>>| image:gui_Form_1.png[pdfwidth=2.5in]
+
+| <<gui_Image,图片组件>>| image:gui_Image_1.png[pdfwidth=2.5in]
+
+| <<gui_PopupView,弹窗查看控件>>| image:gui_popup_view_mini_open.png[pdfwidth=2.5in]
+
+| <<gui_Slider,Slider>>| image:gui_slider.png[pdfwidth=2.5in]
+
+| <<gui_TokenList,标签列表>>| image:gui_tokenList.png[pdfwidth=2.5in]
+
+|===
+
+include::gui_components/gui_AppMenu.adoc[]
+
+include::gui_components/gui_BrowserFrame.adoc[]
+
+include::gui_components/gui_Button.adoc[]
+
+include::gui_components/gui_BulkEditor.adoc[]
+
+include::gui_components/gui_Calendar.adoc[]
+
+include::gui_components/gui_CapsLockIndicator.adoc[]
+
+include::gui_components/gui_CheckBox.adoc[]
+
+include::gui_components/gui_ColorPicker.adoc[]
+
+include::gui_components/gui_CheckBoxGroup.adoc[]
+
+include::gui_components/gui_CurrencyField.adoc[]
+
+include::gui_components/gui_DataGrid.adoc[]
+
+include::gui_components/gui_DateField.adoc[]
+
+include::gui_components/gui_DatePicker.adoc[]
+
+include::gui_components/gui_Embedded.adoc[]
+
+include::gui_components/gui_FieldGroup.adoc[]
+
+include::gui_components/gui_FileMultiUploadField.adoc[]
+
+include::gui_components/gui_FileUploadField.adoc[]
+
+include::gui_components/gui_Filter.adoc[]
+
+include::gui_components/gui_Form.adoc[]
+
+include::gui_components/gui_GroupTable.adoc[]
+
+include::gui_components/gui_Image.adoc[]
+
+include::gui_components/gui_Label.adoc[]
+
+include::gui_components/gui_Link.adoc[]
+
+include::gui_components/gui_LinkButton.adoc[]
+
+include::gui_components/gui_LookupField.adoc[]
+
+include::gui_components/gui_LookupPickerField.adoc[]
+
+include::gui_components/gui_MaskedField.adoc[]
+
+include::gui_components/gui_OptionsGroup.adoc[]
+
+include::gui_components/gui_OptionsList.adoc[]
+
+include::gui_components/gui_PasswordField.adoc[]
+
+include::gui_components/gui_PickerField.adoc[]
+
+include::gui_components/gui_PopupButton.adoc[]
+
+include::gui_components/gui_PopupView.adoc[]
+
+include::gui_components/gui_ProgressBar.adoc[]
+
+include::gui_components/gui_RadioButtonGroup.adoc[]
+
+include::gui_components/gui_RelatedEntities.adoc[]
+
+include::gui_components/gui_ResizableTextArea.adoc[]
+
+include::gui_components/gui_RichTextArea.adoc[]
+
+include::gui_components/gui_SearchPickerField.adoc[]
+
+include::gui_components/gui_SideMenu.adoc[]
+
+include::gui_components/gui_Slider.adoc[]
+
+include::gui_components/gui_SourceCodeEditor.adoc[]
+
+include::gui_components/gui_SuggestionField.adoc[]
+
+include::gui_components/gui_SuggestionPickerField.adoc[]
+
+include::gui_components/gui_Table.adoc[]
+
+include::gui_components/gui_TextArea.adoc[]
+
+include::gui_components/gui_TextField.adoc[]
+
+include::gui_components/gui_TimeField.adoc[]
+
+include::gui_components/gui_TokenList.adoc[]
+
+include::gui_components/gui_Tree.adoc[]
+
+include::gui_components/gui_TreeDataGrid.adoc[]
+
+include::gui_components/gui_TreeTable.adoc[]
+
+include::gui_components/gui_TwinColumn.adoc[]
+

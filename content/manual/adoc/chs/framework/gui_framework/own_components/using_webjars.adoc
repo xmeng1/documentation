@@ -1,0 +1,70 @@
+:sourcesdir: ../../../../../source
+
+[[using_webjars]]
+===== 使用 WebJars
+
+此方法允许使用打包到 JAR 文件中并在 link:http://search.maven.org/[Maven Central] 上部署的各种 JS 库。要在应用程序中使用来自 WebJar 的组件需要执行以下步骤：
+
+** 添加依赖到 *web* 模块的 `compile` 方法：
+
++
+[source, groovy]
+----
+compile 'org.webjars.bower:jrcarousel:1.0.0'
+----
+
+** 创建 *web-toolkit* 模块。
+
+** 创建一个客户端 GWT 部件(widget)类并实现用于创建组件的 JSNI 方法。
+
+** 使用 `@WebJarResource` 注解创建服务端组件类。
+
++
+--
+这个注解只能用于 `ClientConnector` 继承者（通常是来自 *web-toolkit* 模块的 UI 组件类）。
+
+`@WebJarResource` 注解值（或资源定义) 应使用下面的格式之一：
+
+. `<webjar_name>:<sub_path>`，例如：
+
++
+[source, java]
+----
+@WebJarResource("pivottable:plugins/c3/c3.min.css")
+----
+
+. `<webjar_name>/<resource_version>/<webjar_resource>`，例如：
+
++
+[source, java]
+----
+@WebJarResource("jquery-ui/1.12.1/jquery-ui.min.js")
+----
+
+注解值可以包含一个或多个 WebJar 资源字符串定义，多个资源使用字符串数组表示：
+
+[source, java]
+----
+@WebJarResource({
+        "jquery-ui:jquery-ui.min.js",
+        "jquery-fileupload:jquery-fileupload.min.js",
+        "jquery-fileupload:jquery-fileupload.min.js"
+})
+public class CubaFileUpload extends CubaAbstractUploadComponent {
+    ...
+}
+----
+
+WebJar 版本不是必须的，因为 Maven 版本解析策略将自动使用高版本的 WebJar。
+
+[[using_webjars_overridePath]]
+
+或者，可以在 `VAADIN/webjars/` 中指定一个目录来提供静态资源。这样，可以通过在此目录中放入新版本的资源来覆盖 WebJar 资源。要设置路径，请使用 `@WebJarResource` 注解的 `overridePath` 属性，例如：
+
+[source, java]
+----
+@WebJarResource(value = "pivottable:plugins/c3/c3.min.css", overridePath = "pivottable")
+----
+--
+
+** 将新组件添加到界面。

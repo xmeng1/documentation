@@ -1,0 +1,73 @@
+:sourcesdir: ../../../../../source
+
+[[views_creation]]
+===== 创建视图
+
+视图可以通过下列方式创建：
+
+* *编程方式* – 通过创建 `View` 实例。这种方式适合在业务逻辑中创建并视图。
++
+视图实例，包括内嵌的视图，可以通过构造器创建：
++
+[source, java]
+----
+include::{sourcesdir}/common/views_1.java[]
+----
++
+也可以使用 `ViewBuilder`：
++
+[source, java]
+----
+include::{sourcesdir}/common/views_3.java[]
+----
++
+`ViewBuilder` 还能用于 <<dataManager,DataManager>> 的流式操作接口：
++
+[source, java]
+----
+include::{sourcesdir}/common/views_4.java[]
+----
+
+* *界面中声明式创建* – 通过在界面的 XML 中定义内嵌的视图，参考 <<gui_data_comp_decl>> 中的例子。推荐在 CUBA 7.2+ 中使用这种方式在 Generic UI 界面中加载数据。
+
+* *共享仓库中声明式创建* – 通过在项目的 <<views.xml>> 文件中定义视图。应用程序启动时会部署 `views.xml` 文件，创建的 `View` 实例都缓存在 `ViewRepository` 中。此外，通过调用 `ViewRepository` 并提供实体类和视图名称，可以在应用程序代码的任何部分中获取所需的视图。
+
+下面是 XML 视图声明的示例，能加载 `Order` 实体的所有本地属性、关联的 `Customer` 以及 `Items` 集合：
+
+[source, xml]
+----
+include::{sourcesdir}/common/views_2.xml[]
+----
+
+使用共享的视图仓库::
++
+--
+`ViewRepository` 是一个 Spring bean，所有应用程序 block 都可以访问这个 bean。可以使用注入或通过 `AppBeans` 静态方法得到 `ViewRepository` 的引用。然后用 `ViewRepository.getView()` 方法从视图库中获取视图实例。
+
+默认情况下，每个实体的视图库中都有三个名为 `++_local++` 、 `++_minimal++` 和 `_base` 的视图：
+
+* `++_local++` 包含所有<<local_attribute,本地>>实体属性。
+
+* `++_minimal++` 包含实体实例名称中包含的属性，这些属性通过<<namePattern_annotation,@NamePattern>>注解指定。如果未在实体中指定 `@NamePattern` 注解，则此视图不包含任何属性。
+
+* `_base` 包括所有本地非系统属性和由 `@NamePattern` 定义的属性（实际上是 `_minimal` + `_local`）。
+
+CUBA Studio 会在项目内自动创建并维护单一的 <<views.xml,views.xml>> 文件。但是，也可以按照下面的方法创建多个视图描述文件：
+
+* `global` 模块必须包含带有所有视图描述文件的 `views.xml` 文件，这些视图文件必须是全局可访问的（即能被所有的层访问）。该文件需要在所有层的 <<cuba.viewsConfig,cuba.viewsConfig>> 应用程序属性中注册，比如，`core` 模块的 `app.properties`，`web` 模块的 `web-app.properties` 等。Studio 默认会做这些事。
+
+* 如果有大量的共享视图，可以将它们放在多个文件内，比如在标准的 `views.xml` 文件以及附加的 `foo-views.xml`、`bar-views.xml` 文件。然后在 `cuba.viewsConfig` 应用程序属性中注册所有这些文件：
++
+----
+cuba.viewsConfig = +com/company/sales/views.xml com/company/sales/foo-views.xml com/company/sales/bar-views.xml
+----
+
+* 如果有某些视图只在一个应用程序层使用，则可以单独在该层的类似文件中定义，比如 `web-views.xml`，然后在该层的 `cuba.viewsConfig` 属性中注册该文件。
+
+如果视图库已经包含某个实体的特定名称的视图，则不会为此实体部署其它同名视图。如果需要使用新的视图替换视图库中的现有视图并保证其部署，需要为新视图指定 `overwrite="true"` 属性。
+
+[TIP]
+====
+建议为共享视图提供描述性名称。例如，不仅仅是 "browse"，而是 "customerBrowse"。这样可以简化 XML 描述中视图的搜索。
+====
+--

@@ -1,0 +1,7 @@
+:sourcesdir: ../../../../../source
+
+[[build.gradle_stop]]
+===== 停止 Tomcat 服务
+
+`stop` – `CubaStopTomcat` 类型的任务，用来停止在 <<build.gradle_setupTomcat,setupTomcat>> 任务中安装的本地 Tomcat 服务。当使用 *cuba* Gradle 插件的时候，此任务会自动创建并添加到项目中，所以不需要在 `build.gradle` 中声明这个任务。
+

@@ -1,0 +1,154 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_TokenList]]
+====== 标签列表
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=normal-tokenlist" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/TokenList.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`TokenList` 组件提供了一种使用列表的简单方式: 以水平或垂直的方式标签名称、使用下拉列表添加标签、使用每个标签旁边的按钮进行移除。
+
+image::gui_tokenList.png[align="center"]
+
+组件 XML 名称: `tokenList`
+
+下面是一个界面 XML 描述中定义 `TokenList` 组件的示例:
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/tokenList_1.xml[]
+---- 
+
+在上面的示例中，嵌套的 `productsDc` <<gui_data_containers,数据容器>>包含了一个订单的产品集合，同时 `allProductsDc`  数据容器包含了数据库中所有可用产品。id 为 `productsList` 的 `TokenList`  组件展示 `productsDc` 数据容器的内容，同时可以通过从 `allProductsDc` 中添加实例来改变集合。
+
+`tokenList` 属性：
+
+[[gui_TokenList_position]]
+* `position` – 设置下拉列表的位置。这个属性的可选值包括: `TOP`、`BOTTOM`。默认是：`TOP`。
+
+image::gui_tokenListBottom.png[align="center"]
+
+[[gui_TokenList_inline]]
+* `inline` 属性定义包含选中条目的列表如何显示：vertically（垂直） 或 horizontally（水平）。`true` 表示水平对齐，`false` – 垂直对齐。 水平对齐的示例:
+
+image::gui_tokenListInline.png[align="center"]
+
+[[gui_TokenList_simple]]
+* `simple` – 设置为 `true` 时，将隐藏选择组件同时显示 *Add* 按钮。点击 *Add* 按钮将弹出一个选择界面，界面上有实体实例列表，其类型由数据容器定义。选择界面的标识符是根据 `PickerField` 的<<std_picker_actions,标准查找操作>>的规则来确定的。单击 *Clear* 按钮将删除 `TokenList` 组件数据源中的所有元素。
++
+image::gui_tokenListSimple_withClear.png[align="center"]
+
+[[gui_TokenList_clearEnabled]]
+* `clearEnabled` - 当设置为 `false`， *Clear* 按钮将隐藏。
+
+`tokenList` 元素:
+
+[[gui_TokenList_lookup]]
+* `lookup` − 值选择组件的描述。
++
+--
+
+`lookup` 元素属性:
+
+[[gui_TokenList_lookup_lookup]]
+** `lookup` 属性使 `TokenList` 组件可以使用一个实体查找界面来选择值。
++
+image::gui_tokenListLookup.png[align="center"]
+
+[[gui_TokenList_lookup_inputPrompt]]
+* `inputPrompt` - 显示在查找字段中的文本提示信息。如果没有设置，查找字段将不显示任何提示内容。
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/gui_tokenList_2.xml[]
+----
++
+image::gui_TokenList_inputPrompt.png[align="center"]
+
+[[gui_TokenList_lookup_lookupScreen]]
+** `lookupScreen` 属性在 `lookup="true"` 时设置用于选择值的界面的标识符。如果没有设置此属性，则根据 `com.haulmont.cuba.gui.actions.picker.LookupAction` <<std_picker_actions,标准操作>>的规则选择界面标识符。
+
+** `openType` 属性定义查找界面的打开方式，与 `com.haulmont.cuba.gui.actions.picker.LookupAction` <<std_picker_actions,标准操作>>的描述相似。默认值 – `++THIS_TAB++`。
+
+[[gui_TokenList_lookup_multiselect]]
+** `multiselect` - 如果这个属性设置为 `true`, `true` 将传递到查找界面的参数字典的 `MULTI_SELECT` 键。这个标志用于设置界面为多选模式。这个标志定义在 `WindowParams` 枚举中，因此在<<screens,旧版本的界面>>中可以通过以下方式使用：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/tokenListMultiselect_1.java[]
+----
+--
+
+[[gui_TokenList_button]]
+* `addButton` – 对添加条目的按钮的描述。可包含 <<gui_attr_caption,caption>> 和 <<gui_attr_icon,icon>> 属性。
+
+`tokenList` 监听器:
+
+[[gui_TokenList_ItemClickListener]]
+* `ItemClickListener` 允许跟踪 `tokenList` 列表条目上的点击操作。
+* `ValueChangeListener` 可以跟踪 `tokenList` 组件值的变化，像其它任何实现了 `Field` 接口的组件一样。可以使用 <<gui_api_UserOriginated,isUserOriginated()>>  方法来跟踪 `ValueChangeEvent` 的来源。
+
+'''
+
+tokenList 的属性::
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_captionProperty,captionProperty>> -
+<<gui_TokenList_clearEnabled,clearEnabled>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_TokenList_inline,inline>> -
+<<gui_TokenList_position,position>> -
+<<gui_TokenList_simple,simple>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+tokenList 的元素::
+<<gui_TokenList_button,addButton>> -
+<<gui_TokenList_lookup,lookup>>
+
+<<gui_TokenList_lookup,lookup>> 的属性::
+<<gui_attr_captionProperty,captionProperty>> -
+<<gui_LookupField_filterMode,filterMode>> -
+<<gui_TokenList_lookup_inputPrompt,inputPrompt>> -
+<<gui_TokenList_lookup_lookup,lookup>> -
+<<gui_TokenList_lookup_lookupScreen,lookupScreen>> -
+<<gui_TokenList_lookup_multiselect,multiselect>> -
+<<gui_attr_openType,openType>> -
+<<gui_attr_optionsDatasource,optionsDatasource>>
+
+<<gui_TokenList_button,button>> 的属性::
+<<gui_attr_caption,caption>> -
+<<gui_attr_icon,icon>>
+
+API::
+<<gui_api_addValueChangeListener,addValueChangeListener>> -
+<<gui_api_contextHelp,setContextHelpIconClickHandler>> -
+<<gui_TokenList_ItemClickListener,setItemClickListener>> -
+<<gui_LookupField_setOptionCaptionProvider,setOptionCaptionProvider>>
+
+'''
+

@@ -1,0 +1,13 @@
+:sourcesdir: ../../../../../source
+
+[[userSessionSource]]
+===== UserSessionSource
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/global/UserSessionSource.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+该接口用于获取当前用户会话对象。在<<authentication>>章节查看更多信息。
+

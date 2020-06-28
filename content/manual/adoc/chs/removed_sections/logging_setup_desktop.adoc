@@ -1,0 +1,4 @@
+[[logging_setup_desktop]]
+=== Setting up Logging in The Desktop Client
+
+本章节从 7.0 开始就无效了，因为不再支持桌面客户端。

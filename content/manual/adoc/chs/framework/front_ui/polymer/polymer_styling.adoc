@@ -1,0 +1,7 @@
+:sourcesdir: ../../../../../source
+
+[[polymer_styling]]
+===== 样式
+
+参考 Polymer 的 https://www.polymer-project.org/2.0/docs/devguide/style-shadow-dom[样式调整向导]。跟传统的调样式方式最大的不同点就是怎样设置全局样式。因为 Polymer 元素使用的 Shadow DOM 全局样式，样式不会在组件内渗透。因此需要使用 https://www.polymer-project.org/2.0/docs/devguide/style-shadow-dom#style-modules[style-modules]。在 Polymer 客户端有个 `shares-styles.html` 文件，会被自动引用到 Studio 创建的新组件中。
+

@@ -1,0 +1,151 @@
+:sourcesdir: ../../../../../source
+
+[[web_theme_extension]]
+===== 扩展现有主题
+
+平台主题可以在项目中被修改。在修改后的主题中，可以：
+
+* 改变品牌 Logo 图片。
+
+* 在可视化组件中添加图标并使用它们。请参阅下面的<<gui_icons,>>部分。
+
+* 为可视化组件创建新样式，并在<<gui_attr_stylename,stylename>>属性中使用它们。这需要一些 CSS 专业知识。
+
+* 修改可视化组件的现有样式。
+
+* 修改常用参数，例如背景颜色 、 边距 、间距等。
+
+[[web_theme_extension_structure]]
+文件结构和构建脚本::
++
+--
+主题在 link:http://sass-lang.com[SCSS] 中定义。要修改（扩展）项目中的主题，应该在 *web* 模块中创建特定的文件结构。
+
+一种便捷的方法是使用 *CUBA Studio*：在主菜单中，单击 *CUBA > Advanced > Manage themes > Create theme extension*。在弹出窗口中选择要扩展的主题。另一种方法是使用 https://www.cuba-platform.com/marketplace/cuba-cli[CUBA CLI] 中的 `theme` 命令。
+
+最终，以下目录结构将在 `modules/web` 目录中被创建（对于 Halo 主题扩展）：
+
+[source, plain]
+----
+include::{sourcesdir}/gui/themes/themes_42.scss[]
+----
+
+除此之外，<<build.gradle,build.gradle>>脚本将会添加进 `buildScssThemes` 任务，该任务在每次构建 *web* 模块时自动执行。可选的<<build.gradle_deployThemes,deployThemes>>任务可用于将主题中的更改快速应用于正在运行的应用程序。
+
+[TIP]
+====
+如果项目包含带有扩展主题的<<app_components,应用程序组件>>，并且希望此扩展用于整个项目，那么也应该为项目创建主题扩展。有关如何继承组件主题的详细信息，请参阅<<web_theme_inheritance>>部分。
+====
+--
+
+[[web_theme_extension_branding]]
+更改品牌::
++
+--
+可以配置一些品牌相关的属性，例如图标、登录和主应用程序窗口标题以及网站图标（`favicon.ico`）。
+
+要使用自定义图片，请替换 `modules/web/themes/halo/branding` 目录中的默认图片。
+
+要设置窗口标题和登录窗口欢迎文本，请在 *web* 模块的<<main_message_pack,主消息包>>中设置窗口标题和登录窗口欢迎文本（即 `modules/web/<root_package>/web/messages.properties` 文件及其针对不同语言环境的变体）。消息包允许为不同的用户区域设置使用不同的图像文件。示例 `messages.properties` 文件：
+
+[source, plain]
+----
+include::{sourcesdir}/gui/themes/themes_43.scss[]
+----
+
+`favicon.ico` 的路径没有被指定，因为它必须位于主题的根目录中。
+--
+
+[[web_theme_extension_fonts]]
+添加字体::
++
+--
+可以为 Web 主题添加自定义字体。添加一个 Font Family，将其导入 `styles.scss` 文件的第一行，例如：
+
+[source, properties]
+----
+@import url(http://fonts.googleapis.com/css?family=Roboto);
+----
+--
+
+[[web_theme_extension_styles]]
+创建新样式::
++
+--
+为显示客户名称的字段设置黄色背景颜色的示例。
+
+在 XML 描述中， 定义了 <<gui_FieldGroup,FieldGroup>>组件：
+
+[source, xml]
+----
+include::{sourcesdir}/gui/themes/themes_20.xml[]
+----
+
+`FieldGroup` 的 `field` 元素没有<<gui_attr_stylename,stylename>>属性，因此我们必须在控制器中设置字段的样式名称：
+
+[source, java]
+----
+include::{sourcesdir}/gui/themes/themes_21.java[]
+----
+
+在 `halo-ext.scss` 文件中，将新样式定义添加到 `halo-ext` mixin：
+
+[source, css]
+----
+include::{sourcesdir}/gui/themes/themes_22.scss[]
+----
+
+重建项目后，字段将如下所示：
+
+image::gui_themes_fieldgroup_1.png[align="center"]
+--
+
+[[web_theme_extension_modify_styles]]
+修改可视化组件的现有样式::
++
+--
+要修改现有组件的样式参数，请将相应的 CSS 代码添加到 `halo-ext.scss` 文件的 `halo-ext` mixin 中。使用 Web 浏览器的开发人员工具查找分配给可视化组件元素的 CSS 类。例如，要以粗体显示应用程序菜单项，`halo-ext.scss` 文件的内容应如下所示：
+
+[source, css]
+----
+include::{sourcesdir}/gui/themes/themes_6.scss[]
+----
+--
+
+[[web_theme_extension_common]]
+修改通用参数::
++
+--
+主题包含许多控制应用程序背景颜色、组件大小、边距和其它参数的 SCSS 变量。
+
+以下是 Halo 主题扩展的示例，因为它基于来自 *Vaadin* 的 link:https://vaadin.com/valo[Valo] 主题，并提供最广泛的自定义选项。
+
+`themes/halo/halo-ext-defaults.scss` 文件用于覆盖主题变量。大多数 Halo 变量对应于 link:https://vaadin.com/api/valo[Valo 文档] 中描述的变量。以下是最常见的变量：
+
+[source, css]
+----
+include::{sourcesdir}/gui/themes/themes_4.scss[]
+---- 
+
+下面提供了具有深色背景和略微减少外边距的示例主题 `halo-ext-defaults.scss`：
+
+[source, css]
+----
+include::{sourcesdir}/gui/themes/themes_5.scss[]
+----
+
+另外一个示例展示了使用一组变量使得 Halo 主题看上去跟旧的 Havana 主题差不多，Havana 主题从框架 7.0 版本开始已经移除了。
+
+[source, css]
+----
+include::{sourcesdir}/gui/themes/themes_23.scss[]
+----
+--
+
+[[web_theme_extension_header]]
+更改应用程序标题::
++
+--
+Halo 主题支持<<cuba.web.useInverseHeader,cuba.web.useInverseHeader>>属性，该属性控制应用程序标题的颜色。默认情况下，此属性设置为 `true`，它设置一个暗色（高对比）标题。只需将此属性设置为 `false`，即可不需要对主题进行任何更改而创建一个亮色标题。
+--
+

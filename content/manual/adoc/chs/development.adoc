@@ -1,0 +1,25 @@
+[[development]]
+== 应用程序开发
+
+本章节从实践角度介绍了怎么开发基于 CUBA 框架的应用程序。
+
+include::development/recommended_code_style.adoc[]
+
+include::development/project_file_structure.adoc[]
+
+include::development/build_scripts.adoc[]
+
+include::development/project_creation.adoc[]
+
+include::development/app_components_recipes.adoc[]
+
+include::development/spring_profiles.adoc[]
+
+include::development/logging.adoc[]
+
+include::development/debugging.adoc[]
+
+include::development/testing.adoc[]
+
+include::development/hot_deploy.adoc[]
+

@@ -1,0 +1,55 @@
+:sourcesdir: ../../../../../source
+
+[[messages]]
+===== Messages
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/global/Messages.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`Messages` 接口提供了获取<<localization,本地消息字符串>>的方法。
+
+主要方法如下：
+
+* `getMessage()` – 根据消息键名、包名和需要的语言环境返回本地化的消息。该方法有几个重载，如果未在方法参数中指定语言环境，则使用当前用户语言设置。
++
+例如:
++
+[source, java]
+----
+include::{sourcesdir}/common/messages_1.java[]
+----
+
+* `formatMessage()` – 通过消息键名、包名和需要的语言环境检索本地化消息，然后使用获取到的消息格式化输入的参数。格式化消息根据 `String.format()` 方法的规则定义。该方法有几个重载，如果未在方法参数中指定语言环境，则使用当前用户的语言设置。
++
+例如:
++
+[source, java]
+----
+include::{sourcesdir}/common/messages_2.java[]
+----
+
+* `getMainMessage()` – 从应用程序 <<app_tiers,block>> 的<<main_message_pack,主消息包>>返回本地化消息。
++
+例如:
++
+[source, java]
+----
+include::{sourcesdir}/common/messages_3.java[]
+----
+
+* `getMainMessagePack()` – 返回应用程序 block 的<<main_message_pack,主消息包>>的名称。
++
+例如:
++
+[source, java]
+----
+include::{sourcesdir}/common/messages_4.java[]
+----
+
+* `getTools()` – 返回 `MessageTools` 接口实例（见下文）。
+
+include::messages/messageTools.adoc[]
+

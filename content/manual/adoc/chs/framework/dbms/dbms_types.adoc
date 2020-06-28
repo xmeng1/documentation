@@ -1,0 +1,50 @@
+:sourcesdir: ../../../../source
+
+[[dbms_types]]
+==== DBMS 类型
+
+应用程序中使用的 DBMS 的类型由<<cuba.dbmsType,cuba.dbmsType>>和<<cuba.dbmsVersion,cuba.dbmsVersion>>（可选）应用程序属性定义。这些属性会影响各种依赖于数据库类型的平台机制。
+
+应用程序通过 `javax.sql.DataSource` 连接数据库，`javax.sql.DataSource` 是通过<<cuba.dataSourceJndiName,cuba.dataSourceJndiName>><<cuba.dataSourceJndiName,cuba.dataSourceJndiName>>中指定的名称(默认情况下是 `java:comp/env/jdbc/CubaDS`)从 JNDI 中获取的。<<fast_deployment,标准部署方式>>的数据源配置在 *core* 模块的 <<context.xml>> 文件中定义。数据源应使用适用于所选 DBMS 的 JDBC 驱动程序。
+
+平台支持以下“开箱即用”的 DBMS 类型：
+
+[options="header", cols="2,1,1,2"]
+|===
+| ^|cuba.dbmsType ^|cuba.dbmsVersion ^|JDBC driver
+|HSQLDB |hsql||org.hsqldb.jdbc.JDBCDriver
+|PostgreSQL 8.4+ |postgres||org.postgresql.Driver
+|Microsoft SQL Server 2005 |mssql|2005|net.sourceforge.jtds.jdbc.Driver
+|Microsoft SQL Server 2008 |mssql||com.microsoft.sqlserver.jdbc.SQLServerDriver
+|Microsoft SQL Server 2012+ |mssql |2012|com.microsoft.sqlserver.jdbc.SQLServerDriver
+|Oracle Database 11g+ |oracle||oracle.jdbc.OracleDriver
+|MySQL 5.6+ |mysql||com.mysql.jdbc.Driver
+|===
+
+下表描述了 Java 中的实体属性与不同 DBMS 中的表列之间推荐的数据类型映射关系。生成创建和更新数据库的脚本时，CUBA Studio 会自动使用这些类型。使用这些类型，可以保证所有平台机制正常运行。
+
+[options="header"]
+|===
+^|Java ^|HSQL ^|PostgreSQL ^|MS SQL Server ^|Oracle ^|MySQL
+|UUID|varchar(36)|uuid|uniqueidentifier|varchar2(32)|varchar(32)
+|Date|timestamp|timestamp|datetime|timestamp|datetime(3)
+|java.sql.Date|timestamp|date|datetime|date|date
+|java.sql.Time|timestamp|time|datetime|timestamp|time(3)
+|BigDecimal|decimal(p, s)|decimal(p, s)|decimal(p, s)|number(p, s)|decimal(p, s)
+|Double|double precision|double precision|double precision|float|double precision
+|Long|bigint|bigint|bigint|number(19)|bigint
+|Integer|integer|integer|integer|integer|integer
+|Boolean|boolean|boolean|tinyint|char(1)|boolean
+|String (limited)|varchar(n)|varchar(n)|varchar(n)|varchar2(n)|varchar(n)
+|String (unlimited)|longvarchar|text|varchar(max)|clob|longtext
+|byte[]|longvarbinary|bytea|image|blob|longblob
+|===
+
+通常，在数据库和 Java 代码之间转换数据的整个工作由<<orm,ORM 层>>使用合适 JDBC 驱动程序来完成。这意味着使用<<entityManager,EntityManager>>方法和<<query,JPQL 查询>>处理数据时不需要手动转换数据；对于开发人员来说，在编写与数据库交互的代码时应避免使用表格左栏没有列出的 Java 类型。
+
+当通过 <<nativeQuery,EntityManager.createNativeQuery()>> 或 <<queryRunner,QueryRunner>> 使用本地 SQL 时，Java 代码中的某些类型将与上面提到的类型不同，具体取决于所使用的 DBMS。特别是对于 `UUID` 类型的属性 - 只有 PostgreSQL 驱动程序使用此类型返回相应列的值; 其它数据库服务都返回 `String`。要对不同的数据库类型抽象出通用应用程序代码，建议使用<<dbTypeConverter,DbTypeConverter>>接口转换参数类型和查询结果。
+
+include::dbms_types/arbitrary_dbms.adoc[]
+
+include::dbms_types/dbms_version.adoc[]
+

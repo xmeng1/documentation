@@ -1,0 +1,25 @@
+[[security_subsystem]]
+== 安全子系统
+
+CUBA 框架带有成熟的安全子系统，能解决企业级应用中常见的问题：
+
+* 使用自带的 <<users,users>> 存储，<<ldap,LDAP>>，<<sso,单点登录>> 或者 <<social_login,社交网站登录>> 进行用户验证。
+
+* 在数据模型（实体操作和属性）、UI 界面和任何能表达权限许可上（比如，张三可以查看文档，但是不能创建、更新或者删除任何文档，他也可以查看文档的所有属性，但是除了文档的 `amount` 属性），CUBA 提供了 <<roles,基于角色>> 的访问控制。
+
+* <<constraints,数据库行级别>>的访问控制 - 针对某个实体实例的权限控制。比如，张三只能查看他所在部门创建的文档。
+
+include::security_subsystem/security_web.adoc[]
+
+include::security_subsystem/security_components.adoc[]
+
+include::security_subsystem/data_access_checks.adoc[]
+
+include::security_subsystem/security_examples.adoc[]
+
+include::security_subsystem/ldap.adoc[]
+
+include::security_subsystem/sso.adoc[]
+
+include::security_subsystem/social_login.adoc[]
+

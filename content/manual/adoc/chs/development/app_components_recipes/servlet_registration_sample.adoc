@@ -1,0 +1,27 @@
+:sourcesdir: ../../../../source
+
+[[servlet_registration_sample]]
+==== 注册组件中的 DispatcherServlet
+
+本节将介绍如何将一个应用程序<<app_components,组件>>中的 servlet 和 filter 配置传递到使用该组件的应用程序。为了避免<<web.xml,web.xml>>文件中的代码重复，需要在组件中使用特殊的 `ServletRegistrationManager` bean 注册 servlet 和 filter。
+
+关于 Servlet 注册的最常见情况在示例<<servlet_registration,HTTP servlet 注册>>中介绍。我们考虑一个更复杂的例子：一个应用程序组件带有一个用于处理 Web 请求的自定义 `DispatcherServlet` 的实现。
+
+这个 servlet 从 `demo-dispatcher-spring.xml` 文件加载配置，如果要该 servlet 正常工作，应该在源码根目录（例如 `web/src`）先创建一个同名的空文件。
+
+[source,java]
+----
+include::{sourcesdir}/development/servlet_sample.java[]
+----
+
+要注册 `DispatcherServlet`，必须手动对此类进行加载、实例化、初始化，否则不同的类加载器可能会在 SingleWAR/SingleUberJAR <<deployment_variants,部署>>的情况下引发问题。而且，自定义 `DispatcherServlet` 应该需要进行双重初始化 - 第一次手动初始化，第二次由 servlet 容器初始化。
+
+下面是一个初始化 `WebDispatcherServlet` 的组件示例：
+
+[source,java]
+----
+include::{sourcesdir}/development/servlet_sample_2.java[]
+----
+
+注入的 `ServletRegistrationManager` bean 的 `createServlet()` 方法从 `ServletContextInitializedEvent` 获取应用程序<<appContext,上下文>>，并获取 `WebDispatcherServlet` 类的完全限定名。要初始化 servlet，需要传递从 `ServletContextInitializedEvent` 获得的 `ServletContext` 实例和 servlet 名称。`addMapping()` 方法用于定义通过 URL：`/webd/` 访问 servlet 的 HTTP 映射。
+

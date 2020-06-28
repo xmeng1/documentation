@@ -1,0 +1,33 @@
+:sourcesdir: ../../../../source
+
+[[gui_Action]]
+==== 操作
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/Action.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`Action` 是一个接口，这个接口是对可视化组件的操作（换句话说，一些功能）的抽象。当从不同的可视化组件中调用相同的操作时（例如，分别从按钮和表格右键菜单中调用同一个操作），它特别有用。此外，此接口定义了一些通用的属性，例如名称、键盘快捷键、可访问性和可见性标志等。
+
+可以 <<declarative_actions,声明式>> 的创建操作，也可以通过继承 <<baseAction,BaseAction>> 创建操作类。另外，对于表格和选取器组件，框架提供了一组<<standard_actions,标准操作>>。
+
+与操作关联的可视化组件可以有两种类型：
+
+* 只单个操作的可视化组件，这类组件实现 `Component.ActionOwner` 接口。这类组件有<<gui_Button,Button>>和<<gui_LinkButton,LinkButton>>。
++
+通过调用组件的 `ActionOwner.setAction()` 方法反操作链接到组件。此时，组件使用操作的属性设置自身相应的属性。（有关详细信息，请参阅组件概述）。
+
+* 包含多个操作的可视化组件，这类组件实现 `Component.ActionsHolder` 接口。这类组件有 `Window` 、 `Fragment` 、<<gui_DataGrid,DataGrid>> 、 <<gui_Table,Table>>及其继承者， <<gui_Tree,Tree>> ，<<gui_PopupButton,PopupButton>>，<<gui_PickerField,PickerField>>，<<gui_LookupPickerField,LookupPickerField>>。
++
+`ActionsHolder.addAction()` 方法用于向组件添加操作。在组件中实现此方法会检查它是否已包含具有相同标识符的操作。如果包含，则现有操作将替换为新操作。因此，可以在界面描述中声明标准操作，然后在控制器中创建具有不同属性的新操作，并将其添加到组件中。
+
+include::gui_Action/declarative_actions.adoc[]
+
+include::gui_Action/standard_actions.adoc[]
+
+include::gui_Action/custom_action_types.adoc[]
+
+include::gui_Action/baseAction.adoc[]
+

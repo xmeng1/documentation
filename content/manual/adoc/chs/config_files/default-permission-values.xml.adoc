@@ -1,0 +1,56 @@
+:sourcesdir: ../../../source
+
+[[default-permission-values.xml]]
+=== default-permission-values.xml
+
+[WARNING]
+====
+这种类型的文件用在 CUBA 版本 _小于_ 7.2 的项目中，或者用于迁移到新平台的项目，需要保留之前计算有效权限的方法，参阅<<legacy_roles>>章节。
+====
+
+如果没有<<roles,角色>>为需要权限的目标显式定义权限值的时候，就会使用默认权限值。对于有拒绝访问权限的用户来说，这个文件很多时候是需要的：因为如果没有这个文件，有拒绝访问角色的用户默认情况下是连<<main_window_layout,主窗口>>界面和<<gui_Filter,过滤器>>界面都不能访问的。
+
+该文件需要在 *core* 模块创建。
+
+文件的地址通过 <<cuba.defaultPermissionValuesConfig,cuba.defaultPermissionValuesConfig>> 应用程序属性定义。如果应用程序中这个属性没有定义，则会使用默认的 `cuba-default-permission-values.xml` 文件。
+
+XML schema： http://schemas.haulmont.com/cuba/default-permission-values.xsd
+
+这个文件有如下结构：
+
+`default-permission-values` - 根元素，只有一个嵌套元素 - `permission`。
+
+`permission` - 权限许可：定义对象类型和针对这个对象类型的权限。
+
+`permission` 有三个属性：
+
+* `target` - 许可对象：定义权限应用的特殊对象。根据许可类型来定义这个属性的格式：对于界面 - 界面的 `id`，对于实体操作 - 实体的 `id` 和操作类型，比如，`target="sec$Filter:read"`，等等。
+
+* `value` - 许可值。可以是 `0` 或者 `1`，分别表示拒绝或者许可。
+
+* `type` - 权限许可对象的类型：
++
+--
+* `10` - screen - 界面,
+
+* `20` - entity operation - 实体操作,
+
+* `30` - entity attribute - 实体属性,
+
+* `40` - application-specific permission - 程序特定功能权限,
+
+* `50` - UI component - 界面组件.
+--
+
+示例：
+
+[source, xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<default-permission-values xmlns="http://schemas.haulmont.com/cuba/default-permission-values.xsd">
+    <permission target="dynamicAttributesConditionEditor" value="0" type="10"/>
+    <permission target="dynamicAttributesConditionFrame" value="0" type="10"/>
+    <permission target="sec$Filter:read" value="1" type="20"/>
+    <permission target="cuba.gui.loginToClient" value="1" type="40"/>
+</default-permission-values>
+----

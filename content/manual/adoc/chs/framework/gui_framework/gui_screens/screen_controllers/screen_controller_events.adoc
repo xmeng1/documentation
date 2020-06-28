@@ -1,0 +1,81 @@
+:sourcesdir: ../../../../../../source
+
+[[screen_controller_events]]
+====== 界面事件
+
+本节介绍可以在控制器中处理的界面生命周期事件。
+
+[[screen_InitEvent]]
+* `InitEvent` 在界面控制器及其所有以声明方式定义的组件创建后并完成依赖注入时发送的事件。此时，嵌套的界面 fragment 尚未初始化，某些可视化组件未完全初始化，例如按钮还未与操作关联起来。
++
+[source, java]
+----
+include::{sourcesdir}/gui/screens/screen_InitEvent.java[]
+----
+
+[[screen_AfterInitEvent]]
+* `AfterInitEvent` 在界面控制器及其所有以声明方式定义的组件被创建并完成依赖注入，并且所有组件都已完成其内部初始化过程时发送此事件。此时，嵌套的界面 fragment（如果有的话）已经发送了 `InitEvent` 和 `AfterInitEvent` 事件。在此事件监听器中，可以创建可视化组件或数据组件并且进行一些依赖于嵌套 fragment 的额外初始化过程。
+
+[[screen_InitEntityEvent]]
+* `InitEntityEvent` 继承自 `StandardEditor` 和 `MasterDetailScreen` 的界面中，在新实体实例设置给被编辑实体的容器之前发送的事件。使用此事件监听器初始化新实体实例中的默认值，例如：
++
+[source, java]
+----
+include::{sourcesdir}/gui/screens/screen_InitEntityEvent.java[]
+----
+
+[[screen_BeforeShowEvent]]
+* `BeforeShowEvent` 在界面将要展示之前发送的事件，此时，界面尚未被添加到应用程序 UI 中、UI 组件已经应用安全限制、保存的组件设置尚未应用到 UI 组件。对于使用 `@LoadDataBeforeShow` 注解的界面，尚未加载数据。在此事件监听器中，可以加载数据、检查权限和修改 UI 组件。例如：
++
+[source, java]
+----
+include::{sourcesdir}/gui/screens/screen_BeforeShowEvent.java[]
+----
+
+[[screen_AfterShowEvent]]
+* `AfterShowEvent` 在显示界面之后立即发送此事件，此时，界面已经被添加到应用程序 UI 中。保存的组件设置已应用到 UI 组件。在此事件监听器中，可以显示通知、对话框或其它界面。例如：
++
+[source, java]
+----
+include::{sourcesdir}/gui/screens/screen_AfterShowEvent.java[]
+----
+
+[[screen_BeforeCloseEvent]]
+* `BeforeCloseEvent` 在界面通过其 `close(CloseAction)` 方法关闭之前发送的事件。此刻界面仍然正常显示并且功能完整。组件设置尚未保存。在此事件监听器中，可以做任何条件检查并使用事件的 `preventWindowClose()` 方法阻止界面关闭，例如：
++
+[source, java]
+----
+include::{sourcesdir}/gui/screens/screen_BeforeCloseEvent.java[]
+----
++
+还有一个同名的事件，它定义在 `Window` 接口内。此事件会在界面被外部（界面控制器之外）操作关闭之前发送，比如点击窗口标签页的关闭按钮或者按下 Esc 键。可以使用 `getCloseOrigin()` 方法获取窗口关闭的类型，此方法返回一个实现了 `CloseOrigin` 接口的对象。`CloseOrigin` 接口的默认实现是 `CloseOriginType`，有三个值：
++
+** `BREADCRUMBS` - 界面通过点击面包屑链接关闭。
+** `CLOSE_BUTTON` - 界面通过窗口顶部的关闭按钮关闭，或者通过窗口标签页的关闭按钮或右键菜单的操作：关闭、关闭全部、关闭其它。
+** `SHORTCUT` - 界面通过 <<shortcuts,cuba.gui.closeShortcut>> 应用程序属性定义的快捷键关闭。
++
+可以通过在 `@Subscribe` 注解中指定 `Target.FRAME` 的方法来订阅 `Window.BeforeCloseEvent`：
++
+[source, java]
+----
+include::{sourcesdir}/gui/screens/window_BeforeCloseEvent.java[]
+----
+
+[[screen_AfterCloseEvent]]
+* `AfterCloseEvent` 在界面通过 `close(CloseAction)` 方法关闭并且在 `Screen.AfterDetachEvent` 之后发送的事件。组件设置已保存。在此事件监听器中，可以在关闭界面后显示通知或对话框，例如：
++
+[source, java]
+----
+include::{sourcesdir}/gui/screens/screen_AfterCloseEvent.java[]
+----
+
+[[screen_AfterDetachEvent]]
+* `AfterDetachEvent` 在用户关闭界面或用户注销时从应用程序 UI 中移除界面后发送的事件。此事件监听器可用于释放界面持有的资源。请注意，在 HTTP 会话过期时不会发送此事件。
+
+[[screen_UrlParamsChangedEvent]]
+* `UrlParamsChangedEvent` 打开的界面对应的浏览器 URL 参数更改时发送的事件。事件在显示界面之前触发，以便能够进行一些准备工作。在此事件监听器中，可以根据新的参数加载一些数据或更改界面控件的状态：
++
+[source, java]
+----
+include::{sourcesdir}/gui/screens/screen_UrlParamsChangedEvent.java[]
+----

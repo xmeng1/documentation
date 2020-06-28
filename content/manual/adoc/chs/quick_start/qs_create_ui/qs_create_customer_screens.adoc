@@ -1,0 +1,22 @@
+:sourcesdir: ../../../../source
+
+[[qs_create_customer_screens]]
+==== Customer 界面
+
+在 CUBA 项目树的 *Data Model* 部分右键点击 `Customer` 实体，在右键菜单中选择 *New > Screen* 来创建查看和编辑 `Customer` 的标准界面。然后，Studio 会打开模板浏览界面。
+
+在可用模板列表里选择 *Entity browser and editor screens*，然后点击 *Next*。
+
+image::quick_start/screen_templates.png[align="center"]
+
+这个窗口的所有字段都已经填上了默认值，不需要修改了。点击 *Next*，下个界面中，本地化消息内容保持不变，然后点击 *Finish*。
+
+image::quick_start/customer_screens.png[align="center"]
+
+界面文件会显示在 *Generic UI* 部分的 *Screens* 部分：
+
+* `customer-browse.xml` - 浏览界面描述文件
+* `CustomerBrowse` - 浏览界面控制器
+* `customer-edit.xml` - 编辑界面描述文件
+* `CustomerEdit` - 编辑界面控制器
+

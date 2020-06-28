@@ -1,0 +1,39 @@
+:sourcesdir: ../../../../../source
+
+[[dsContext]]
+===== DsContext
+
+[WARNING]
+====
+这是旧版本的 API。对于从 7.0 开始的新 API，请参阅 <<gui_data>>。
+====
+
+所有通过声明式方法创建的数据源都在界面的 `DsContext` 对象中注册。`DsContext` 的引用可以通过在界面控制器中调用 `getDsContext()` 方法获得，也可以通过 <<screen_controller_injection>> 获得。
+
+`DsContext` 是为以下任务设计的：
+
+. 组织数据源的依赖关系，当在一个数据源中设置某个记录（比如，通过 `setItem()` 方法更改“当前”实例）的时候，引起了另一个关联的数据源的改动。通过这些数据源之间的依赖关系，可以组织界面中可视化组件的主从（master-detail）关系
++
+数据源之间的依赖关系通过使用带有 `ds$` 前缀的<<datasource_query,查询参数>>来组织。
+
+. 收集所有修改了的实体实例，然后通过一次单一的调用 `DataManager.commit()` 将数据提交给 Middleware，比如，可以通过这种方式在单一的数据库事务中保存所有数据更改。
++
+--
+举例说明，假设用户可以在某个界面上编辑 `Order` 实体以及属于 `Order` 的一组 `OrderLine` 实体。`Order` 实体在 `Datasource` 中，`OrderLine` 集合在一个嵌套的 `CollectionDatasource` 数据源中，这个嵌套的数据源通过 `Order.lines` 属性创建。
+
+如果用户更改了 `Order` 的某些属性并且创建了一个 `OrderLine` 的新实例，接下来，当界面的改动提交给 <<dataManager,DataManager>> 的时候，两个实体（改动的 `Order` 和新的 `OrderLine`）会被同时发送给 Middleware。之后，这两个实体会一起被合并到同一个<<entityManager,持久化上下文>>，最后，在数据库事务提交的时候再被保存到数据库。这样的话可以不需要在 ORM 层指定 cascade 参数，而且也避免了在 <<oneToMany_annotation, @OneToMany>> 注解描述中提到的问题。
+
+提交数据库的事务之后，`DsContext` 会从 Middleware 收到一组保存到数据库的对象实例（如果是乐观锁的情况，至少这些实体的 `version` 属性会增加），然后将这些收到的实例设置到数据源，替换旧的实体。因此，可以在提交改动之后马上在数据源使用最新的实体实例而不需要再次向 Middleware 和数据库发起额外的刷新请求。
+--
+
+. 声明两个监听器：`BeforeCommitListener` 和 `AfterCommitListener`。这两个监听器分别接收提交实体改动之前和之后的消息通知。通过 `BeforeCommitListener` 可以添加实体集合到 <<dataManager,DataManager>> 然后跟需要提交的数据在一个事务提交。在数据库事务提交之后，可以通过 `AfterCommitListener` 监听器来获得 `DataManager` 返回的提交之后的保存的实体。
++
+这个机制在某些时候很有用，比如一些实体，虽然跟界面元素绑定，但是不受数据源的控制，而且在界面控制器创建和修改。比如，<<gui_FileUploadField,FileUploadField>> 这个可视化组件，当上传文件完成之后，创建了一个 `FileDescriptor` 的实例，就可以通过这种机制在 `BeforeCommitListener` 添加到 `CommitContext` 跟其它的界面元素一起在提交到数据库。
++
+在下面的例子中，当界面提交的时候，一个 `Customer` 的新实例会被发送到 Middleware 然后跟其它修改过的实体一起被提交到数据库：
++
+[source, java]
+----
+include::{sourcesdir}/gui/dscontext_1.java[]
+---- 
+

@@ -1,0 +1,35 @@
+:sourcesdir: ../../../../../source
+
+[[notifications]]
+===== 通知消息
+
+[WARNING]
+====
+这是旧版本的 API。对于从 7.0 开始的新 API，请参阅 <<gui_notifications>>。
+====
+
+通知消息可以通过 `Frame` 接口的 `showNotification()` 方法来调用。由于<<screen_controller,界面控制器>>都实现了这个接口，所以可以直接在界面控制器调用此方法。
+
+`showNotification()` 方法有下列参数：
+
+* `caption` - 通知文本。对于 HTML 类型的消息，可以使用 HTML 标签来格式化消息内容。使用 HTML 时，确保对数据库取出的数据进行转义保护，避免 web 客户端进行代码注入。在非 HTML 格式的消息中可以使用 `\n` 来换行。
+
+* `description` – 在 caption 下显示的一条可选的描述信息。也可以使用 HTML 和非 HTML 格式。
+
+* `type` – 消息类型。可能的类型：
+
+** `TRAY`, `++TRAY_HTML++` - 在界面右下角显示通知消息，之后会自动消失。
+
+** `HUMANIZED`, `++HUMANIZED_HTML++` – 显示在界面中间的标准通知消息，之后会自动消失。
+
+** `WARNING`, `++WARNING_HTML++` – 警告通知消息，点击时消失。
+
+** `ERROR`, `++ERROR_HTML++` – 错误通知消息，点击时消失。
+
+显示通知消息示例：
+
+[source, java]
+----
+include::{sourcesdir}/gui/notifications_1.java[]
+----
+

@@ -1,0 +1,78 @@
+:sourcesdir: ../../../../../source
+
+[[dialogs]]
+===== 对话框消息
+
+[WARNING]
+====
+这是旧版本的 API。对于从 7.0 开始的新 API，请参阅 <<gui_dialogs>>。
+====
+
+通用对话框::
++
+--
+通用对话框可以通过 `Frame` 接口的 `showMessageDialog()` 和 `showOptionDialog()` 方法来调用。由于<<screen_controller,界面控制器>>都实现了这个接口，所以可以直接在界面控制器调用这些方法。
+
+[[dialogs_showMessageDialog]]
+* `showMessageDialog()` 用来展示一条消息，此方法有下列参数：
+
+** `title` – 窗口标题
+
+** `message` - 消息内容。对于 HTML 类型的消息，可以使用 HTML 标签来格式化消息内容。使用 HTML 时，确保对数据库取出的数据进行转义保护，避免 web 客户端进行代码注入。在非 HTML 格式的消息中可以使用 `\n` 来换行。
+
+** `messageType` – 消息类型。可能的类型：
+
+*** `CONFIRMATION` 、 `++CONFIRMATION_HTML++` – 确认窗口。
+
+*** `WARNING` 、  `++WARNING_HTML++` – 警告窗口
++
+消息类型的不同只反映在桌面客户端。
++
+也可以通过参数设置消息类型：
++
+**** `width` - 窗口宽度。
++
+**** `modal` - 窗口是否模态弹出。
++
+**** `maximized` - 对话框是否最大化到整个界面。
++
+**** `closeOnClickOutside` - 对话框是否可以通过点击界面对话框外面的部分进行关闭。
++
+显示对话框消息示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/dialogs_1.java[]
+----
+
+[[dialogs_showOptionDialog]]
+* `showOptionDialog()` 用来展示消息以及一些用户可以操作的按钮。除了上面提到的 `showMessageDialog()` 的参数外，这个方法还可以接收一个 action 的数组或者列表，并且会为每个 action 创建一个按钮。当按钮点击后，窗口调用相应操作的 `actionPerform()` 方法然后关闭。
++
+对于采用标准名称和图标的按钮来说，使用匿名类继承 `DialogAction` 很方便，支持使用 `DialogAction.Type` 枚举类型定义的五种动作：`OK` 、`CANCEL` 、`YES` 、 `NO` 、 `CLOSE`。相应的按钮名称从<<main_message_pack,主语言包>>中取得。
++
+下面这个例子是一个有 `Yes` 和 `No` 按钮的消息对话框，并且从语言包中获取到当前界面的标题和消息文本：
++
+[source, java]
+----
+include::{sourcesdir}/gui/dialogs_2.java[]
+----
++
+`DialogAction` 的 `Status` 参数用来给动作的按钮设置特殊的显示样式。`Status.PRIMARY` 会使相应的按钮高亮并且被选中。`Status` 参数也可以省去，这样的话会默认的高亮样式。如果给 `showOptionDialog` 传递了多个 `Status.PRIMARY` 的操作，只有第一个动作的按钮会被设置成 `cuba-primary-action` 样式并且被选中。
+--
+
+[[dialogs_fileUploadDialog]]
+文件上传对话框::
++
+--
+使用 `FileUploadDialog` 窗口来提供上传文件到<<file_upload,临时存储>>的基本功能。这个窗口包含了一个可以投放文件的区域，可以通过拖拽的方式从浏览器外将文件投放到指定区域进行上传，同时也提供了一个上传文件的按钮。
+
+image::gui_fileUploadDialog.png[align="center"]
+上传窗口是通过 `openWindow()` 方法打开的，当上传成功的时候，窗口关闭会返回 `COMMIT_ACTION_ID`。可以通过 `CloseListener` 或者 `CloseWithCommitListener` 监听器来跟踪窗口的关闭动作，然后用 `getFileId()` 和 `getFileName()` 方法来取到上传文件的 UUID 和名称。之后可以创建一个 `FileDescriptor` 对象用来作为这个文件在数据模型层的引用，可以用这个对象来实现其它业务逻辑。
+
+[source, java]
+----
+include::{sourcesdir}/gui/dialogs_3.java[]
+----
+--
+
+`Dialogs` 的展示可以使用带 `$cuba-window-modal-*` 前缀的 SCSS 变量进行自定义。可以在创建一个 <<web_theme_extension,主题扩展>> 或者一个 <<web_theme_creation,自定义主题>> 之后在可视化编辑器里修改这些变量的值。

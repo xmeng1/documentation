@@ -1,0 +1,11 @@
+:sourcesdir: ../../../source
+
+[[jmx_tools]]
+=== 使用 JMX 工具
+
+本章节介绍在基于 CUBA 的应用程序中使用 *Java Management Extensions* 的各方面内容。
+
+include::jmx_tools/jmx_console.adoc[]
+
+include::jmx_tools/jmx_remote_access.adoc[]
+

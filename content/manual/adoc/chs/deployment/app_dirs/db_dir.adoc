@@ -1,0 +1,11 @@
+:sourcesdir: ../../../../source
+
+[[db_dir]]
+==== 数据库脚本目录
+
+这个目录存放了用来创建和更新数据库的 SQL 脚本。是中间件 block 独有的目录。
+
+脚本目录结构是按照 <<db_scripts,>> 里面描述的构建的，但是这些目录还有额外的更高一级的目录，用来区分<<app_components,应用程序组件>>和应用程序本身的脚本。高一级目录的数字编号是项目构建 <<build.gradle,任务>>创建的。
+
+数据库脚本目录是由 <<cuba.dbDir,cuba.dbDir>> 应用程序属性指定。在 Tomcat 的<<fast_deployment,快速部署>>模式下，这个目录是中间件 web 应用程序目录下的 `WEB-INF/db` 目录，比如：`tomcat/webapps/app-core/WEB-INF/db`。如果是其它的部署方式，这个目录会 WAR 或者 UberJAR 文件里的 `/WEB-INF/db` 目录。
+

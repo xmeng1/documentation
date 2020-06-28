@@ -1,0 +1,14 @@
+:sourcesdir: ../../../../../source
+
+[[web_theme_usage]]
+===== 使用现有主题
+
+平台包括三个即用型主题：Hover 、Halo 和 Havana。默认情况下，应用程序将使用<<cuba.web.theme,cuba.web.theme>>应用程序属性中指定的主题。
+
+用户可以在标准 *Help* > *Settings* 界面中选择其它主题。如果要禁用选择主题的选项，请在项目的<<screens.xml,web-screens.xml>>文件中注册 `settings` 界面，并为其设置 `changeThemeEnabled = false` 参数：
+
+[source, xml]
+----
+include::{sourcesdir}/gui/themes/themes_1.xml[]
+---- 
+

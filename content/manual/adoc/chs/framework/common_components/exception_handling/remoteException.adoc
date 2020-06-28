@@ -1,0 +1,35 @@
+:sourcesdir: ../../../../../source
+
+[[remoteException]]
+===== 传递中间件异常
+
+如果从中间件抛出的异常是由于处理客户端请求引发的，则中止执行并且将异常对象返回给客户端。该对象通常包括底层异常链。此链可能包含客户端层不能够访问的类（例如，JDBC 驱动异常）。因此，平台不是发送此异常链到客户端，而是将其描述存储到专门创建的 `RemoteException` 对象中，将 `RemoteException` 对象发送到客户端。
+
+导致异常的信息存储为 `RemoteException.Cause` 对象列表。每个 `Cause` 对象都包含一个异常类名及其消息。此外，如果异常类是 "客户端支持" 的，则 `Cause` 也会存储异常对象。这样可以在 Exception 对象的字段中传递信息给客户端。
+
+如果异常类的对象应该作为 Java 对象传递给客户端层，则异常类应使用 `@SupportedByClient` 注解。例如:
+
+[source, java]
+----
+include::{sourcesdir}/common/mwexception_1.java[]
+----
+
+这样，当在中间件上抛出没有使用 `@SupportedByClient` 注解的异常时，客户端调用代码将接收到包含字符串形式的原始异常信息的 `RemoteException`。
+如果源异常带有 `@SupportedByClient` 注解，则调用者能直接接收到异常实例。这使得在客户端能够以传统方式（使用 try/catch 块）处理应用程序代码中间层<<services,服务>>声明的异常。
+
+请注意，如果需要将客户端支持的异常作为对象传递给客户端。则它的 `getCause()` 链上不应该包含任何不支持的异常。因此，如果在中间层创建异常实例并且希望将其传递给客户端， 请确保 cause 参数包含的异常类型能被客户端识别。
+
+`ServiceInterceptor` 类是一个<<services,服务>>拦截器，可以在异常对象传递给客户层之前将其打包。此外，它还执行异常日志记录。
+默认情况下会记录有关异常的所有信息，包含完整的 stacktrace 日志。如果不需要，可添加 `@Logging` 注解到异常类并指定日志级别:
+
+* `FULL` – 完整信息，包括 stacktrace（默认）。
+* `BRIEF` – 仅包含异常类名称和消息。
+* `NONE` – 没有输出。
+
+例如:
+
+[source, java]
+----
+include::{sourcesdir}/common/mwexception_2.java[]
+----
+

@@ -1,0 +1,35 @@
+:sourcesdir: ../../../../../source
+
+[[entityStates]]
+===== EntityStates
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/global/EntityStates.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+获取由 <<orm,ORM>> 管理的持久化实体信息的接口。与 <<persistence,Persistence>> 和 <<persistenceTools,PersistenceTools>> bean 不同，此接口可用于所有<<app_tiers,层>>。
+
+`EntityStates` 接口具有以下方法：
+
+* `isNew()` – 确定传递的实例是否是新创建的，即是否在 <<entity_states,New>> 状态。如果此实例实际上处于 <<entity_states,Managed>> 状态但在当前事务中刚被持久化，或者不是持久化实体，也会返回 `true`。
+
+* `isManaged()` - 确定传递的实例是否被托管，比如是否添加到持久化上下文。
+
+* `isDetached()` – 确定传递的实例是否处于<<entity_states,游离>>状态。如果此实例不是持久化实体，也返回 `true`。
+
+* `isLoaded()` - 确定是否从数据库加载了属性。属性已加载：如果属性包含在<<views,视图>>中，或者如果是本地属性并且未向加载机制（<<entityManager,EntityManager>> 或 <<dataManager,DataManager>>）提供视图。此方法只能检查实体的直接属性。
+
+* `checkLoaded()` - 与 `isLoaded()` 一样，但如果传递给方法的属性中至少有一个未加载，则抛出 `IllegalArgumentException`。
+
+* `isLoadedWithView()` - 接收实例和视图作为参数，如果实际加载了视图所需的所有属性，则返回 true。
+
+* `checkLoadedWithView()` - 与 `isLoadedWithView()` 一样，只不过是抛出 `IllegalArgumentException` 而不返回 false。
+
+* `makeDetached()` - 接收新创建的实体实例并将其转换为游离状态。游离的对象可以传递给 `DataManager.commit()` 或 `EntityManager.merge()` 以将其状态保存在数据库中。请参阅 API 文档中的详细信息。
+
+* `makePatch()` - 接受新创建的实体实例并使其成为 _补丁对象（patch object）_。该补丁对象可以传递给 `DataManager.commit()` 或 `EntityManager.merge()` 以将其状态保存在数据库中。与游离对象不同，补丁对象只保存非空属性。请参阅 API 文档中的详细信息。
+
+include::entityStates/persistenceHelper.adoc[]
+

@@ -1,0 +1,246 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_Image]]
+====== 图片组件
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=url-image" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/Image.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`Image` 图片组件可以显示不同源的图片。可以绑定到数据容器或通过代码设置。
+
+该组件的 XML 名称为： `image`
+
+`Image` 图片组件可以显示实体属性为 `FileDescriptor` 或 `byte[]` 类型的数据。下面是一个简单的通过 `dataContainer` 和 `property` 属性设置图片的例子:
+
+[source, xml]
+----
+<image id="image" dataContainer="employeeDc" property="avatar"/>
+----
+
+该组件展示 `employeeDc` 数据容器中 `Employee` 实体的 `avatar` 属性。
+
+`Image` 图片组件还可以展示其它源的图片。可通过以下 `image` 的元素设置不同的源类型：
+
+[[gui_Image_classpath]]
+* `classpath` - classpath 中的某个资源
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/image_4.xml[]
+----
+
+[[gui_Image_file]]
+* `file` - 文件系统中的某个资源
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/image_2.xml[]
+----
+
+[[gui_Image_relativePath]]
+* `relativePath` - 应用程序目录中的某个资源
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/image_10.xml[]
+----
+
+[[gui_Image_theme]]
+* `theme` - <<gui_themes,主题>>资源，例如 `VAADIN/themes/customTheme/some/path/image.png`。
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/image_3.xml[]
+----
+
+[[gui_Image_url]]
+* `url` - 可以从指定 URL 加载的资源
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/image_1.xml[]
+----
+
+`image` 图片组件的属性：
+
+[[gui_Image_scaleMode]]
+* `scaleMode` - 缩放模式，有以下几种模式可选：
++
+--
+* `FILL` - 根据组件大小拉伸图片。
+
+* `CONTAIN` - 保留长宽比压缩图片到能刚好在组件中全部展示。
+
+* `COVER` - 图片会被压缩或者拉升以适应组件的整个区域，维持组件本身的比例。如果图片的比例和组件的比例不匹配，会将图片做裁剪以适配组件的比例。
+
+* `SCALE_DOWN` - 在 `NONE` 和 `CONTAIN` 中选择图片能全部展示并且尺寸最小的方式。
+
+* `NONE` - 按实际大小显示。
+--
+
+[[gui_Image_alternateText]]
+* `alternateText` - 设置替换文本，当资源未设置或找不到时显示该文本。
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/image_14.xml[]
+----
+
+`image` 资源设置:
+
+[[gui_Image_bufferSize]]
+* `bufferSize` - 下载该资源时的缓存大小，以字节为单位。
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/image_13.xml[]
+----
+
+[[gui_Image_cacheTime]]
+* `cacheTime` - 该资源缓存过期时间，以毫秒为单位。
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/image_11.xml[]
+----
+
+[[gui_Image_mimeType]]
+* `mimeType` - 该资源的 MIME 类型。
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/image_12.xml[]
+----
+
+`Image` 图片组件接口的方法：
+
+[[gui_Image_setDatasource]]
+* `setDatasource()` - 设置图片数据源类型，只支持 `FileDescriptor` 和 `byte[]` 两种类型。
++
+数据源可以通过编辑的方式设置，比如在表单元格中显示图片：
++
+[source,java]
+----
+include::{sourcesdir}/gui_vcl/image_8.java[]
+----
++
+image::gui_Image_1.png[align="center"]
+
+[[gui_Image_setSource]]
+* `setSource()` - 设置图片源内容。输入源类型，返回源对象，并继续通过流式接口配置源内容。每种源类型都有各自设置源内容的方法，比如 `ThemeResource` 主题源用 `setPath()`；`StreamResource` 流资源用 `setStreamSupplier()` ：
++
+--
+[source,java]
+----
+include::{sourcesdir}/gui_vcl/image_7.java[]
+----
+
+或：
+
+[source,java]
+----
+include::{sourcesdir}/gui_vcl/image_9.java[]
+----
+
+[[gui_Image_ResourceType]]
+使用以下实现了 `Resource` 接口的资源类型，或者通过扩展它实现自定义资源：
+
+* `ClasspathResource` - 位于 classpath 中的图片. 这类资源还可以通过 `image` 组件的 `classpath` 元素以声明的方式设置。
+
+* `FileDescriptorResource` - 通过 `FileDescriptor` 从 `FileStorage` 中获取的图片。
+
+* `FileResource` - 文件系统中的图片。这类资源还可以通过 `image` 组件的 `file` 元素以声明的方式设置。
+
+* `RelativePathResource` - 应用程序中的图片。这类资源还可以通过 `image` 组件的 `relativePath` 元素以声明的方式设置。
+
+* `StreamResource` - 来自于流的图片。
+
+* `ThemeResource` - 主题的图片，比如 `VAADIN/themes/yourtheme/some/path/image.png`。这类资源还可以通过 `image` 组件的 `theme` 元素以声明的方式设置。
+
+* `UrlResource` - 从 URL 中加载的图片。这类源还可以通过 `image` 组件的 `url` 元素以声明的方式设置。
+--
+
+[[gui_Image_createResource]]
+* `createResource()` - 根据图片源类型创建图片资源。创建的对象可以传入 `setSource()` 方法。
++
+--
+[source,java]
+----
+include::{sourcesdir}/gui_vcl/image_6.java[]
+----
+--
+
+[[gui_Image_ClickListener]]
+* `addClickListener()` - 设置点击图片区域的监听器。
++
+[source,java]
+----
+include::{sourcesdir}/gui_vcl/image_15.java[]
+----
+
+[[gui_Image_SourceChangeListener]]
+* `addSourceChangeListener()` - 设置图片源改变的监听器。
+
+'''
+
+Image 图片组件的属性列表::
+<<gui_attr_align,align>> -
+<<gui_Image_alternateText,alternateText>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_colspan,colspan>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_attr_property,property>> -
+<<gui_attr_required,required>> -
+<<gui_attr_requiredMessage,requiredMessage>> -
+<<gui_attr_responsive,responsive>> -
+<<gui_attr_rowspan,rowspan>> -
+<<gui_Image_scaleMode,scaleMode>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+Image resources 图片源的属性列表::
+<<gui_Image_bufferSize,bufferSize>> -
+<<gui_Image_cacheTime,cacheTime>> -
+<<gui_Image_mimeType,mimeType>>
+
+Image 图片组件的元素::
+<<gui_Image_classpath,classpath>> -
+<<gui_Image_file,file>> -
+<<gui_Image_relativePath,relativePath>> -
+<<gui_Image_theme,theme>> -
+<<gui_Image_url,url>>
+
+API::
+<<gui_Image_ClickListener,addClickListener>> -
+<<gui_Image_SourceChangeListener,addSourceChangeListener>> -
+<<gui_Image_createResource,createResource>> -
+<<gui_Image_scaleMode,setScaleMode>> -
+<<gui_Image_setDatasource,setDatasource>> -
+<<gui_Image_setSource,setSource>>
+
+'''
+

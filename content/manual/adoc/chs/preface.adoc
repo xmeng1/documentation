@@ -1,0 +1,29 @@
+[[preface]]
+== 序言
+
+本手册提供关于 CUBA 框架的参考信息，并且介绍了使用此平台开发商业应用程序的最重要的内容。
+
+如果要使用此平台，需要掌握以下技术知识：
+
+* Java SE
+
+* 关系型数据库(SQL, DDL)
+
+另外，掌握以下技术和框架对更深层次的了解此平台有很大帮助：
+
+* link:https://docs.gradle.org/{gradleVersion}/userguide/userguide.html[Gradle] 构建系统
+
+* link:$$http://projects.spring.io/spring-framework$$[Spring Framework] - Spring 框架
+
+* link:$$https://en.wikipedia.org/wiki/Java_Persistence_API$$[Java Persistence API] - JPA
+
+* link:$$https://vaadin.com/book$$[Vaadin] web 应用程序框架
+
+* HTML / CSS / JavaScript
+
+* Java Servlets
+
+如果有任何关于改进本手册的建议，请提交 issue 到 https://github.com/cubacn/documentation[GitHub]。如果发现拼写或者单词错误，缺陷或者不一致的地方，请直接 fork 这个仓库并提交修改。谢谢！
+
+:sectnums:
+

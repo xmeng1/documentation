@@ -1,0 +1,51 @@
+:sourcesdir: ../../../../../source
+
+[[service_creation]]
+===== 创建服务
+
+服务接口的名称应以 `Service` 结尾，实现类的名称应以 `ServiceBean` 结尾。
+
+CUBA Studio 能帮助轻松创建服务接口的脚手架代码和存根类。Studio 还会自动在 `spring.xml` 中注册新服务。要创建服务，请使用 CUBA 项目树的 *Middleware* 节点中的 *New>Service* 任务。
+
+如果要手动创建服务，请按照以下步骤操作。
+
+. 在 *global* <<app_modules,模块>>中创建服务接口（因为服务接口必须在所有<<app_tiers,层>>中可用），并在其中指定服务名称。建议使用以下格式指定名称：`++{project_name}_{interface_name}++`。例如：
++
+[source, java]
+----
+include::{sourcesdir}/middleware/service_1.java[]
+----
+
+. 在 *core* 模块中创建服务类，并使用接口中指定的名称向其添加 `@org.springframework.stereotype.Service` 注解：
++
+[source, java]
+----
+include::{sourcesdir}/middleware/service_2.java[]
+----
+
+作为<<managed_beans, Spring bean>> 的服务类应放在包的树结构中，其根目录需要在<<spring.xml,spring.xml>>文件的 `context:component-scan` 元素中指定。这时，`spring.xml` 文件会包含以下元素：
+
+[source, xml]
+----
+include::{sourcesdir}/middleware/service_3.xml[]
+----
+
+这意味着将从 `com.sample.sales` 包开始搜索此应用程序 block 中带注解的 bean。
+
+如果不同的服务或其它中间件组件需要调用相同的业务逻辑，则应将其提取并封装在适当的<<managed_beans, Spring bean>>中。例如：
+
+[source, java]
+----
+include::{sourcesdir}/middleware/service_7_1.java[]
+----
+
+[source, java]
+----
+include::{sourcesdir}/middleware/service_7_2.java[]
+----
+
+[source, java]
+----
+include::{sourcesdir}/middleware/service_7_3.java[]
+----
+

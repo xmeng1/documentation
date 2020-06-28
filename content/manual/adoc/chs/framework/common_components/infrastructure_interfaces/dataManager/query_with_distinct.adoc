@@ -1,0 +1,18 @@
+:sourcesdir: ../../../../../../source
+
+[[query_with_distinct]]
+====== 去重查询
+如果一个界面包含带分页的表格，以及用于加载数据的 JPQL 查询，由于应用了<<gui_Filter,通用过滤器>>或访问组<<constraints,约束>>，JPQL 查询在运行时会被修改。在 JPQL 查询中省略 `distinct` 运算符时会发生以下情况：
+
+* 如果在数据库级别进行数据集合的组合，则加载的数据集将包含重复行。
+* 在客户端级别，由于数据被添加到 map 中（`java.util.Map`），重复项在数据源中会消失。
+* 对于分页表格，界面可能显示的行数少于请求的行数，而总行数超出请求的数量。
+
+因此，我们建议在 JPQL 查询中包含 `distinct`，以确保从数据库返回的数据集中不存在重复项。但是，如果返回的记录数很大（超过 10000），则在使用 `distinct` 执行 SQL 查询时，某些数据库服务器（特别是 PostgreSQL）会出现性能问题。
+
+为了解决这个问题，平台包含一种在 SQL 级别上没有 `distinct` 的情况下正常运行的机制。此机制由 <<cuba.inMemoryDistinct,cuba.inMemoryDistinct>> 应用程序属性启用。启用后，会执行以下操作：
+
+* JPQL 查询仍然应包含 `select distinct`。
+* 在将数据发送到 ORM 之前，`DataManager` 会从 JPQL 查询中删除 `distinct`。
+* 数据页由 `DataManager` 加载后，会删除重复项在 DB 运行其它查询，用来检索返回给客户端需要的行数。
+

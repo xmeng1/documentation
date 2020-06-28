@@ -1,0 +1,4 @@
+[[web_theme_migration]]
+=== 从 Havana 迁移至功能丰富的 Halo 主题
+
+示例请参阅<<web_theme_extension_common,修改主题通用参数>>部分。

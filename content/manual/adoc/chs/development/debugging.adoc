@@ -1,0 +1,13 @@
+:sourcesdir: ../../../source
+
+[[debugging]]
+=== 调试
+
+本章节介绍使用 CUBA 应用程序调试的步骤。
+
+include::debugging/debug_setup.adoc[]
+
+include::debugging/debug_version.adoc[]
+
+include::debugging/debug_widgets.adoc[]
+

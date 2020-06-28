@@ -1,0 +1,11 @@
+:sourcesdir: ../../../../source
+
+[[work_dir]]
+==== 工作目录
+
+应用程序使用工作目录来存储一些持久化数据和配置。
+
+比如，<<file_storage,文件存储>>机制默认使用工作目录的 `filestorage` 子目录。还有，中间件模块会将启动时自动生成的 <<persistence.xml,persistence.xml>> 和 `orm.xml` 保存到工作目录。
+
+工作目录是由 <<cuba.dataDir,cuba.dataDir>> 应用程序属性指定。默认情况，工作目录在应用程序主目录下。
+

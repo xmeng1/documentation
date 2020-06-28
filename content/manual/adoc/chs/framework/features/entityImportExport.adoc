@@ -1,0 +1,30 @@
+:sourcesdir: ../../../../source
+
+[[entityImportExport]]
+==== 以 JSON 格式导入和导出实体
+
+平台提供了一个 API，用于以 JSON 格式导出和导入实体关系图。它可以通过 `EntityImportExportAPI` 接口在中间件使用，也可以通过 `EntityImportExportService` 在客户端使用。这些接口具有一组相同的方法，如下所述。导出/导入实现委托给 `EntitySerializationAPI` 接口，也可以直接使用这个接口。
+
+* `exportEntitiesToJSON()` - 将一组实体序列化为 JSON。
++
+[source, java]
+----
+include::{sourcesdir}/common/entityImportExportService_1.java[]
+----
+
+*  `exportEntitiesToZIP()` - 将一组实体序列化为 JSON，并将 JSON 文件打包为 ZIP 文件。在下面的示例中，使用<<fileLoader,FileLoader>>接口将 ZIP 文件保存到文件存储中：
++
+[source, java]
+----
+include::{sourcesdir}/common/entityImportExportService_2.java[]
+----
+
+* `importEntitiesFromJSON()` - 反序列化 JSON 并根据由 `entityImportView` 参数（参阅 JavaDocs 中的 `EntityImportView` 类）描述的规则持久化反序列后的实体。如果一个实体在数据库中不存在，则会创建该实体。否则，将更新 `entityImportView` 中指定的现有实体的字段。
+
+* `importEntitiesFromZIP()` - 读取包含 JSON 文件的 ZIP 存档，像 `importEntitiesFromJSON()` 方法一样反序列化 JSON 并持久化反序列化的实体。
++
+[source, java]
+----
+include::{sourcesdir}/common/entityImportExportService_3.java[]
+----
+

@@ -1,0 +1,41 @@
+:sourcesdir: ../../../../source
+
+[[uniqueNumbers]]
+==== 序列生成
+
+该机制可以通过单个 API 生成唯一的数字序列，并且与 DBMS 类型无关。
+
+这个机制的主要部分是实现了 `UniqueNumbersAPI` 接口的 `UniqueNumbers` <<managed_beans,bean>>。这个 bean 对象可以在中间件<<app_tiers,block>>中找到。这个接口具有以下方法：
+
+* `getNextNumber(String domain)` – 获取序列的下一个值。该机制能够同时管理由任意字符串标识的多个序列。需要获取值的序列的名称通过 `domain` 参数传递。
++
+序列不需要初始化。当第一次调用 `getNextNumber()` 方法时，将创建相应的序列并返回 1。
+
+*  `getCurrentNumber(String domain)` – 获得当前值，也就是序列生成的最后一个值。`domain` 参数设置序列名称。
+
+* `setCurrentNumber(String domain)` – 设置序列的当前值。下一次调用 `getNextNumber()` 方法时将返回这个值递增 1 之后的值。
+
+下面是在一个中间件 bean 对象中获取序列中的下一个值的示例：
+
+[source, java]
+----
+@Inject
+private UniqueNumbersAPI uniqueNumbers;
+
+private long getNextValue() {
+  return uniqueNumbers.getNextNumber("mySequence");
+}
+----
+
+<<services,服务>> 的 `getNextNumber()` 方法用于在客户端 block 中获取序列值。
+
+与 `UniqueNumbersAPI` 拥有相同方法的 `app-core.cuba:type=UniqueNumbers` <<jmx_beans,JMX bean>>用于管理序列。
+
+序列生成机制的实现取决于 DBMS 类型。序列参数也可以直接在数据库中管理，但方式不同。
+
+* 对于 HSQL、 Microsoft SQL Server 2012+ 、 PostgreSQL 和 Oracle，每个 `UniqueNumbersAPI` 序列对应于数据库中名称为 `++SEC_UN_{domain}++` 格式的数据库原生序列。
+
+* 对于 2012 之前的 Microsoft SQL Server，每个序列对应一个带有 IDENTITY 类型主键的 `++SEC_UN_{domain}++` 表。
+
+* 对于 MySQL，序列对应于 `SYS_SEQUENCE` 表中的记录。
+

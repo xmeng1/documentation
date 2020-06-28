@@ -1,0 +1,44 @@
+:sourcesdir: ../../../../source
+
+[[file_storage]]
+==== 文件存储
+
+文件存储允许上传、存储和下载与实体相关联的任意文件。在平台标准实现中，使用文件系统中的特定结构将文件存储在主数据库之外。
+
+文件存储机制包括以下部分：
+
+* `FileDescriptor` 实体 – 用于表示上传的文件（不要与 `java.io.FileDescriptor` 混淆），使用这个实体就可以通过实体模型对象来引用文件。
+
+* `FileStorageAPI` 接口 – 提供对中间<<app_tiers,层>>的文件存储的访问。其主要方法有：
+
+** `saveStream()` – 根据指定的 `FileDescriptor` 保存文件内容，该文件可以作为 `InputStream` 传递。
+
+** `openStream()` – 根据指定的 `FileDescriptor` 获取文件内容，文件内容以打开的 `InputStream` 的形式返回。
+
+* `FileUploadController` 类 – Spring MVC 控制器，它使用 HTTP POST 请求将文件从客户端发送到中间件。
+
+* `FileDownloadController` 类 – Spring MVC 控制器，它使用 HTTP GET 请求将文件从中间件下载到客户端。
+
+* <<gui_FileUploadField,FileUpload>>和<<gui_FileMultiUploadField,FileMultiUpload>>可视化组件 - 能够将文件从用户的计算机上传到应用程序的客户端层，然后将它们传输到中间件。
+
+* `FileUploadingAPI` 接口 – 上传文件到客户端的临时存储。上面提到的可视化组件通过它将文件上传到客户端层。在应用程序代码中可以使用 `putFileIntoStorage()` 方法将文件移动到中间件的永久存储中。
+
+* <<fileLoader,FileLoader>> - 处理文件存储的接口，这个接口在中间层和客户端层都可以使用。
+
+* `ExportDisplay` – 用于将各种应用程序资源下载到用户计算机的客户端层接口。可以使用 `show()` 方法从永久存储中获取文件，该方法需要一个 `FileDescriptor` 参数。可以通过调用 `AppConfig.createExportDisplay()` 静态方法来获得 `ExportDisplay` 的实例，或通过在控制器类中使用<<screen_controller_injection,注入>>来获取。
+
+[TIP]
+====
+在用户计算机和存储之间的文件双向传输总是通过在输入和输出流之间复制数据来进行。在应用程序的任何层，文件都不会被完全加载到内存中，因此可以传输几乎任何大小的文件。
+====
+
+include::file_storage/file_upload.adoc[]
+
+include::file_storage/file_download.adoc[]
+
+include::file_storage/fileLoader.adoc[]
+
+include::file_storage/file_storage_impl.adoc[]
+
+include::file_storage/aws_file_storage_impl.adoc[]
+

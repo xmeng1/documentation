@@ -1,0 +1,10 @@
+:sourcesdir: ../../../../../../source
+
+[[own_component_in_studio]]
+====== CUBA Studio 对自定义可视化组件的支持
+
+[WARNING]
+====
+Coming soon.
+====
+

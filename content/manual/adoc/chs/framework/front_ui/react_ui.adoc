@@ -1,0 +1,6 @@
+:sourcesdir: ../../../../source
+
+[[react_ui]]
+==== 基于 React 的用户界面
+
+相关文档在代码仓库的 https://github.com/cuba-platform/frontend#table-of-contents[README] 文件中。

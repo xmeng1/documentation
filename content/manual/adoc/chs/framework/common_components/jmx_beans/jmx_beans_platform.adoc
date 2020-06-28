@@ -1,0 +1,19 @@
+:sourcesdir: ../../../../../source
+
+[[jmx_beans_platform]]
+===== 平台内置 JMX Beans
+
+本节介绍平台中可用的一些 JMX beans。
+
+include::jmx_beans_platform/cachingFacadeMBean.adoc[]
+
+include::jmx_beans_platform/configStorageMBean.adoc[]
+
+include::jmx_beans_platform/emailerMBean.adoc[]
+
+include::jmx_beans_platform/persistenceManagerMBean.adoc[]
+
+include::jmx_beans_platform/scriptingManagerMBean.adoc[]
+
+include::jmx_beans_platform/serverInfoMBean.adoc[]
+

@@ -1,0 +1,727 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_DataGrid]]
+====== 数据网格
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=datagrid-basic-settings" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/DataGrid.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`DataGrid` - 数据网格组件类似于<<gui_Table,表格>>组件, 适合用于展示、分类、排序表格类数据，由于使用了在滚动时加载数据的延迟加载方式，所以此组件具有更好的数据行、列操作性能。
+
+image::gui_dataGrid_1.png[align="center"]
+
+该组件的 XML 名称为 `dataGrid`
+
+以下为在 XML 文件中定义数据网格的示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/datagrid.xml[]
+----
+
+其中<column>元素里的 `id` 属性标识一列，`property` 指示数据容器实体中的属性，对应的数据库中的数据会展示在该列。
+
+*dataGrid - 数据网格中的元素：*
+
+[[gui_DataGrid_columns]]
+* `columns` - 必要元素，定义 `DataGrid` 的所有列。`columns` 元素有如下属性：
++
+--
+[[gui_DataGrid_columns_includeAll]]
+** `includeAll` – 加载 <<gui_data_containers,dataContainer>> 或 <<datasources,datasource>> 中定义的 <<views,view>> 的所有属性。
++
+在下面的例子中，我们显示了 `customersDc` 中使用视图的所有属性。如果视图包含系统属性，也同样会显示。
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/gui_dataGrid_columns_includeAll.xml[]
+----
++
+如果实体的视图包含引用属性，该属性会按照其<<namePattern_annotation,实例名称>>进行展示。如果需要展示一个特别的属性，则需要在视图和 `column` 元素中定义：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/gui_Table_columns_includeAll_related.xml[]
+----
++
+如果未指定视图，`includeAll` 会加载给定实体及其祖先的所有属性。
+
+[[gui_DataGrid_columns_exclude]]
+** `exclude` – 英文逗号分隔的属性列表，这些属性不会被加载到数据网格。
++
+在下面的例子中，我们会显示除了 `name` 和 `order` 之外的所有属性：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/gui_dataGrid_columns_exclude.xml[]
+----
+--
++
+每一列是在嵌套的 `column` 元素中描述，该元素有如下属性：
++
+--
+* `id` - 非必须属性，标识一列。如果没有设置，对应的 `property` 值会被用作该列的标识，所以这种时候 `property` 值是必须的。否则会抛出 `GuiDevelopmentException` 异常。如果列是在界面控制器代码中创建的，则 `id` 属性是必须的。
+
+[[gui_DataGrid_property]]
+* `property` - 指对应的实体属性。可以是数据源/数据容器实体的属性，也可以是关联实体的属性，关联实体属性前面需要加上关联类名字并通过“.”连接。例如：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/datagrid_dot.xml[]
+----
+
+* `caption` - 可选属性，定义列标题。如果未设置，对应的<<entity_localization,本地化属性名称>>会被做为列标题显示。
+
+[[gui_DataGrid_expandRatio]]
+* `expandRatio` - 设置列宽占比。默认情况下，所有列等宽（`expandRatio = 1`）。如果至少有一列设置了其它值，则忽略所有的隐式值，并且只使用设置的值。
+
+[[gui_DataGrid_collapsible]]
+* `collapsible` - 定义用户是否可以通过 `DataGrid` 表格组件右上角的侧边栏菜单隐藏/显示该列。默认为 `true`。
+
+[[gui_DataGrid_collapsed]]
+* `collapsed` -  可选属性，设置为 `true` 时自动隐藏该列。该属性默认值为 `false`。
+
+[[gui_DataGrid_collapsingToggleCaption]]
+* `collapsingToggleCaption` - 设置在侧边栏菜单中该列的标题。默认为 `null`, 此时侧边栏菜单中该列的标题与数据网格中该列的标题一致。
++
+image::gui_dataGrid_2.png[align="center"]
+
+[[gui_DataGrid_resizable]]
+* `resizable` - 定义用户是否可以调整列宽。
+
+[[gui_DataGrid_column_sortable,sortable]]
+* `sortable` - 可选属性，可以用来关闭针对该列的排序。当整个 `DataGrid` 数据网格控件的 `sortable` 属性设置为 `true`（默认值）时生效。
+ 
+* `width` - 可选属性，定义列宽。只支持以像素为单位的数值类型。
+
+[[gui_DataGrid_minimumWidth]]
+* `minimumWidth` - 设置最小列宽，以像素为单位。
+
+[[gui_DataGrid_maximumWidth]]
+* `maximumWidth` - 设置最大列宽，以像素为单位。
+
+`column` 元素可以包含一个内嵌的 <<gui_formatter,formatter>> 元素，通过它可以用不同于<<datatype,数据类型>>的格式展示数据：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/datagrid_formatter.xml[]
+----
+--
+
+[[gui_DataGrid_actions]]
+* `actions` - 可选元素，定义 `DataGrid` 数据网格的<<gui_Action,操作>>。除了自定义的操作，`ListActionType` 枚举类中定义的<<standard_actions,标准操作>>也支持，它们是: create（创建）、 edit（编辑）、  remove（删除）、  refresh（刷新）、  add（添加，从数据库中选择一条记录放入当前数据网格）、  exclude（移出，将所选行从当前数据网格中移出，但不会从数据库删除）.
+
+[[gui_DataGrid_buttonsPanel]]
+* `buttonsPanel` - 按钮区 `ButtonsPanel`，位于 `DataGrid` 数据网格的上方，其中包含各操作对应的按钮。
+
+[[gui_DataGrid_rowsCount]]
+
+* `rowsCount` - 可选元素，会为数据网格控件创建一个行数( `RowsCount` )控件。行数控件会启用数据分页，在界面控制器中调用 `CollectionLoader.setMaxResults()` 方法可以控制数据加载器中的数据量，进而能控制每页最大行数。另外，绑定到相同数据源的通用过滤器组件也能实现此功能。
++
+`rowsCount` 控件也会显示数据结果总数，但不需要把这些数据全部加载出来。用户可以点击 "*?*" 按钮, 它会调用 `com.haulmont.cuba.core.global.DataManager#getCount` 方法，该方法使用相同的参数请求数据库，同时使用 `++COUNT(*)++` 聚合函数代替加载数据。返回的数值会显示在 "*?*" 位置。
++
+`RowsCount` 组件的 `autoLoad` 属性如果设置为 `true`，启用自动加载行数。可以在 XML 描述中设置：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/datagrid_rowscount_1.xml[]
+----
++
+另外，在界面控制器中也可以通过 `RowsCount` API 启用或禁用该功能：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/datagrid_rowscount_2.java[]
+----
+
+*数据网格控件属性:*
+
+[[gui_DataGrid_aggregatable]]
+* `aggregatable` 属性可以启用对 `DataGrid` 的行进行聚合运算，支持下列运算符：
++
+--
+
+** `SUM` − 和
+
+** `AVG` − 均值
+
+** `COUNT` − 计数
+
+** `MIN` − 最小值
+
+** `MAX` − 最大值
+
+[[gui_DataGrid_column_aggregation]]
+聚合 `DataGrid` 列的 `aggregation` 元素需要设置 `type` 属性，表示聚合的函数。
+默认情况下，聚合列只支持数字类型，比如 `Integer`、`Double`、`Long` 和 `BigDecimal`。聚合值会显示在 `DataGrid` 顶部的附加行内。聚合的功能与 <<gui_Table, 表格>> 组件一致。也就是说，同样可以使用 <<gui_Table_column_aggregation_strategyClass,strategyClass>>、<<gui_Table_column_aggregation_valueDescription,valueDescription>> 和  <<gui_Table_column_aggregation_formatter,formatter>>。
+
+带聚合列的 `DataGrid` XML 描述示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/datagrid_aggregation_1.xml[]
+----
+--
+
+[[gui_DataGrid_aggregationPosition]]
+* `aggregationPosition` 属性可以设置聚合值行的位置： `TOP` 或 `BOTTOM`。默认为 `TOP`。
+
+[[gui_DataGrid_columnResizeMode]]
+* `columnResizeMode` - 设置调整列宽时的动画效果。支持两种效果：
++
+--
+* `ANIMATED` - 动画效果，列宽跟随鼠标拖拽（默认）。
+
+* `SIMPLE` - 简单效果，列宽会在拖拽动作结束后才发生改变。
+--
++
+[[gui_DataGrid_ColumnResizeListener]]
+列宽变化事件可以通过监听器 `ColumnResizeListener` 跟踪。可以使用 <<gui_api_UserOriginated,isUserOriginated()>> 方法跟踪列宽变化事件的来源。
+
+[[gui_DataGrid_columnsCollapsingAllowed]]
+* `columnsCollapsingAllowed` - 允许隐藏/折叠列，定义用户是否可以在侧边栏菜单中隐藏/折叠某些列。侧边栏菜单中显示的列旁边会有复选框。当用户选择或者取消选择某列时，对应列的 `collapsed` 属性值会变化。当 `columnsCollapsingAllowed` 属性为 `false` 时，列对应的 `collapsed` 属性不能被设置为 `true`。
++
+[[gui_DataGrid_ColumnCollapsingChangeListener]]
+列折叠状态的变化可以通过监听器 `ColumnCollapsingChangeListener` 跟踪。列折叠事件的来源可以使用 <<gui_api_UserOriginated,isUserOriginated()>> 方法进行跟踪.
+
+[[gui_DataGrid_contextMenuEnabled]]
+* `contextMenuEnabled` - 开启或关闭右键菜单。默认为 `true`。
++
+[[gui_DataGrid_ContextClickListener]]
+`DataGrid` 数据网格控件的右键点击事件可以通过监听器 `ContextClickListener` 跟踪。
+
+[[gui_DataGrid_editorBuffered]]
+* `editorBuffered` - 编辑器缓冲模式开启或关闭。默认为 `true`。
+
+[[gui_DataGrid_editorCancelCaption]]
+* `editorCancelCaption` - 设置 `DataGrid` 数据网组件编辑器中取消（cancel）按钮的名称。
+
+[[gui_DataGrid_editorCrossFieldValidate]]
+* `editorCrossFieldValidate` - 在<<gui_DataGrid_inline_editor,行内编辑器>>启用跨字段验证。默认为 `true`。
+
+[[gui_DataGrid_editorEnabled]]
+* `editorEnabled` -  启用数据项的行内编辑器。默认为 `false`。如果数据网格组件是跟 <<gui_keyvalue_containers,KeyValueCollectionContainer>> 或者 <<value_datasources,ValueCollectionDatasource>> 绑定的，则该数据是只读的，此时设置 `editorEnabled` 属性便没有意义。
+
+[[gui_DataGrid_editorSaveCaption]]
+* `editorSaveCaption` - 设置数据网格组件编辑器中保存（save）按钮的名称。
+
+[[gui_DataGrid_frozenColumnCount]]
+* `frozenColumnCount` - 设置固定列的个数。`0` 表示不需要固定任何列，除了开启多选模式时的选择列。设为 `-1` 的时候即使选择列也不固定。
+
+[[gui_DataGrid_headerVisible]]
+* `headerVisible` - 定义是否显示表头。默认为 `true`。
+
+[[gui_DataGrid_reorderingAllowed]]
+* `reorderingAllowed` - 定义用户是否可以通过鼠标拖拽重新设置列的顺序。默认值为 `true`。
++
+[[gui_DataGrid_ColumnReorderListener]]
+列排序的改变事件可以通过监听器 `ColumnReorderListener` 跟踪。排序改变事件的来源可以通过 <<gui_api_UserOriginated,isUserOriginated()>> 方法跟踪。
+
+[[gui_DataGrid_selectionMode]]
+* `selectionMode` - 设置行选择模式，支持以下四种：
++
+--
+* `SINGLE` - 单行选择。
+* `MULTI` - 多行选择。
+* `MULTI_CHECK` - 通过内嵌复选框列进行多选。
+* `NONE` - 不支持选择。
++
+[[gui_DataGrid_SelectionListener]]
+行选中事件可以通过监听器 `SelectionListener` 跟踪。行选中事件的来源可以使用 <<gui_api_UserOriginated,isUserOriginated()>> 方法跟踪.
++
+image::gui_dataGrid_3.png[align="center"]
+--
+
+[[gui_DataGrid_sortable]]
+* `sortable` - 开启/关闭数据网格控件的排序功能。默认为 `true`。开启后，点击列名会在列名右边显示排序图标。使用列的 `sortable` 属性可以禁用该列的排序功能。
++
+[[gui_DataGrid_SortListener]]
+`DataGrid` 的排序事件可以通过监听器 `SortListener` 跟踪。排序事件的来源可以通过 <<gui_api_UserOriginated,isUserOriginated()>> 方法跟踪。
+
+[[gui_DataGrid_textSelectionEnabled]]
+* `textSelectionEnabled` - 开启/关闭数据网格单元格中的文字选择功能。默认为 `false`。
+
+*DataGrid 接口的方法：*
+
+* `getColumns()` - 按当前界面的展示顺序获取列集合。
+
+* `getSelected()` 、 `getSingleSelected()` - 返回所选行对应实体的实例。getSelected() 返回一个集合。如果没有选择任何行，则返回一个空的集合。如果设置的是 `SelectionMode.SINGLE` 单选模式，用 getSingleSelected() 会更方便，它直接返回一个被选择的实体实例，或者 null（没有选择任何行）。
+
+* `getVisibleColumns()` - 按当前界面中列的显示顺序获取用户可见的列集合。
+
+[[gui_DataGrid_scrollTo]]
+* `scrollTo()` - 将 `DataGrid` 滚动到指定行。需要一个实体实例做为输入参数来指定滚动到哪一行。除了实体实例参数，另有重载方法支持 `ScrollDestination` 参数，该参数可以为以下值：
++
+--
+* `ANY` - 滚动尽量少的位置来展示所需要的数据。
+* `START` - 滚动 `DataGrid` ，使所需要的数据展示在可见部分的顶端。
+* `MIDDLE` - 滚动 `DataGrid` ，使所需要的数据展示在可见部分的中部。
+* `END` - 滚动 `DataGrid` ，使所需要的数据展示在可见部分的底部。
+--
+
+* `scrollToStart()` and `scrollToEnd()` - 将 `DataGrid` 滚动到开头或结尾。
+
+[[gui_DataGrid_addCellStyleProvider]]
+* `addCellStyleProvider()` - 为 `DataGrid` 单元格添加 style provider。
+
+[[gui_DataGrid_addRowStyleProvider]]
+* `addRowStyleProvider()` - 为 `DataGrid` 行添加 style provider。
+
+[[gui_DataGrid_setEnterPressAction]]
+* `setEnterPressAction()` - 设置按下 *回车键* 时需要执行的<<gui_Action,操作>>。如果没有定义这种操作，控件会尝试按以下顺序找一个合适的操作：
++
+--
+* `setItemClickAction()` 方法定义的操作。
+
+* 通过 `shortcut` 快捷键属性定义给 *回车键* 的操作。
+
+* `edit（编辑）` 操作。
+
+* `view（查看）` 操作。
+
+如果找到一个操作，并且其属性 `enabled` = `true`，则会执行它。
+
+--
+
+[[gui_DataGrid_setItemClickAction]]
+* `setItemClickAction()` -  设置双击时的<<gui_Action,操作>>。如果没有定义，组件会按以下顺序找一个合适的操作：
++
+--
+* 通过 `shortcut` 快捷键属性定义给 *回车键* 的操作。
+
+* `edit（编辑）` 操作。
+
+* `view（查看）` 操作。
+
+如果找到一个操作并且属性 `enabled` = `true`，则会执行它。
+
+[[gui_DataGrid_ItemClickListener]]
+单击事件可以通过监听器 `ItemClickListener` 跟踪。
+--
+
+[[gui_DataGrid_sort]]
+* `sort()` - 根据指定列对数据进行排序，通过枚举值 `SortDirection` 控制排序方式：
++
+--
+* `ASCENDING` - 升序 (A-Z, 1..9)。
+
+* `DESCENDING` - 降序 (Z-A, 9..1)。
+--
+
+[[gui_DataGrid_getAggregationResults]]
+* `getAggregationResults()` 方法返回<<gui_DataGrid_aggregatable,聚合>>结果的映射（map），键值为 `DataGrid` 的列标识符，值为聚合值。
+
+*使用描述提供者:*
+
+[[gui_DataGrid_setDescriptionProvider]]
+* `setDescriptionProvider()` 方法用来为每个 `DataGrid` 列的单元格生成可选的描述（提示）。描述支持 HTML 标记。
+
++
+--
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/datagrid_cellDescription.java[]
+----
+
+image::gui_dataGrid_11.png[align="center"]
+--
+
+[[gui_DataGrid_setRowDescriptionProvider]]
+* `setRowDescriptionProvider()` 方法用来为每个 `DataGrid` 行生成可选的描述（提示）。如果同时也设置了列描述提供者，只有在列描述提供者返回 null 时显示行描述提供器实例。
+
++
+--
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/datagrid_rowDescription.java[]
+----
+
+image::gui_dataGrid_10.png[align="center"]
+--
+
+[[gui_DataGrid_setDetailsGenerator]]
+*使用 DetailsGenerator：*
+
+使用 `setDetailsGenerator()` 方法设置 `DetailsGenerator` 接口，可以生成自定义控件来展示对应行的明细：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/datagrid_detailsGenerator.java[]
+----
+
+<1> – 参考 https://demo.cuba-platform.cn/sampler/open?screen=datagrid-detailsgenerator[DataGridDetailsGeneratorSample] 类中的 `createCloseButton` 方法全部代码。
+<2> – 参考 https://demo.cuba-platform.cn/sampler/open?screen=datagrid-detailsgenerator[DataGridDetailsGeneratorSample] 类中的 `getContent` 方法全部代码。
+
+结果如图所示：
+
+image::gui_dataGrid_15.png[align="center"]
+
+[[gui_DataGrid_inline_editor]]
+*使用数据网格行内编辑器：*
+
+`DataGrid` 组件支持行内编辑器来编辑单元格数据。当用户要编辑一个数据项时，行内编辑界面会显示并自带默认的保存和取消按钮。
+
+行内编辑器对应的方法有:
+
+* `getEditedItem()` - 返回正在被编辑的数据项。
+
+* `isEditorActive()` - 是否正在行内编辑界面编辑某个数据项。
+
+[[gui_DataGrid_editItem]]
+* `editItem(Object itemId)`（废弃） - 为提供了 `id` 的数据项打开编辑界面。如果数据项在当前界面区域不可见，数据网格会将数据项滚动到可视区域。
+
+[[gui_DataGrid_edit]]
+* `edit(Entity item)` - 为指定的数据项打开编辑界面。如果数据项在当前界面区域不可见，数据网格会将数据项滚动到可视区域。
+
+[[gui_DataGrid_inlineEditorCrossFieldValidate]]
+`DataGrid` 行内编辑器可以使用<<bean_validation_custom_constraints,实体约束>>（跨字段验证）。如果有验证错误，`DataGrid` 会显示错误消息。开启/禁用该功能或者获取当前状态可以使用下面方法：
+
+* `setEditorCrossFieldValidate(boolean validate)` - 启用、禁用行内编辑器的跨字段验证。默认为 `true`。
+
+* `isEditorCrossFieldValidate()` - 如果行内编辑器的跨字段验证开启，则返回 `true`。
+
+使用以下方法添加/删除行内编辑界面打的监听器：
+
+[[gui_DataGrid_EditorOpenListener]]
+* `addEditorOpenListener()`, `removeEditorCloseListener()` - 添加/删除行内编辑界面打开监听器。
++
+--
+当用户双击 `DataGrid` 数据网格中某个区域时，行内编辑界面打开，使用上述监听器，可以获取被编辑行的其它字段并进行需要的修改。这种方法可以使得不用关闭当前行内编辑器就能修改其它字段。
+
+例如:
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/datagrid_editor_open.java[]
+----
+--
+
+[[gui_DataGrid_EditorCloseListener]]
+* `addEditorCloseListener()`, `removeEditorCloseListener()` - 添加/删除行内编辑界面关闭监听器。
+
+[[gui_DataGrid_EditorPreCommitListener]]
+* `addEditorPreCommitListener()`, `removeEditorPreCommitListener()` - 添加/删除行内编辑界面数据提交前监听器。
+
+[[gui_DataGrid_EditorPostCommitListener]]
+* `addEditorPostCommitListener()`, `removeEditorPostCommitListener()` - 添加/删除行内编辑界面数据提交后监听器。
+
+行内编辑器所做的数据修改只提交到数据源或者数据容器。需要额外的代码把他们持久化到数据库。
+
+可以通过 `EditorFieldGenerationContext` 类对编辑器组件进行定制，在某一列上使用 `setEditFieldGenerator()` 方法设置该列数据的编辑器组件：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/datagrid_editor.java[]
+----
+
+结果如下:
+
+image::gui_dataGrid_14.png[align="center"]
+
+[[gui_DataGrid_addGeneratedColumn]]
+
+*使用 ColumnGenerator(列生成器) 接口：*
+
+`DataGrid` 组件通过以下方法生成列：
+
+* `addGeneratedColumn(String columnId, ColumnGenerator generator)`
+
+* `addGeneratedColumn(String columnId, ColumnGenerator generator, int index)`
+
+`ColumnGenerator` 是用来定义生成的列或者计算出的列的接口：
+
+* 该列每一行的数据值,
+
+* 该列数据类型。
+
+下面是一个生成列的示例，这个列显示大写的用户登录名：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/datagrid_generatedColumns.java[]
+----
+
+结果如下:
+
+image::gui_dataGrid_7.png[align="center"]
+
+`ColumnGeneratorEvent`  通过 `getValue` 方法传入, 它包含实体信息，在当前行的 ID 为 `loginUpperCase` 的列显示需要的数据。
+
+默认情况下，新生成的列加在数据网格的最右边。有两种方法可以管理列的位置：代码中使用 index 或者在界面 XML 文件中提前定义好并设置 `id`, 然后在 `addGeneratedColumn` 方法中使用该 id。
+
+[[gui_DataGrid_setRenderer]]
+
+*使用渲染器:*
+
+[[gui_DataGrid_createRenderer]]
+数据在列中的显示方式可以通过渲染器自定义。比如想在单元格中显示图标，可以使用 `ImageRenderer` 类和图标路径实现：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/datagrid_renderer.java[]
+----
+
+结果如下：
+
+image::gui_dataGrid_8.png[align="center"]
+
+`WebComponentRenderer` 接口可以使得在数据网格单元格中显示不同的 Web 控件。以下是生成一个带查找控件的列的例子：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/datagrid_webComponentRenderer.java[]
+----
+
+结果如下：
+
+image::gui_dataGrid_13.png[align="center"]
+
+[[gui_DataGrid_setConverter]]
+当字段类型与渲染器支持的类型不匹配时，可以创建一个 Function 来匹配模型和视图的数据类型。比如，想把布尔类型用图标展示时，可以巧妙的使用 `HtmlRenderer` 来做 HTML 渲染以及实现布尔类型转换为图标展示的逻辑。
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/datagrid_converter.java[]
+----
+
+结果如下：
+
+image::gui_dataGrid_9.png[align="center"]
+
+渲染器可以通过两种方式创建：
+
+* 在 `DataGrid` 接口的 set 方法中直接设置渲染器接口。
+
+* 为对应的模块直接创建渲染器实现：
++
+`dataGrid.createRenderer(DataGrid.ImageRenderer.class) → new WebImageRenderer()`
+
+目前平台支持以下渲染器接口：
+
+* `IconRenderer` - 显示 `CubaIcon` 的渲染器。
+
+* `TextRenderer` - 显示文本。
+
+* `HtmlRenderer` - 显示 HTML 布局。
+
+* `ProgressBarRenderer` - 把 0 到 1 之间的 `double` 浮点值作为 `ProgressBar` 进度条组件显示。
+
+* `DateRenderer` - 以预定义格式显示日期。
+
+* `NumberRenderer` - 以预定义格式显示数字。
+
+* `ButtonRenderer` - 把字符串值做为按钮文字展示。
+
+* `ImageRenderer` - 将指定路径的图像显示。
+
+* `CheckBoxRenderer` - 将布尔值做为复选框显示。
+
+*表头（Header）和表尾（Footer）：*
+
+`HeaderRow` 和 `FooterRow` 接口受制于分别展示表头和表尾单元格，支持跨列合并单元格。
+
+`DataGrid` 的以下方法用于创建和管理表头、表尾：
+
+* `appendHeaderRow()` 、  `appendFooterRow()` - 在表头或表尾区底部添加一个新行。
+
+* `prependHeaderRow()`、 `prependFooterRow()` - 在表头或表尾区顶部添加一个新行。
+
+* `addHeaderRowAt()` 、 `addFooterRowAt()` - 在表头或表尾区的指定位置添加新行。该位置及其后面的行位置顺序下移，行索引增加。
+
+* `removeHeaderRow()` 、 `removeFooterRow()` - 从表头或表尾区删除指定行。
+
+* `getHeaderRowCount()` 、  `getFooterRowCount()` - 获取表头或表尾区行数。
+
+* `setDefaultHeaderRow()` - 设置表头默认行。默认表头行为用户提供排序功能。
+
+`HeaderCell`  和 `FooterCell` 接口提供自定义静态单元格功能：
+
+* `setStyleName()` - 为单元格设置自定义样式。
+
+* `getCellType()` - 返回单元格内容类型。静态单元格枚举类型 `DataGridStaticCellType` 有三个值：
++
+--
+* `TEXT` -  文本
+
+* `HTML` - HTML
+
+* `COMPONENT` - 组件
+--
+* `getComponent()` 、  `getHtml()` 、  `getText()` - 不同类型单元格获取内容的方法。
+
+下面这个例子中，表头包含合并的单元格，表尾显示经计算得出的值：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/datagrid_example_1.xml[]
+----
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/datagrid_example_2.java[]
+----
+
+image::gui_dataGrid_12.png[align="center"]
+
+*数据网格样式：*
+
+可以在 XML 描述中使用 `stylename` 属性为 `DataGrid` 组件设置预定义样式。
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/datagrid_styles_1.xml[]
+----
+
+或者在界面控制器使用编程的方式设置。
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/datagrid_styles_2.java[]
+----
+
+预定义样式：
+
+[[gui_DataGrid_borderless]]
+* `borderless` - DataGrid 无边线。
+
+[[gui_DataGrid_no-horizontal-lines]]
+* `no-horizontal-lines` - DataGrid 行之间无水平分割线。
+
+[[gui_DataGrid_no-vertical-lines]]
+* `no-vertical-lines` - DataGrid 列之间无垂直分割线。
+
+[[gui_DataGrid_no-stripes]]
+* `no-stripes` - 每行背景颜色统一。
+
+`DataGrid` 的展示可以使用带 `$cuba-datagrid-*` 前缀的 SCSS 变量进行自定义。可以在创建一个 <<web_theme_extension,主题扩展>> 或者一个 <<web_theme_creation,自定义主题>> 之后在可视化编辑器里修改这些变量的值。
+
+'''
+
+DataGrid 的属性列表::
+<<gui_DataGrid_aggregatable,aggregatable>> -
+<<gui_DataGrid_aggregationPosition,aggregationPosition>> -
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_colspan,colspan>> -
+<<gui_DataGrid_columnResizeMode,columnResizeMode>> -
+<<gui_DataGrid_columnsCollapsingAllowed,columnsCollapsingAllowed>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_DataGrid_contextMenuEnabled,contextMenuEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_DataGrid_editorBuffered,editorBuffered>> -
+<<gui_DataGrid_editorCancelCaption,editorCancelCaption>> -
+<<gui_DataGrid_editorCrossFieldValidate,editorCrossFieldValidate>> -
+<<gui_DataGrid_editorEnabled,editorEnabled>> -
+<<gui_DataGrid_editorSaveCaption,editorSaveCaption>> -
+<<gui_Table_emptyStateLinkMessage,emptyStateLinkMessage>> -
+<<gui_Table_emptyStateMessage,emptyStateMessage>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_DataGrid_frozenColumnCount,frozenColumnCount>> -
+<<gui_DataGrid_headerVisible,headerVisible>> -
+<<gui_attr_height,height>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_DataGrid_reorderingAllowed,reorderingAllowed>> -
+<<gui_attr_responsive,responsive>> -
+<<gui_attr_rowspan,rowspan>> -
+<<gui_DataGrid_selectionMode,selectionMode>> -
+<<gui_attr_settingsEnabled,settingsEnabled>> -
+<<gui_DataGrid_sortable,sortable>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_DataGrid_textSelectionEnabled,textSelectionEnabled>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+DataGrid 的元素::
+<<gui_DataGrid_actions,actions>> -
+<<gui_DataGrid_buttonsPanel,buttonsPanel>> -
+<<gui_DataGrid_columns,columns>> -
+<<gui_DataGrid_rowsCount,rowsCount>>
+
+<<gui_DataGrid_columns,columns>> 元素属性列表::
+<<gui_DataGrid_columns_includeAll, includeAll>> -
+<<gui_DataGrid_columns_exclude, exclude>>
+
+column 元素的属性列表::
+<<gui_attr_caption,caption>> -
+<<gui_DataGrid_collapsed,collapsed>> -
+<<gui_DataGrid_collapsible,collapsible>> -
+<<gui_DataGrid_collapsingToggleCaption,collapsingToggleCaption>> -
+<<gui_attr_editable,editable>> -
+<<gui_DataGrid_expandRatio,expandRatio>> -
+<<gui_attr_id,id>> -
+<<gui_DataGrid_maximumWidth,maximumWidth>> -
+<<gui_DataGrid_minimumWidth,minimumWidth>> -
+<<gui_DataGrid_property,property>> -
+<<gui_DataGrid_resizable,resizable>> -
+<<gui_Table_column_sort,sort>> -
+<<gui_DataGrid_column_sortable,sortable>> -
+<<gui_attr_width,width>>
+
+column 的元素::
+<<gui_DataGrid_column_aggregation,aggregation>> -
+<<gui_Table_column_aggregation_formatter,formatter>>
+
+<<gui_DataGrid_column_aggregation,aggregation>> 的属性::
+<<gui_Table_column_aggregation_strategyClass,strategyClass>> -
+<<gui_DataGrid_column_aggregation,type>> -
+<<gui_Table_column_aggregation_valueDescription,valueDescription>>
+
+API::
+<<gui_DataGrid_addGeneratedColumn,addGeneratedColumn>> -
+<<gui_api_settings,applySettings>> -
+<<gui_DataGrid_createRenderer,createRenderer>> -
+<<gui_DataGrid_edit,edit>> -
+<<gui_DataGrid_getAggregationResults,getAggregationResults>> -
+<<gui_api_settings,saveSettings>> -
+<<gui_DataGrid_scrollTo,getColumns>> -
+<<gui_DataGrid_setDescriptionProvider,setDescriptionProvider>> -
+<<gui_DataGrid_addCellStyleProvider,addCellStyleProvider>> -
+<<gui_DataGrid_setConverter,setConverter>> -
+<<gui_DataGrid_setDetailsGenerator,setDetailsGenerator>> -
+<<gui_DataGrid_inlineEditorCrossFieldValidate,setEditorCrossFieldValidate>> -
+<<gui_Table_setEmptyStateLinkClickHandler,setEmptyStateLinkClickHandler>> -
+<<gui_DataGrid_setEnterPressAction,setEnterPressAction>> -
+<<gui_DataGrid_setItemClickAction,setItemClickAction>> -
+<<gui_DataGrid_setRenderer,setRenderer>> -
+<<gui_DataGrid_setRowDescriptionProvider,setRowDescriptionProvider>> -
+<<gui_DataGrid_addRowStyleProvider,addRowStyleProvider>> -
+<<gui_DataGrid_sort,sort>>
+
+DataGrid 监听器::
+<<gui_DataGrid_ColumnCollapsingChangeListener,ColumnCollapsingChangeListener>> -
+<<gui_DataGrid_ColumnReorderListener,ColumnReorderListener>> -
+<<gui_DataGrid_ColumnResizeListener,ColumnResizeListener>> -
+<<gui_DataGrid_ContextClickListener,ContextClickListener>> -
+<<gui_DataGrid_EditorCloseListener,EditorCloseListener>> -
+<<gui_DataGrid_EditorOpenListener,EditorOpenListener>> -
+<<gui_DataGrid_EditorPostCommitListener,EditorPostCommitListener>> -
+<<gui_DataGrid_EditorPreCommitListener,EditorPreCommitListener>> -
+<<gui_DataGrid_ItemClickListener,ItemClickListener>> -
+<<gui_DataGrid_SelectionListener,SelectionListener>> -
+<<gui_DataGrid_SortListener,SortListener>>
+
+预定义样式::
+<<gui_DataGrid_borderless,borderless>> - 
+<<gui_DataGrid_no-horizontal-lines,no-horizontal-lines>> -
+<<gui_DataGrid_no-vertical-lines,no-vertical-lines>> -
+<<gui_DataGrid_no-stripes,no-stripes>>
+
+'''

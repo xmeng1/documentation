@@ -1,0 +1,20 @@
+:sourcesdir: ../../../../source
+
+[[email_sending]]
+==== 发送邮件
+
+平台的电子邮件发送提供以下基础功能：
+
+* 同步或异步发送。在同步发送的情况下，调用代码将一直等待，直到消息被发送到 SMTP 服务器。在异步发送的情况下，消息被持久化到数据库，并且将控制权立即交回给调用代码。实际发送动作稍后由<<scheduled_tasks,计划任务>>完成。
+
+* 对于同步和异步模式，都能可靠地跟踪消息发送的时间戳或数据库中的错误。
+
+* 提供用户界面，用于搜索和查看有关已发送消息的信息，包括所有消息属性和内容、发送状态和尝试次数。
+
+include::email_sending/email_sending_methods.adoc[]
+
+include::email_sending/email_attachments.adoc[]
+
+include::email_sending/email_sending_properties.adoc[]
+
+include::email_sending/sending_emails_recipe.adoc[]

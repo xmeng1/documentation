@@ -1,0 +1,90 @@
+:sourcesdir: ../../../../../source
+
+[[icon_set]]
+===== 图标集
+
+图标集允许将可视化组件中图标的使用与主题中图片的实际路径或字体元素常量解耦。它们还简化了对继承自应用程序组件的 UI 中使用的图标的覆盖。
+
+图标集是一个枚举，包含了与图标对应的枚举值。图标集必须实现 `Icons.Icon` 接口，该接口有一个参数：表示图标资源的字符串，例如，`font-icon:CHECK` 或 `icons/myawesomeicon.png`。要获取资源，请使用平台提供的 `Icons` bean。
+
+可以在 *web* 或者 *gui* 模块中创建图标集。图标集中所有图标的名称应匹配正则表达式：`[A-Z]_`，即它们应仅包含大写字母和下划线。
+
+例如:
+
+[source, java]
+----
+public enum MyIcon implements Icons.Icon {
+
+    // adding new icon
+    COOL_ICON("icons/cool-icon.png"),
+
+    // overriding a CUBA default icon
+    OK("icons/my-ok.png");
+
+    protected String source;
+
+    MyIcon(String source) {
+        this.source = source;
+    }
+
+    @Override
+    public String source() {
+        return source;
+    }
+}
+----
+
+图标集应该在<<cuba.iconsConfig,cuba.iconsConfig>>应用程序属性中注册，例如：
+
+.web-app.properties
+[source, plain]
+----
+cuba.iconsConfig = +com.company.demo.gui.icons.MyIcon
+----
+
+[TIP]
+====
+要使某个应用程序组件中的图标集在目标项目中可用，此属性应该添加到<<app-component.xml,应用程序组件描述>>。
+====
+
+现在，可以在界面 XML 描述中以声明方式使用此图标集中的图标：
+
+[source, xml]
+----
+<button icon="COOL_ICON"/>
+----
+
+或在界面控制器中以编程方式使用：
+
+[source, java]
+----
+button.setIconFromSet(MyIcon.COOL_ICON);
+----
+
+以下前缀允许以声明方式使用不同来源的图标：
+
+* `theme` - 图标将由当前主题目录提供，例如，`web/themes/halo/awesomeFolder/superIcon.png`：
++
+[source, xml]
+----
+<button icon="theme:awesomeFolder/superIcon.png"/>
+----
+
+* `file` - 图标将由文件系统提供：
++
+[source, xml]
+----
+<button icon="file:D:/superIcon.png"/>
+----
+
+* `classpath` - 图标将由类路径提供，例如，`com/company/demo/web/superIcon.png`
++
+[source, xml]
+----
+<button icon="classpath:/com/company/demo/web/superIcon.png"/>
+----
+
+平台提供了一个预定义的图标集 - `CubaIcon`。它包括几乎完整的 `FontAwesome` 图标集和 CUBA 特定的图标。可以在 Studio 图标编辑界面中选择这些图标：
+
+image::icon_set.png[align="center"]
+

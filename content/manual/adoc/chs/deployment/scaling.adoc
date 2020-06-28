@@ -1,0 +1,61 @@
+:sourcesdir: ../../../source
+
+[[scaling]]
+=== 应用程序扩展
+
+本章节介绍在负载增加或者有更强的容错需求的时候怎样对包含 *Middleware* 和 *Web Client* blocks 的 CUBA 应用程序进行扩展。
+
+[cols="3,2", frame="all", width="100%"]
+|===
+
+a| *扩展级别 1. 两个 blocks 部署在同一个应用服务内*
+
+这是使用标准<<fast_deployment,快速部署>>流程的最简单情况。
+
+在这种情况下，*Web Client* 和 *Middleware* 之间的数据传输性能可以达到最大化，因为当启用 <<cuba.useLocalServiceInvocation,cuba.useLocalServiceInvocation>> 应用程序属性时，可以跳过网络堆栈直接调用 Middleware 服务。
+^| image:scaling_1.png[align="center",pdfwidth=2.5in]
+
+a| *扩展级别 2. Middleware 和 web 客户端部署在不同的应用程序服务内*
+
+这个选择可以在两个应用服务器之间分散负载，从而更好的使用两个服务器的资源。还有，用这种部署方式从 web 用户来的负载会对其它进程的执行影响小一些。这里的其它进程是指处理其它客户端类型、运行<<scheduled_tasks,计划任务>>还有潜在可能的一些从中间层（middle layer）来的集成任务（integration tasks）。
+
+对服务器资源的要求：
+
+* Tomcat 1 (Web 客户端):
+** 内存大小 – 按比例分配给同时在线的用户
+** CPU – 按照使用的强度
+* Tomcat 2 (Middleware):
+** 内存大小 – 固定大小，而且相对来说不大
+** CPU – 取决于 web 客户端和其它进程的使用强度
+
+在这种部署选择或者更复杂的部署情况下，web 客户端的 <<cuba.useLocalServiceInvocation,cuba.useLocalServiceInvocation>> 应用程序属性应该设置成 `false`，<<cuba.connectionUrlList,cuba.connectionUrlList>> 属性需要包含 Middleware block 的 URL。
+^| image:scaling_2.png[align="center",pdfwidth=2.5in]
+
+| *扩展级别 3. Web 客户端集群搭配单一 Middleware 服务*
+
+这种部署选择是用在，由于并发用户数太大导致 Web 客户端的内存需求超过了单一 JVM 的承载能力的场景。集群中多个 Web 客户端启动后，用户连接通过负载均衡来处理。所有的 Web 客户端都连接同一个 Middleware 服务器。
+
+多个 Web 客户端自动提供了一定级别的容错。但是，不支持在客户端之间复制 HTTP 会话，如果有一个 web 客户端服务器计划外宕机了，所有连到这个服务器的用户需要重新登录应用程序。
+
+这个部署选择的配置在 <<cluster_webclient,>> 介绍。
+^| image:scaling_3.png[align="center",pdfwidth=2.5in]
+
+| *扩展级别 4. Web 客户端集群搭配 Middleware 集群*
+
+这个方案是最强大的部署选择，能提供全面的 Web 客户端和 Middleware 容错性和负载均衡。
+
+连接到 Web 客户端的用户通过负载均衡接入。多个 Web 客户端服务器跟 Middleware 集群协作提供服务。Middleware 服务不需要额外的负载均衡 - 通过 <<cuba.connectionUrlList,cuba.connectionUrlList>> 应用程序属性已经足够定义 Middleware 服务器 URL 列表。另外还可通过<<cluster_mw_zk,集成 Apache ZooKeeper 插件>>用来做 Middleware 服务的动态发现。
+
+多个 Middleware 服务会交换用户会话、锁等信息。这样的话，Middleware 可以提供全容错 - 其中一台服务宕机之后，另一台可用的 Middleware 服务会接过用户的请求继续处理，从而不会影响终端用户的感受。
+
+这个部署选择的配置在 <<cluster_mw,>> 介绍。
+^| image:scaling_4.png[align="center",pdfwidth=2.5in]
+
+|===
+
+include::scaling/cluster_webclient.adoc[]
+
+include::scaling/cluster_mw.adoc[]
+
+include::scaling/serverId.adoc[]
+

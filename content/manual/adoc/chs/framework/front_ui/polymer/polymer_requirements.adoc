@@ -1,0 +1,7 @@
+:sourcesdir: ../../../../../source
+
+[[polymer_requirements]]
+===== Polymer 需求
+
+安装 http://git-scm.com/downloads[Git] 并确保在命令行可用。对于前端应用来说，需要安装 https://bower.io/[bower] 包管理器。
+

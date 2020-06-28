@@ -1,0 +1,30 @@
+:sourcesdir: ../../../../../../source
+
+[[abstractLookup]]
+====== AbstractLookup
+
+[WARNING]
+====
+这是旧版本的 API。对于从 7.0 开始的新 API，请参阅 <<screen_controllers>>。
+====
+
+`AbstractLookup` 是<<screen_lookup,查找界面>>控制器的基类，<<abstractWindow,AbstractWindow>> 的子类。定义了下列方法：
+
+[[abstractLookup_setLookupComponent]]
+* `setLookupComponent()` – 设置查找组件，用来选择实体实例。
++
+作为一条编码规则，用来做选择的组件在 XML 描述中定义，不需要在应用程序代码中调用这个方法。
+
+[[abstractLookup_setLookupValidator]]
+* `setLookupValidator()` – 为界面设置 `Window.Lookup.Validator` 对象，在返回实体的实例之前，这里的 `validate()` 方法会被平台调用。如果 `validate()` 方法返回 `false`，查找实体的过程或者窗口关闭的过程会被中断。
++
+默认情况不设置这个验证器。
+
+'''
+
+API::
+<<abstractLookup_setLookupComponent,setLookupComponent()>> -
+<<abstractLookup_setLookupValidator,setLookupValidator()>>
+
+'''
+

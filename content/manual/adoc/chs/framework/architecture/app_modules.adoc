@@ -1,0 +1,24 @@
+:sourcesdir: ../../../../source
+
+[[app_modules]]
+==== 应用程序模块
+
+模块是 CUBA 应用程序的最小组成部分。是应用程序项目中的单个模块，并具有相应的包含可执行代码的 JAR 文件。
+
+标准模块：
+
+* *global* – 包含所有层共享的实体类、服务接口和其它类。用于所有<<app_tiers,应用程序 block>>。
+
+* *core* – 实现中间层的服务和所有其它组件。
+
+* *gui* – 包含<<gui_framework,通用用户界面>>的组件。用于 *Web Client* block。
+
+* *web* – 基于 *Vaadin* 的通用用户界面实现。
+
+* *portal* – 可选模块 - 基于 *Spring MVC* 的 Web 门户的实现。
+
+* *front* – 可选模块 - 使用 JavaScript 实现的<<front_ui>>。
+
+.应用程序模块
+image::AppModules.svg[align="center"]
+

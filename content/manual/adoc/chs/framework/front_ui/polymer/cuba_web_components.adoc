@@ -1,0 +1,11 @@
+:sourcesdir: ../../../../../source
+
+[[cuba_web_components]]
+===== CUBA Polymer Web 组件
+
+CUBA 元素的详细 API 参考可以在 https://cuba-elements.github.io/cuba-elements/[这里] 找到。
+
+include::cuba_web_components/polymer_inintialization.adoc[]
+
+include::cuba_web_components/polymer_working_with_data.adoc[]
+

@@ -1,0 +1,115 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_BulkEditor]]
+====== 批量编辑器
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/BulkEditor.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`BulkEditor` - 批量编辑器支持一次修改多个实体对象的属性值。它是个按钮，一般可以加到<<gui_Table,表格>>或<<gui_Tree,树>>组件, 点击它时打开批量编辑器界面。
+
+image::gui_bulkEdit.png[align="center"]
+
+该组件对应的 XML 名称： `bulkEditor`
+
+[WARNING]
+====
+`BulkEditor` 只能用在使用了<<gui_legacy,遗留 API>>的界面中。最新 API 的类似功能通过<<BulkEditAction>>提供。
+====
+
+要使用 `BulkEditor` , 相应的表格或者树组件的 `multiselect`  属性需设置为 `"true"`。
+
+批量实体编辑界面是基于定义的 view（view 里一般包括实体的字段和引用）、实体动态属性和用户权限自动生成的。系统属性不会显示在生成的界面里。
+
+实体属性名称会按字母排序。默认情况下，值都为空，界面提交的时候，非空值会更新到所有的实体对象中。
+
+批量实体编辑界面也支持批量删除值 - 实体对象的对应字段会设置为空( `null`)。操作方法是点击字段旁边的 image:gui_bulkEditorSetNullButton.png[] 按钮，点击之后，该字段变为不可编辑, 再次点击该按钮则该字段恢复可编辑。
+
+image::gui_invoiceBulkEdit.png[align="center"]
+
+以下为在表格中使用 `bulkEditor` 批量编辑器的例子：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/bulkEditor_1.xml[]
+----
+
+`bulkEditor` 批量编辑器的属性有 ::
++
+--
+[[gui_BulkEditor_for]]
+* 属性 `for` 是必须的，它指向需要该功能的<<gui_DataGrid,数据网格>> 、 <<gui_Table,表格>>或<<gui_Tree,树>>组件的标识；在上述例子中，应该是 `invoiceTable`。
+
+[[gui_BulkEditor_exclude]]
+* 属性 `exclude` 标识需要在批量编辑界面排除的字段，它可以包含一个正则表达式。比如： `date|customer`
++
+image::gui_TableBulkEdit.png[align="center"]
+
+[[gui_BulkEditor_includeProperties]]
+* `includeProperties` - 定义批量编辑界面需要包含的字段；设置它以后，其它字段会被忽略。
++
+`includeProperties` 不会应用到动态属性。
++
+以声明的方式设置时，多个属性之间应该用逗号隔开：
++
+[source,xml]
+----
+<bulkEditor for="ordersTable" includeProperties="name, description"/>
+----
++
+这些属性也可以在界面控制器中以编程的方式设置：
++
+[source,java]
+----
+bulkEditor.setIncludeProperties(Arrays.asList("name", "description"));
+----
+
+[[gui_BulkEditor_loadDynamicAttributes]]
+* `loadDynamicAttributes` 定义实体的<<dynamic_attributes,动态属性>>是否在批量编辑界面显示。默认为 `true`。
+
+[[gui_BulkEditor_useConfirmDialog]]
+* `useConfirmDialog` 定义保存之前是否弹出确认<<dialogs,对话框>>，默认为 `true`。
++
+image::gui_BulkEditor_useConfirmDialog.png[align="center"]
+
+[[gui_BulkEditor_columnsMode]]
+* `columnsMode` − 定义批量编辑界面列的数量，是 `ColumnsMode` 枚举的值。默认为 `TWO_COLUMNS`。示例：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/bulkEditor_2.xml[]
+----
+
+批量编辑界面的外观可以通过以 `$c-bulk-editor-*` 开头的 SCSS 变量自定义。在创建了 <<web_theme_extension,主题扩展>> 或 <<web_theme_creation,自定义主题>> 之后可以在可视化编辑器修改这些变量的值。
+--
+
+'''
+
+bulkEditor 批量编辑器的属性::
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_BulkEditor_columnsMode,columnsMode>> -
+<<gui_attr_css,css>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_enable,enable>> -
+<<gui_BulkEditor_exclude,exclude>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_BulkEditor_for,for>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_BulkEditor_includeProperties,includeProperties>> -
+<<gui_BulkEditor_loadDynamicAttributes,loadDynamicAttributes>> -
+<<gui_attr_openType,openType>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_BulkEditor_useConfirmDialog,useConfirmDialog>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+'''
+

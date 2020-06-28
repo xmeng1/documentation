@@ -1,0 +1,25 @@
+:sourcesdir: ../../../../source
+
+[[jmx_console]]
+==== 内置 JMX 控制台
+
+*cuba* <<app_components,应用程序组件>>的 Web 客户端模块包含 JMX 对象查看和编辑工具。工具的入口是注册在 `jmxConsole` 标识符下的 `com/haulmont/cuba/web/app/ui/jmxcontrol/browse/display-mbeans.xml` 界面，可以通过标准应用程序菜单的 *Administration* > *JMX Console* 访问。
+
+不需要额外的配置，这个控制台能显示当前用户正在运行的 web 客户端 JVM 内注册的所有 JMX 对象。因此，在最简单的情况下，当所有的应用程序 block 都部署到一个 web 容器实例的时候，JMX 控制台可以访问所有层（tier）的 JMX beans 甚至包括 JVM 和 web 容器的 JMX 对象。
+
+应用程序 beans 的名称都带有一个拥有这些 bean 的 web-app 名称的前缀。比如，`app-core.cuba:type=CachingFacade` bean 会被 *app-core* web-app 加载，该 web-app 实现了中间件 block；而 `app.cuba:type=CachingFacade` bean 会被 *app* web-app 加载，该 web-app 实现了 Web 客户端 block。
+
+.JMX 控制台
+image::jmx-console.png[align="center"]
+
+JMX 控制台也可以访问远程 JVM 的 JMX 对象。这个功能在应用程序 blocks 部署在几台不同的 web 容器是很有用，比如，分开部署的 web 客户端和中间件。
+
+需要连接远程 JVM，可以通过控制台的 *JMX Connection* 字段选择一个之前建立的连接或者创建一个新连接：
+
+.编辑 JMX 连接
+image::jmx-connection-edit.png[align="center"]
+
+要建立连接，需要提供 JMX 主机地址，端口，登录名和密码。还有个 *Node name - 节点名称* 字段，如果在指定的地址监测到 CUBA 应用服务的 block 的话，会自动填充。这种情况下，这个字段的值会被定义成此 block 的<<cuba.webHostName,cuba.webHostName>> 和 <<cuba.webPort,cuba.webPort>> 的组合，这样也利于辨认包含这个服务的服务器。如果连接是通过第三方 JMX 接口建立的，那么 *Node name* 字段会有"Unknown JMX interface"值。但是也可以手动修改它。
+
+为了提供远程 JVM 连接，JVM 需要做适当的配置（见下面）。
+

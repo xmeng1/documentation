@@ -1,0 +1,107 @@
+:sourcesdir: ../../../../../source
+
+[[gui_data_loaders]]
+===== 数据加载器
+
+数据加载器用来从中间层加载数据到<<gui_data_containers,数据容器>>。
+
+根据交互的数据容器不同，数据加载器的接口有稍微的不同：
+
+* `InstanceLoader` 使用实体 id 或者 JPQL 查询语句加载单一实体到 `InstanceContainer`。
+
+* `CollectionLoader` 使用 JPQL 查询语句加载实体集合到 `CollectionContainer`。可以设置分页、排序以及其它可选的参数。
+
+* `KeyValueCollectionLoader` 加载 `KeyValueEntity` 实体的集合到 `KeyValueCollectionContainer`。除了 `CollectionLoader` 参数，还可以指定一个<<data_store,数据存储>>参数。
+
+在界面的 XML 描述中，所有的加载器都用同一个 `<loader>` 元素中定义，加载器的类型通过包裹它的容器类型确定。
+
+数据加载器不是必选的，因为可以使用 `DataManager` 或者自定义的服务来加载数据，之后直接设置给容器。但是使用加载器通过在界面中声明式的定义可以简化数据加载的过程，特别是要使用<<gui_Filter,过滤器>>组件的情况下。通常，集合加载器从界面的描述文件中获得 JPQL 查询语句，然后从过滤器组件拿到查询参数，之后创建 `LoadContext` 并且调用 `DataManager` 加载实体。所以，典型的 XML 描述看起来是这样：
+
+[source, xml]
+----
+include::{sourcesdir}/gui/data_loaders/loader_1.xml[]
+----
+
+`loader` XML 元素的属性可以用来定义可选参数，比如 `cacheable` 、 `softDeletion` 等。
+
+在实体编辑界面，加载器的 XML 元素通常是空的，因为实例加载器需要一个实体的标识符，这个标识符通过编程的方式使用 `StandardEditor` 基类指定。
+
+[source, xml]
+----
+include::{sourcesdir}/gui/data_loaders/loader_2.xml[]
+----
+
+加载器可以将实际的加载动作代理到一个函数，这个函数可以通过 `setLoadDelegate()` 方法或者通过在界面控制器中使用 `@Install` 注解来声明式的提供。示例：
+
+[source, java]
+----
+include::{sourcesdir}/gui/data_loaders/loader_3.java[]
+----
+
+在上面的例子中，`customersDl` 加载器会使用 `customersDlLoadDelegate()` 方法来加载 `Customer` 实体列表。此方法接收 `LoadContext` 参数，加载器会按照它的参数（查询语句、过滤器等等）来创建这个参数。在这个例子中，数据加载是通过 `DataManager` 来完成的，这个实现跟标准加载器的实现一样高效，但是好处是可以使用自定义的服务或者可以在加载完实体之后做其它的事情。
+
+可以通过监听 `PreLoadEvent` 和 `PostLoadEvent` 事件，在加载之前或之后添加一些业务逻辑：
+
+[source, java]
+----
+include::{sourcesdir}/gui/data_loaders/loader_5.java[]
+----
+
+一个加载器也可以通过编程的方式创建和配置，示例：
+
+[source, java]
+----
+include::{sourcesdir}/gui/data_loaders/loader_4.java[]
+----
+
+当加载器设置了 <<gui_DataContext,DataContext>> （当使用 XML 描述定义加载器的时候是默认设置的），所有加载的实体都自动合并到数据上下文（data context）。
+
+[[gui_data_loader_query_conditions]]
+查询条件::
++
+--
+有时需要在运行时修改数据加载器的查询语句，以便过滤数据库级别加载的数据。需要根据用户输入的参数进行过滤，最简单的方法就是将<<gui_Filter,过滤器>>可视化组件与数据加载器关联起来。
+
+不需要使用全局过滤器或者添加全局过滤器，而是可以为加载器查询语句单独创建一组过滤条件。一个过滤条件是一组带有参数的查询语句片段。_在片段中所有的参数都设置了之后_ ，这些片段才会被添加到生成的查询语句文本中。过滤条件会在<<data_store,数据存储>>级别传递，因此可以包含各个数据存储支持的不同语言的片段。框架会提供 JPQL 的过滤条件。
+
+作为例子，考虑按照 `Customer` 实体的两个属性：string `name` 和 boolean `status` 对实体进行过滤，看看如何创建一组过滤条件。
+
+加载器的查询过滤条件可以通过 `<condition>` XML 元素进行声明式的定义，或者通过 `setCondition()` 方法编程式的定义。下面是在 XML 中配置条件的示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui/data_loaders/loader_condition_1.xml[]
+----
+<1> - 添加 JPQL 条件命名空间
+<2> - 在 `query` 内定义 `condition` 元素
+<3> - 如果有多个条件，添加 `and` 或 `or` 元素
+<4> - 使用可选的 `join` 元素和必须的 `where` 元素定义 JPQL 条件
+
+假设界面有两个 UI 组件用来输入条件参数：`nameFilterField` 文本控件和 `statusFilterField` 复选框。为了在用户改变它们值的时候刷新数据，需要在界面控制器添加事件监听器：
+
+[source, java]
+----
+include::{sourcesdir}/gui/data_loaders/loader_condition_1.java[]
+----
+<1> - 注意这里怎么使用 ORM 提供的<<query_case_insensitive>>
+
+如上面所说，只有在条件的参数都设置了之后才会将条件添加到查询语句中。所以在数据库会执行什么样的查询语句依赖于在 UI 组件如何输入参数：
+
+.只有 nameFilterField 有值
+[source]
+----
+select e from demo_Customer e where e.name like :name
+----
+
+.只有 statusFilterField 有值
+[source]
+----
+select e from demo_Customer e where e.status = :status
+----
+
+.nameFilterField 和 statusFilterField 都有值
+[source]
+----
+select e from demo_Customer e where (e.name like :name) and (e.status = :status)
+----
+--

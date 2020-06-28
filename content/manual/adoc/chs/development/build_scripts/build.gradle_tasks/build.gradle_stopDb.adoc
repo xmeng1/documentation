@@ -1,0 +1,7 @@
+:sourcesdir: ../../../../../source
+
+[[build.gradle_stopDb]]
+===== 停止本地 HSQL 数据库
+
+`stopDb` – `CubaHsqlStop` 类型的任务，用来停止本地 HSQLDB 服务，任务参数跟 `startDb` 类似。
+

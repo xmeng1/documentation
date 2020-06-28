@@ -1,0 +1,270 @@
+:sourcesdir: ../../../../source
+
+[[list_actions]]
+==== 集合的标准行为（历史版本）
+
+[WARNING]
+====
+这是旧版本 API。从 7.0 版本开始的新 API，请参考 <<std_list_actions>>。
+====
+
+对于 `ListComponent` 的继承者们（<<gui_Table,Table>>，<<gui_GroupTable,GroupTable>>，<<gui_TreeTable,TreeTable>> 和 <<gui_Tree,Tree>>），标准的行为是通过 `ListActionType` 枚举类型来定义的；这些操作的实现类在 `com.haulmont.cuba.gui.components.actions` 包。
+
+在表格中使用标准行为的示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui/listActions_1.xml[]
+----
+
+下面详细介绍这些行为：
+
+[[createAction]]
+*CreateAction - 创建*
+
+`CreateAction` – 使用 *create* 标识符的 action。用来创建新的实例并且打开编辑界面。如果在编辑界面成功的提交了一个新的实体实例到数据库，`CreateAction` 会将这个新的实例添加到表格的数据源，并且在界面上使这个实体成为选中状态。
+
+`CreateAction` 类中定义了下面这些特殊的方法：
+
+* `setOpenType()` 可以设置新实体编辑界面的打开模式。默认 `++THIS_TAB - 当前标签页++`。
++
+因为通过其它模式打开编辑界面的需求是很常见的（比如，`DIALOG - 对话框` 模式），可以在使用声明式方式创建 `create` 行为的时候，在 `action` 元素的 `openType` 属性指定需要的打开模式。通过这种方式可以避免在界面控制器获取 action 引用通过编程的方式设置。示例：
++
+[source, xml]
+----
+include::{sourcesdir}/gui/createAction_1.xml[]
+----
+
+* `setWindowId()` 可以设置实体编辑界面的标识符。默认情况下，使用 `++{entity_name}.edit++`，比如 `sales_Customer.edit`。
+
+* `setWindowParams()` 可以设置传递给编辑界面的 `init()` 方法的参数。这些参数可以通过 `@WindowParam` 注解<<screen_controller_injection,注入>>到界面控制器中，或者也可以在<<datasource_query_params_param,数据源查询>>中通过 `param$` 前缀直接使用。
+
+* `setWindowParamsSupplier()` 跟 `setWindowParams()` 的不同之处在于，这个方法可以在 action 即将要被调用的时候修改编辑窗口的参数值。可以提供新的参数，新的参数会跟 `setWindowParams()` 方法中提供的参数合并，并且覆盖之前的参数。示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/createAction_5.java[]
+----
+
+* `setInitialValues()` 可以设置将要编辑的实体的属性初始化值。这个方法接收一个 `Map` 对象，键值是属性名称，值为属性值。示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/createAction_2.java[]
+----
++
+在 <<init_values_in_CreateAction>> 章节也提供一个使用 `setInitialValues()` 的例子。
+
+* `setInitialValuesSupplier()` 跟 `setInitialValues()` 的不同之处在于，这个方法可以在 action 即将要被调用的时候修改实体初始化的值。可以提供新的参数，新的参数会跟 `setInitialValues()` 方法中提供的参数合并，并且覆盖之前的参数。示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/createAction_4.java[]
+----
+
+* `setBeforeActionPerformedHandler()` 可以提供一个处理函数，这个函数在 action 执行之前调用。这个函数返回值是 `true` 的话，action 会继续执行；返回 `false` 终止执行。示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/createAction_6.java[]
+----
+
+* `afterCommit()` 在新实体成功提交到数据库并且编辑界面关闭之后会调用此方法。这个方法本身没有实现，可以通过继承重写此方法来处理这个事件。
+
+* `setAfterCommitHandler()` 提供一个处理函数，在新实体成功提交到数据库并且编辑界面关闭之后会调用此函数。可以通过提供此函数避免创建 action 的子类并重写 `afterCommit()` 方法。示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/createAction_3.java[]
+---- 
+
+* `afterWindowClosed()` 不管实体是否提交，只要关闭了编辑界面就会最后调用此方法。这个方法本身没有实现，可以通过继承重写此方法来处理这个事件。
+
+* `setAfterWindowClosedHandler()` 提供一个处理函数，不管实体是否提交，只要关闭了编辑界面就会最后调用此函数。可以通过提供此函数避免创建 action 的子类并重写 `afterWindowClosed()` 方法。
+
+[[editAction]]
+*EditAction - 编辑*
+
+`EditAction` 是使用 *edit* 标识符的 action，用来为选中的实体实例打开编辑界面。如果编辑界面成功的将实例保存到数据库，`EditAction` 会更新表格数据源中的实例。
+
+`EditAction` 类中定义了下面这些特殊的方法：
+
+* `setOpenType()` 可以设置实体编辑界面的打开模式。默认 `++THIS_TAB - 当前标签页++`。
++
+因为通过其它模式打开编辑界面的需求是很常见的（比如，`DIALOG - 对话框` 模式），可以在使用声明式方式创建 `edit` 行为的时候，在 `action` 元素的 `openType` 属性指定需要的打开模式。通过这种方式可以避免在界面控制器获取 action 引用通过编程的方式设置。示例：
++
+[source, xml]
+----
+include::{sourcesdir}/gui/editAction_1.xml[]
+---- 
+
+* `setWindowId()` 可以设置实体编辑界面的标识符。默认情况下，使用 `++{entity_name}.edit++`，比如 `sales_Customer.edit`。
+
+* `setWindowParams()` 可以设置传递给编辑界面的 `init()` 方法的参数。这些参数可以通过 `@WindowParam` 注解<<screen_controller_injection,注入>>到界面控制器中，或者也可以在<<datasource_query_params_param,数据源查询>>中通过 `param$` 前缀直接使用。
+
+* `setWindowParamsSupplier()` 跟 `setWindowParams()` 的不同之处在于，这个方法可以在 action 即将要被调用的时候修改编辑窗口的参数值。可以提供新的参数，新的参数会跟 `setWindowParams()` 方法中提供的参数合并，并且覆盖之前的参数。示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/editAction_4.java[]
+----
+
+* `setBeforeActionPerformedHandler()` 可以提供一个处理函数，这个函数在 action 执行之前调用。这个函数返回值是 `true` 的话，action 会继续执行；返回 `false` 终止执行。示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/editAction_5.java[]
+----
+
+* `afterCommit()` 在新实体成功提交到数据库并且编辑界面关闭之后会调用此方法。这个方法本身没有实现，可以通过继承重写此方法来处理这个事件。
+
+* `setAfterCommitHandler()` 提供一个处理函数，在新实体成功提交到数据库并且编辑界面关闭之后会调用此函数。可以通过提供此函数避免创建 action 的子类并重写 `afterCommit()` 方法。示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/editAction_2.java[]
+---- 
+
+* `afterWindowClosed()` 不管实体是否提交，只要关闭了编辑界面就会最后调用此方法。这个方法本身没有实现，可以通过继承重写此方法来处理这个事件。
+
+* `setAfterWindowClosedHandler()` 提供一个处理函数，不管实体是否提交，只要关闭了编辑界面就会最后调用此函数。可以通过提供此函数避免创建 action 的子类并重写 `afterWindowClosed()` 方法。
+
+* `getBulkEditorIntegration()` 为表格批量编辑提供了可能性。表格需要设置 `multiselect` 属性启用。当表格选中多行的时候，如果触发 `EditAction` 行为，则会打开<<gui_BulkEditor,批量编辑器>>组件进行批量编辑。
++
+--
+返回的 `BulkEditorIntegration` 实例可以通过下面的方法进行进一步处理：
+
+* `setOpenType()`,
+
+* `setExcludePropertiesRegex()`,
+
+* `setFieldValidators()`,
+
+* `setModelValidators()`,
+
+* `setAfterEditCloseHandler()`.
+--
++
+[source, java]
+----
+include::{sourcesdir}/gui/editAction_3.java[]
+----
+
+[[removeAction]]
+*RemoveAction - 删除*
+
+`RemoveAction` - 是使用 *remove* 标识符的 action，用来删除选中的实体实例。
+
+`RemoveAction` 类中定义了下面这些特殊的方法：
+
+* `setAutocommit()` 可以控制从数据库删除的动作是否提交。默认情况下，在动作触发之后会调用 `commit()` 提交从数据库删除实体。可以通过 `setAutocommit()` 方法或者设置构造器中对应的参数将 `autocommit` 属性设置为 false 来禁用自动提交。这样的话，需要显式调用数据源的 `commit()` 方法来提交改动。
++
+`autocommit` 的值不会影响 `Datasource.CommitMode.PARENT` 模式下的数据源，比如，提供<<composition_annotation,组合>>实体编辑的数据源。
+
+* `setConfirmationMessage()` 设置删除数据确认窗口的信息文本。
+
+* `setConfirmationTitle()` 设置删除确认窗口的标题。
+
+* `setBeforeActionPerformedHandler()` 可以提供一个处理函数，这个函数在 action 执行之前调用。这个函数返回值是 `true` 的话，action 会继续执行；返回 `false` 终止执行。示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/removeAction_2.java[]
+----
+
+* `afterRemove()` 当实体被成功删除之后，调用此方法。这个方法本身没有实现，可以通过继承重写此方法来处理这个事件。
+
+* `setAfterRemoveHandler()` 提供一个处理函数，在实体成功从数据库删除之后会调用此函数。可以通过提供此函数避免创建 action 的子类并重写 `afterRemove()` 方法。示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/removeAction_1.java[]
+----  
+
+[[refreshAction]]
+*RefreshAction - 刷新*
+
+`RefreshAction` - 是使用 *refresh* 标识符的 action。用来更新（重新加载）实体集合。当触发时，这个动作会调用相应组件绑定的<<datasources,数据源>>中的 `refresh()` 方法。
+
+`RefreshAction` 类中定义了下面这些特殊的方法：
+
+* `setRefreshParams()` 可以设置传递给 `CollectionDatasource.refresh()` 方法的参数，这些参数之后会用在<<datasource_query,数据源查询>>中。默认情况不会带任何参数。
+
+* `setRefreshParamsSupplier()` 跟 `setRefreshParams()` 的不同之处在于，这个方法可以在 action 即将要被调用的时候修改编辑窗口的参数值。可以提供新的参数，新的参数会跟 `setRefreshParams()` 方法中提供的参数合并，并且覆盖之前的参数。示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/refreshAction_1.java[]
+----
+
+[[addAction]]
+*AddAction - 添加*
+
+`AddAction` – 是使用 *add* 标识符的 action，用来选择一个已存在的实体并添加到集合中。当触发时，会打开实体的<<screen_lookup,查找界面>>。
+
+`AddAction` 类中定义了下面这些特殊的方法：
+
+* `setOpenType()` 可以设置实体选择界面的打开模式。默认 `++THIS_TAB - 当前标签页++`。
++
+因为通过其它模式打开查找界面的需求是很常见的（比如，`DIALOG - 对话框` 模式），可以在使用声明式方式创建 `add` 行为的时候，在 `action` 元素的 `openType` 属性指定需要的打开模式。通过这种方式可以避免在界面控制器获取 action 引用通过编程的方式设置。示例：
++
+[source, xml]
+----
+include::{sourcesdir}/gui/addaction_1.xml[]
+----
+
+* `setWindowId()` 可以设置实体查找界面的标识符。默认情况下，使用 `++{entity_name}.lookup++`，比如 `sales_Customer.lookup`。如果不存在这种类型的界面，则会尝试打开 `++{entity_name}.browse++` 界面，比如 `sales_Customer.browse`。
+
+* `setWindowParams()` 可以设置传递给查找界面的 `init()` 方法的参数。这些参数可以通过 `@WindowParam` 注解<<screen_controller_injection,注入>>到界面控制器中，或者也可以在<<datasource_query_params_param,数据源查询>>中通过 `param$` 前缀直接使用。
+
+* `setWindowParamsSupplier()` 跟 `setWindowParams()` 的不同之处在于，这个方法可以在 action 即将要被调用的时候修改编辑窗口的参数值。可以提供新的参数，新的参数会跟 `setWindowParams()` 方法中提供的参数合并，并且覆盖之前的参数。示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/addaction_2.java[]
+----
+
+* `setHandler()` 可以设置一个实现了 `Window.Lookup.Handler` 接口的对象，这个对象会传递给查找界面。默认情况下，会使用 `AddAction.DefaultHandler` 对象。
+
+* `setBeforeActionPerformedHandler()` 可以提供一个处理函数，这个函数在 action 执行之前调用。这个函数返回值是 `true` 的话，action 会继续执行；返回 `false` 终止执行。示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/addaction_3.java[]
+----
+
+[[excludeAction]]
+*ExcludeAction - 排除*
+
+`ExcludeAction` - 是使用 *exclude* 标识符的 action。允许用户从一个实体集合中排除实体实例，而并不会从数据库删除。这个 action 的类是继承于 `RemoveAction`，但是在触发这个动作的时候调用的是 `CollectionDatasource` 里的 `excludeItem()` 而不是 `removeItem()`。此外，对于嵌套数据源中的实体，`ExcludeAction` 动作会将子实体跟父实体的连接断开。因此这个 action 可以用来编辑一对多的关联关系。
+
+除了 `RemoveAction` 里面的方法外，`ExcludeAction` 类中定义了下面这些特殊的方法：
+
+* `setConfirm()` – 定义是否要显示确认删除窗口。也可以通过 action 的构造器设置这个参数。默认值是 `false`。
+
+* `setBeforeActionPerformedHandler()` 可以提供一个处理函数，这个函数在 action 执行之前调用。这个函数返回值是 `true` 的话，action 会继续执行；返回 `false` 终止执行。示例：
+[source, java]
+----
+include::{sourcesdir}/gui/excludeAction.java[]
+----
+
+[[excelAction]]
+*ExcelAction - 导出 Excel*
+
+`ExcelAction` - 是使用 *excel* 标识符的 action。用来将表格数据导出成 XLS 格式的文件，并且下载。只能在 <<gui_Table,Table>>，<<gui_GroupTable,GroupTable>> 和 <<gui_TreeTable,TreeTable>> 组件添加此行为。
+
+当通过编程的方式创建这个行为的时候，可以用实现了 `ExportDisplay` 接口的类为文件下载设置 `display` 参数。默认情况下使用标准的实现类。
+
+`ExcelAction` 类中定义了下面这些特殊的方法：
+
+* `setFileName()`  - 设置 Excel 文件名称，不包含文件名后缀。
+
+* `getFileName()` - 返回 Excel 文件名称，不包含文件名后缀。
+
+* `setBeforeActionPerformedHandler()` 可以提供一个处理函数，这个函数在 action 执行之前调用。这个函数返回值是 `true` 的话，action 会继续执行；返回 `false` 终止执行。示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/excelAction.java[]
+----
+

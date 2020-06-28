@@ -1,0 +1,38 @@
+:sourcesdir: ../../../../../source
+
+[[jespa_conf]]
+===== 安装和配置
+
+* 按步骤完成 *Jespa Operator's Manual* 的 *Installation* -> *Step 1: Create the Computer Account for NETLOGON Communication*，参考 link:$$http://www.ioplex.com/support.html$$[http://www.ioplex.com/support.html]。
+
+* 在 <<app_properties_files,local.app.properties>> 文件的 `activeDirectory.domains` 属性里设置域参数。每个域的描述符应该按照这个格式：`++domain_name|full_domain_name|service_account_name|service_account_password++`。域描述符之间通过分号分隔。
++
+示例：
++
+[source, properties]
+----
+activeDirectory.domains = MYCOMPANY|mycompany.com|JESPA$@MYCOMPANY.COM|password1;TEST|test.com|JESPA$@TEST.COM|password2
+----
+
+* 启用集成活动目录，通过设置 `local.app.properties` 文件的 `activeDirectory.integrationEnabled` 属性：
++
+[source, properties]
+----
+activeDirectory.integrationEnabled = true
+----
+
+* 在 `local.app.properties` 文件配置其它的 Jespa 属性（参考 *Jespa Operator's Manual*），示例：
++
+[source, properties]
+----
+jespa.log.level=3
+----
++
+如果应用程序部署在 Tomcat，Jespa 的日志保存在 `tomcat/logs`。
+
+* 在浏览器设置添加服务器地址到本地网络：
+
+** *Internet Explorer* 和 *Chrome*： *Settings* > *Security* > *Local intranet* > *Sites* > *Advanced*
+
+** *Firefox*： `about:config` > `network.automatic-ntlm-auth.trusted-uris=http://myapp.mycompany.com`
+

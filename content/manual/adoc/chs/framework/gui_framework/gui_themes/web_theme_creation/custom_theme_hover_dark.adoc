@@ -1,0 +1,29 @@
+:sourcesdir: ../../../../../../source
+
+[[custom_theme_hover_dark]]
+====== 创建 Hover Dark 主题
+
+这里介绍创建 Hover Dark 主题的步骤，这个主题是默认 Hover 主题的暗色变体。使用此主题的示例应用程序可在 https://github.com/cuba-platform/sample-hover-dark[GitHub] 上找到。
+
+. 按照<<web_theme_creation,>>部分中的说明在项目中创建新的 *hover-dark* 主题。
++
+会在 *web* 模块中创建所需的文件结构。新建的 `webThemesModule` 模块及其配置将自动被添加到 `settings.gradle` 和 <<build.gradle,build.gradle>> 文件中。
+
+. 重新设置 `hover-dark-defaults.scss` 文件中的默认<<web_theme_extension_common,样式变量>>，比如，可以用以下变量值替换其中的变量：
++
+[source, css]
+----
+include::{sourcesdir}/gui/themes/themes_45.scss[]
+----
+
+. 使用 <<cuba.themeConfig,cuba.themeConfig>> 应用程序属性定义要在应用程序中使用的主题：
++
+[source, plain]
+----
+cuba.themeConfig = com/haulmont/cuba/hover-theme.properties /com/company/demo/web/hover-dark-theme.properties
+----
+
+于是，在应用程序中将有两个主题将可用：默认 Hover 主题及其暗色变体。
+
+image::cookbook/hover-dark.png[align="center"]
+

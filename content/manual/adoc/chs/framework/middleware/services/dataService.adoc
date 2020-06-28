@@ -1,0 +1,7 @@
+:sourcesdir: ../../../../../source
+
+[[dataService]]
+===== 数据服务
+
+`DataService` 使用外观设计模式提供了从客户端层调用<<dataManager,DataManager>>中间件实现的功能。建议不要在应用程序代码中使用 `DataService` 接口，应该直接在中间层和客户端层使用 `DataManager`。
+

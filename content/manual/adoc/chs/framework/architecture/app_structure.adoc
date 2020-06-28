@@ -1,0 +1,16 @@
+:sourcesdir: ../../../../source
+
+[[app_structure]]
+==== 应用程序结构
+
+上面列出的架构原则在组装完成的应用程序结构能直接反映出来。假设我们有个简单的应用程序，包含两个 block - *Middleware* 和 *Web Client* ；并依赖了两个应用程序组件的功能 - *cuba* 和 *reports*。
+
+.一个简单的应用程序的结构
+image::SampleAppArtifacts.svg[align="center"]
+
+该图展示了 *Tomcat* 服务的几个目录的内容，其中包含已部署的应用程序。
+
+*Middleware* <<app_tiers,block>> 由 `app-core` WEB 应用程序表示，*Web Client* block 由 `app` Web 应用程序表示。Web 应用程序包含 `WEB-INF/lib` 目录下的 JAR 文件。每个 JAR（<<artifact,工件>>）都是一个应用程序<<app_modules,模块>>或<<app_components,组件>>构建的结果。
+
+比如，中间层 Web 应用程序 `app-core` 包含哪些 JAR 文件是由以下情况决定的：*Middleware* block 包含 *global* 和 *core* 模块，同时应用程序依赖了 *cuba* 和 *reports* 组件。
+

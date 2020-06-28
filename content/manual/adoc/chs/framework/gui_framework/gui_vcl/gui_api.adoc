@@ -1,0 +1,494 @@
+:sourcesdir: ../../../../../source
+
+[[gui_api]]
+===== 可视化组件 API
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/Component.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+通用::
++
+--
+[[gui_api_unwrap]]
+* `unwrap()` - 返回针对不同客户端的组件实例（Vaadin 或者 Swing 组件）。可以在 Client 模块简化底层 API 的调用，参考 <<webComponentsHelper>> 章节。
++
+[source, java]
+----
+com.vaadin.ui.TextField vTextField = textField.unwrap(com.vaadin.ui.TextField.class);
+----
+
+* `unwrapComposition()` - 返回针对不同客户端的最外层的外部包裹容器（external container）。可以在 Client 模块简化底层 API 的调用。
+
+这两个方法支持所有可视化组件。
+--
+http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/Buffered.html[Buffered-缓冲写入模式接口] ::
++
+--
+[[gui_api_commit]]
+* `commit()` - 从上次更新之后的所有改动更新到数据源。
+
+[[gui_api_discard]]
+* `discard()` - 从上次更新之后所有的改动都废弃掉。对象会从数据源更新数据。
+
+[[gui_api_isModified]]
+* `isModified()` - 如果从上次更新后这个对象有过改动，这个方法会返回 `true`。
+
+[source, java]
+----
+if (textArea.isModified()) {
+    textArea.commit();
+}
+----
+
+支持此接口的组件：
+
+<<gui_CheckBox,CheckBox>> -
+<<gui_CurrencyField,CurrencyField>> -
+<<gui_DateField,DateField>> -
+<<gui_DatePicker,DatePicker>> -
+<<gui_FileUploadField,FileUploadField>> -
+<<gui_LookupField,LookupField>> -
+<<gui_LookupPickerField,LookupPickerField>> -
+<<gui_MaskedField,MaskedField>> -
+<<gui_PasswordField,PasswordField>> -
+<<gui_PickerField,PickerField>> -
+<<gui_RichTextArea,RichTextArea>> -
+<<gui_SearchPickerField,SearchPickerField>> -
+<<gui_SuggestionPickerField,SuggestionPickerField>> -
+<<gui_TextArea,TextArea>> -
+<<gui_TextField,TextField>> -
+<<gui_TimeField,TimeField>>
+--
+
+http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/Collapsable.html[Collapsable-可折叠接口] ::
++
+--
+[[gui_api_expanded]]
+* `addExpandedStateChangeListener()` - 添加实现了 `ExpandedStateChangeListener`  接口的监听器来拦截组件的展开状态变化事件。
++
+[source, java]
+----
+@Subscribe("groupBox")
+protected void onGroupBoxExpandedStateChange(Collapsable.ExpandedStateChangeEvent event) {
+    notifications.create()
+            .withCaption("Expanded: " + groupBox.isExpanded())
+            .show();
+}
+----
+支持此接口的组件：
+
+<<gui_Filter,Filter>> -
+<<gui_GroupBoxLayout,GroupBoxLayout>>
+--
+
+http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/ComponentContainer.html[ComponentContainer-组件容器接口] ::
++
+--
+[[gui_api_add]]
+* `add(component)` - 添加子组件到容器。
+
+[[gui_api_remove]]
+* `remove(component)` - 从容器移除子组件。
+
+[[gui_api_removeAll]]
+* `removeAll()` - 移除容器内所有组件。
+
+[[gui_api_getOwnComponent]]
+* `getOwnComponent(id)` - 返回直接拥有（directly owned）的组件。
+
+[[gui_api_getComponent]]
+* `getComponent(id)` - 返回这个容器下面组件树的一个组件。
+
+[[gui_api_getComponentNN]]
+* `getComponentNN(id)` - 返回这个容器下面组件树的一个组件。如果没找到，会抛出异常。
+
+[[gui_api_getOwnComponents]]
+* `getOwnComponents()` - 返回这个容器直接拥有的所有组件。
+
+[[gui_api_getComponents]]
+* `getComponents()` - 返回这个容器下的组件树的所有组件。
+
+支持此接口的组件：
+
+<<gui_Accordion,Accordion>> -
+<<gui_BoxLayout,BoxLayout>> -
+<<gui_CssLayout,CssLayout>> -
+<<gui_FieldGroup,FieldGroup>> -
+<<gui_Form,Form>> -
+<<gui_Frame,Frame>> -
+<<gui_GridLayout,GridLayout>> -
+<<gui_GroupBoxLayout,GroupBoxLayout>> -
+<<gui_HtmlBoxLayout,HtmlBoxLayout>> -
+<<gui_ScrollBoxLayout,ScrollBoxLayout>> -
+<<gui_SplitPanel,SplitPanel>> -
+<<gui_TabSheet,TabSheet>>
+--
+
+http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/OrderedContainer.html[OrderedContainer-有序容器接口] ::
++
+--
+[[gui_api_indexOf]]
+* `indexOf()` - 返回给定组件在有序容器中的索引位置。
+
+支持此接口的组件：
+
+<<gui_BoxLayout,BoxLayout>> -
+<<gui_CssLayout,CssLayout>> -
+<<gui_Frame,Frame>> -
+<<gui_GroupBoxLayout,GroupBoxLayout>> -
+<<gui_ScrollBoxLayout,ScrollBoxLayout>> -
+--
+
+http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/HasContextHelp.html[HasContextHelp-内容提示接口] ::
++
+--
+[[gui_api_contextHelp]]
+* `setContextHelpText()` - 设置内容提示文本。如果设置的话，会为字段添加一个特殊的图标，参阅： <<gui_attr_contextHelpText,contextHelpText>>。
+
+* `setContextHelpTextHtmlEnabled()` - 定义是否用 HTML 渲染内容提示文本。参阅： <<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>>。
+
+* `setContextHelpIconClickHandler()` - 设置内容提示图标点击处理函数。点击处理函数比 <<gui_attr_contextHelpText,context help text>> 优先级高，也就是说，如果点击处理函数设置了的话，默认的弹出小窗便不会显示。
+
+[source, java]
+----
+textArea.setContextHelpIconClickHandler(contextHelpIconClickEvent ->
+        dialogs.createMessageDialog()
+                .withCaption("Title")
+                .withMessage("Message body")
+                .withType(Dialogs.MessageType.CONFIRMATION)
+                .show()
+);
+----
+
+几乎所有组件都支持此接口：
+
+<<gui_Accordion,Accordion>> -
+<<gui_BoxLayout,BoxLayout>> -
+<<gui_BrowserFrame,BrowserFrame>> -
+<<gui_ButtonsPanel,ButtonsPanel>> -
+<<gui_Calendar,Calendar>> -
+<<gui_CheckBox,CheckBox>> -
+<<gui_CheckBoxGroup,CheckBoxGroup>> -
+<<gui_ColorPicker,ColorPicker>> -
+<<gui_CssLayout,CssLayout>> -
+<<gui_CurrencyField,CurrencyField>> -
+<<gui_DataGrid,DataGrid>> -
+<<gui_DateField,DateField>> -
+<<gui_DatePicker,DatePicker>> -
+<<gui_Embedded,Embedded>> -
+<<gui_FieldGroup,FieldGroup>> -
+<<gui_FileUploadField,FileUploadField>> -
+<<gui_Filter,Filter>> -
+<<gui_Form,Form>> -
+<<gui_GridLayout,GridLayout>> -
+<<gui_GroupBoxLayout,GroupBoxLayout>> -
+<<gui_GroupTable,GroupTable>> -
+<<gui_HtmlBoxLayout,HtmlBoxLayout>> -
+<<gui_Image,Image>> -
+<<jsComponent,JavaScriptComponent>> -
+<<gui_Label,Label>> -
+<<gui_LookupField,LookupField>> -
+<<gui_LookupPickerField,LookupPickerField>> -
+<<gui_MaskedField,MaskedField>> -
+<<gui_OptionsGroup,OptionsGroup>> -
+<<gui_OptionsList,OptionsList>> -
+<<gui_PasswordField,PasswordField>> -
+<<gui_PickerField,PickerField>> -
+<<gui_PopupView,PopupView>> -
+<<gui_ProgressBar,ProgressBar>> -
+<<gui_RadioButtonGroup,RadioButtonGroup>> -
+<<gui_RichTextArea,RichTextArea>> -
+<<gui_ScrollBoxLayout,ScrollBoxLayout>> -
+<<gui_SearchPickerField,SearchPickerField>> -
+<<gui_Slider,Slider>> - 
+<<gui_SourceCodeEditor,SourceCodeEditor>> -
+<<gui_SplitPanel,SplitPanel>> -
+<<gui_SuggestionField,SuggestionField>> -
+<<gui_SuggestionPickerField,SuggestionPickerField>> -
+<<gui_Table,Table>> -
+<<gui_TabSheet,TabSheet>> -
+<<gui_TextArea,TextArea>> -
+<<gui_TextField,TextField>> -
+<<gui_TimeField,TimeField>> -
+<<gui_TokenList,TokenList>> -
+<<gui_Tree,Tree>> -
+<<gui_TreeDataGrid,TreeDataGrid>> -
+<<gui_TreeTable,TreeTable>> -
+<<gui_TwinColumn,TwinColumn>>
+--
+
+http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/HasSettings.html[HasSettings-用户设置接口] ::
++
+--
+[[gui_api_settings]]
+* `applySettings()` - 恢复上次用户使用该组件的设置。
+
+* `saveSettings()` - 保存当前用户对该组件的设置。
+
+支持此接口的组件：
+
+<<gui_DataGrid,DataGrid>> -
+<<gui_Filter,Filter>> -
+<<gui_GroupBoxLayout,GroupBoxLayout>> -
+<<gui_SplitPanel,SplitPanel>> -
+<<gui_Table,Table>> -
+<<gui_TextArea,TextArea>>
+--
+
+http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/HasUserOriginated.html[HasUserOriginated-事件来源接口] ::
++
+--
+[[gui_api_UserOriginated]]
+* `isUserOriginated()` - 提供事件来源的信息。如果事件是在客户端通过用户交互触发，则返回 `true`。如果是在服务端以编程方式触发，则返回 `false`。
++
+用例示范：
++
+[source, java]
+----
+@Subscribe("customersTable")
+protected void onCustomersTableSelection(Table.SelectionEvent<Customer> event) {
+    if (event.isUserOriginated())
+        notifications.create()
+                .withCaption("You selected " + event.getSelected().size() + " customers")
+                .show();
+}
+----
+
+`isUserOriginated()` 方法支持对以下事件进行跟踪：
+
+* `CollapseEvent`，所属组件： <<gui_TreeDataGrid,TreeDataGrid>>，
+* `ColumnCollapsingChangeEvent`，所属组件： <<gui_DataGrid,DataGrid>>，
+* `ColumnReorderEvent`，所属组件： <<gui_DataGrid,DataGrid>>，
+* `ColumnResizeEvent`，所属组件： <<gui_DataGrid,DataGrid>>，
+* `ExpandedStateChangeEvent`，所属组件： <<gui_Filter,Filter>> 和 <<gui_GroupBoxLayout,GroupBoxLayout>> (参阅 <<gui_api_expanded,Collapsable>>)，
+* `ExpandEvent`，所属组件： <<gui_TreeDataGrid,TreeDataGrid>>，
+* `SelectedTabChangeEvent`，所属组件： <<gui_TabSheet,TabSheet>>，
+* `SelectionEvent`，所属组件： <<gui_DataGrid,DataGrid>>，
+* `SelectionEvent`，所属组件： <<gui_Table,Table>>，
+* `SortEvent`，所属组件： <<gui_DataGrid,DataGrid>>，
+* `SplitPositionChangeEvent`，所属组件： <<gui_SplitPanel,SplitPanel>>，
+* `ValueChangeEvent`，所属组件：所有实现了 `HasValue` 接口的组件 (参阅： <<gui_api_addValueChangeListener,ValueChangeListener>>)。
+--
+
+http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/HasValue.html[HasValue-有值处理接口] ::
++
+--
+[[gui_api_addValueChangeListener]]
+* `addValueChangeListener()` - 添加实现了 `ValueChangeListener` 接口的监听器来拦截组件的值变化事件。
+
++
+[source, java]
+----
+@Inject
+private TextField<String> textField;
+@Inject
+private Notifications notifications;
+
+@Subscribe
+protected void onInit(InitEvent event) {
+    textField.addValueChangeListener(stringValueChangeEvent ->
+            notifications.create()
+                    .withCaption("Before: " + stringValueChangeEvent.getPrevValue() +
+                            ". After: " + stringValueChangeEvent.getValue())
+                    .show());
+}
+----
++
+为了达到相同的目的，也可以订阅组件特定的事件，示例：
++
+[source, java]
+----
+@Subscribe("textField")
+protected void onTextFieldValueChange(HasValue.ValueChangeEvent<String> event) {
+    notifications.create()
+            .withCaption("Before: " + event.getPrevValue() +
+                    ". After: " + event.getValue())
+            .show();
+}
+----
+
+也可参阅 <<gui_api_UserOriginated,UserOriginated>>.
+
+支持此接口的组件：
+
+<<gui_CheckBox,CheckBox>> -
+<<gui_CheckBoxGroup,CheckBoxGroup>> -
+<<gui_ColorPicker,ColorPicker>> -
+<<gui_CurrencyField,CurrencyField>> -
+<<gui_DateField,DateField>> -
+<<gui_DatePicker,DatePicker>> -
+<<gui_FileUploadField,FileUploadField>> -
+<<gui_Label,Label>> -
+<<gui_LookupField,LookupField>> -
+<<gui_LookupPickerField,LookupPickerField>> -
+<<gui_MaskedField,MaskedField>> -
+<<gui_OptionsGroup,OptionsGroup>> -
+<<gui_OptionsList,OptionsList>> -
+<<gui_PasswordField,PasswordField>> -
+<<gui_PickerField,PickerField>> -
+<<gui_ProgressBar,ProgressBar>> -
+<<gui_RadioButtonGroup,RadioButtonGroup>> -
+<<gui_RichTextArea,RichTextArea>> -
+<<gui_SearchPickerField,SearchPickerField>> -
+<<gui_Slider,Slider>> - 
+<<gui_SourceCodeEditor,SourceCodeEditor>> -
+<<gui_SuggestionField,SuggestionField>> -
+<<gui_SuggestionPickerField,SuggestionPickerField>> -
+<<gui_TextArea,TextArea>> -
+<<gui_TextField,TextField>> -
+<<gui_TimeField,TimeField>> -
+<<gui_TokenList,TokenList>> -
+<<gui_TwinColumn,TwinColumn>>
+--
+
+http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/LayoutClickNotifier.html[LayoutClickNotifier-布局点击通知接口] ::
++
+--
+[[gui_api_addLayoutClickListener]]
+* `addLayoutClickListener()` - 添加实现了 `LayoutClickListener` 接口的监听器拦截鼠标在组件区域点击事件。
++
+[source, java]
+----
+vbox.addLayoutClickListener(layoutClickEvent ->
+    notifications.create()
+            .withCaption("Clicked")
+            .show());
+----
++
+为了达到相同的目的，也可以订阅组件特定的事件，示例：
++
+[source, java]
+----
+@Subscribe("vbox")
+protected void onVboxLayoutClick(LayoutClickNotifier.LayoutClickEvent event) {
+    notifications.create()
+            .withCaption("Clicked")
+            .show();
+}
+----
+
+支持此接口的组件：
+
+<<gui_ButtonsPanel,ButtonsPanel>> -
+<<gui_BoxLayout,BoxLayout>> -
+<<gui_CssLayout,CssLayout>> -
+<<gui_GridLayout,GridLayout>>
+--
+
+http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/HasMargin.html[HasMargin-容器边距接口] ::
++
+--
+[[gui_api_margin]]
+* `setMargin()` - 设置容器外边框和容器内容之间的边距。
++
+** 设置组件所有方向的边距：
++
+[source, java]
+----
+vbox.setMargin(true);
+----
++
+** 只设置上边距和下边距：
++
+[source, java]
+----
+vbox.setMargin(true, false, true, false);
+----
++
+** 创建 `MarginInfo` 配置类实例来设置边距：
++
+[source, java]
+----
+vbox.setMargin(new MarginInfo(true, false, false, true));
+----
+
+* `getMargin()` - 以 `MarginInfo` 实例的方式返回组件的边距设置。
+
+支持此接口的组件：
+
+<<gui_BoxLayout,BoxLayout>> -
+<<gui_Filter,Filter>> -
+<<gui_Frame,Frame>> -
+<<gui_GridLayout,GridLayout>>
+<<gui_ScrollBoxLayout,ScrollBoxLayout>>
+--
+
+http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/HasOuterMargin.html[HasOuterMargin-组件外边距接口] ::
++
+--
+[[gui_api_outerMargin]]
+* `setOuterMargin()` - 设置组件外边框外的边距。
++
+** 设置所有方向的外边距：
++
+[source, java]
+----
+groupBox.setOuterMargin(true);
+----
++
+** 只设置组件上下外边距：
++
+[source, java]
+----
+groupBox.setOuterMargin(true, false, true, false);
+----
++
+** 创建 `MarginInfo` 配置类实例来设置外边距：
++
+[source, java]
+----
+groupBox.setOuterMargin(new MarginInfo(true, false, false, true));
+----
+
+* `getOuterMargin()` - 以 `MarginInfo` 实例的方式返回组件的外边距设置。
+
+支持此接口的组件：
+
+<<gui_GroupBoxLayout,GroupBoxLayout>>
+--
+
+http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/HasSpacing.html[HasSpacing-留白接口] ::
++
+--
+[[gui_api_spacing]]
+* `setSpacing()` - 在这个组件和他的子组件之间添加一些空白。
++
+[source, java]
+----
+vbox.setSpacing(true);
+----
+
+支持此接口的组件：
+
+<<gui_BoxLayout,BoxLayout>> -
+<<gui_ButtonsPanel,ButtonsPanel>> -
+<<gui_Frame,Frame>> -
+<<gui_GridLayout,GridLayout>>
+<<gui_GroupBoxLayout,GroupBoxLayout>> -
+<<gui_ScrollBoxLayout,ScrollBoxLayout>>
+--
+
+http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/ShortcutNotifier.html[ShortcutNotifier-快捷键接口] ::
++
+--
+[[gui_api_shortcut]]
+* `addShortcutAction()` - 添加一个操作，当用户按下配置的快捷键组合的时候触发。
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/cssLayout.java[]
+----
+
+支持此接口的组件：
+
+<<gui_BoxLayout,BoxLayout>> -
+<<gui_ButtonsPanel,ButtonsPanel>> -
+<<gui_CssLayout,CssLayout>> -
+<<gui_GridLayout,GridLayout>> -
+<<gui_GroupBoxLayout,GroupBoxLayout>> -
+<<gui_ScrollBoxLayout,ScrollBoxLayout>>
+--
+

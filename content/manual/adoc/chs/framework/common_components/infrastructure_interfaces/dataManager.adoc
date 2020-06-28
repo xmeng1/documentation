@@ -1,0 +1,156 @@
+:sourcesdir: ../../../../../source
+
+[[dataManager]]
+===== DataManager
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/global/DataManager.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`DataManager` 接口在中间层和客户端层提供 CRUD 功能，是一种通用工具，用于从数据库加载实体关系图并保存已更改的游离实体实例。
+
+[TIP]
+====
+有关 DataManager 与 <<entityManager,EntityManager>> 之间差异的信息，请参阅 <<dm_vs_em>>。
+====
+
+实际上，`DataManager` 只是委托给一个<<data_store,数据存储>>实现，并在需要时处理跨数据库引用。当使用标准 `RdbmsStore` 处理存储在关系型数据库中的实体时，下面描述的大多数实现细节都有效。对于另一种类型的数据存储，除接口方法名称之外的所有内容都可能不同。为简单起见，_DataManager_ 在没有另外说明时指的是 _基于 RdbmsStore 的 DataManager_。
+
+下面列出了 `DataManager` 的方法:
+
+* `load(Class)` - 加载指定类的实体。此方法是流式 API 的入口点：
++
+[source, java]
+----
+include::{sourcesdir}/common/dataManager_4.java[]
+----
+
+* `loadValues(String query)` - 通过查询纯数值加载键值对。此方法是流式 API 的入口点：
++
+[source, java]
+----
+include::{sourcesdir}/common/dataManager_5.java[]
+----
++
+<1> - 指定实体所在的数据存储。 如果实体位于主数据存储，那么可以忽略这个方法。
+<2> -  指定返回的 `KeyValueEntity` 实体中的属性名称。 属性的顺序必须与查询结果集的列对应。
+
+* `loadValue(String query, Class valueType)` - 通过查询纯数值加载单个值。此方法是流式 API 的入口点：
++
+[source, java]
+----
+include::{sourcesdir}/common/dataManager_6.java[]
+----
++
+<1> - 指定实体所在的数据存储。 如果实体位于主数据存储，那么可以忽略这个方法。
+
+* `load(LoadContext)`, `loadList(LoadContext)` – 根据传递给它的 `LoadContext` 对象的参数加载实体。`LoadContext` 必须包含 JPQL 查询语句或实体标识符。如果两者都定义的话，则使用查询语句而忽略实体标识符。
++
+例如:
++
+[source, java]
+----
+include::{sourcesdir}/common/dataManager_1.java[]
+----
+
+* `loadValues(ValueLoadContext)` - 加载键值对列表。该方法接受 `ValueLoadContext`，定义纯数值的查询语句和键值列表。返回包含 `KeyValueEntity` 实例的列表。例如：
++
+[source, java]
+----
+include::{sourcesdir}/common/dataManager_3.java[]
+----
+
+* `getCount(LoadContext)` - 返回传递给方法的查询语句的记录数。可能的情况下，`RdbmsStore` 中的标准实现使用与原始查询相同的条件执行 `select count()` 查询，以获得最佳性能。
+
+* `commit(CommitContext)` – 将 `CommitContext` 中传递的一组实体保存到数据库中。必须分别指定用于更新和删除的实体的集合。
++
+该方法返回 <<entityManager,EntityManager>>.merge() 返回的实体实例集合，实际上这些就是刚刚在 DB 中更新的新实例。后续的操作需要使用这些返回的实例，以防止数据丢失或造成乐观锁。通过使用 `CommitContext.getViews()` 获得的视图映射为每个保存的实例设置视图，这样可以确保返回实体中包含需要的属性。
++
+`DataManager` 可以为保存的实体进行 <<bean_validation_in_DataManager,bean 验证>>。
++
+保存实体集合的示例：
++
+[source, java]
+----
+include::{sourcesdir}/common/dataManager_2.java[]
+----
+
+* `reload(Entity, View)` - 使用<<views,视图>>从数据库重新加载指定实例的便捷方法。委托给 `load()` 方法执行。
+
+* `remove(Entity)` - 从数据库中删除指定的实例。委托给 `commit()` 方法执行。
+
+* `create(Class)` - 在内存中创建给定实体的实例。这是一个便捷的方法，委托给了 `Metadata.create()`。
+
+* `getReference(Class, Object)` - 返回一个实体实例，该实例可以用作对数据库中存在的对象的引用。
++
+--
+例如，如果要创建 `User`，则必须设置用户所属的 `Group`。如果知道 group ID，可以从数据库加载然后设置给用户。此方法可以避免不必要的数据库多次访问：
+
+[source, java]
+----
+include::{sourcesdir}/common/dataManager_7.java[]
+----
+
+引用也可用于通过 id 删除现有对象：
+
+[source, java]
+----
+include::{sourcesdir}/common/dataManager_8.java[]
+----
+--
+
+[[dm_query]]
+查询::
++
+--
+当系统使用关系型数据库时，用<<jpql,JPQL>>查询语句加载数据。参阅 <<jpql_functions>>、<<query_case_insensitive>> 和 <<jpql_macro>> 章节了解 CUBA 中的 JPQL 和 JPA 标准之间的差异。另外需要注意，`DataManager` 只能执行 "select" 查询。
+
+流式接口的 `query()` 方法可以接收完整的或者省略的查询语句。如果使用省略的查询语句，需要符合下面的规则：
+
+* 可以省略 `"select <alias>"` 子句。
+* 如果 `"from"` 子句包含单一实体，而且又不想用实体别名，则可以省略 `"from <entity> <alias> where"` 子句。此时，框架会使用 `e` 作为该实体的别名。
+* 可以使用位置标记查询条件并同时将调价值作为额外的参数传递给 `query()` 方法。
+
+示例：
+
+[source, java]
+----
+include::{sourcesdir}/common/dataManager_9.java[]
+----
+
+需要注意的是，位置标记条件参数只在流式接口支持。`LoadContext.Query` 还是只支持命名条件参数。
+--
+
+[[dm_transactions]]
+事务::
++
+--
+DataManager 总是启动一个新的<<transactions,事务>>并在操作完成时提交事务，从而返回<<entity_states,游离状态>>的实体。在中间层，如果需要实现复杂的事务行为，可以使用 <<transactionalDataManager,TransactionalDataManager>>。
+--
+
+[[dm_partial_entities]]
+部分实体::
++
+--
+_部分(Partial)_ 实体是一个实体实例，这个实例的属性可以是已加载的本地属性的一个子集。默认情况下，DataManager 根据<<views,视图>>加载部分实体（事实上，`RdbmsStore` 只是将视图的 <<view_loadPartialEntities,loadPartialEntities>> 属性设置为 true 并将其传递给 <<entityManager,EntityManager>> ）。
+
+在下面这些情况下，DataManager 会加载所有本地属性，视图仅用来获取引用：
+
+* 加载的实体是<<entity_cache,可缓存的>>。
+* 为实体定义了内存 "读取" <<constraints,约束>>。
+* 为实体设置了动态<<entity_attribute_access,属性访问控制>>。
+* `LoadContext` 的 `loadPartialEntities` 属性设置为 false。
+--
+
+include::dataManager/dm_vs_em.adoc[]
+
+include::dataManager/transactionalDataManager.adoc[]
+
+include::dataManager/dm_security.adoc[]
+
+include::dataManager/query_with_distinct.adoc[]
+
+include::dataManager/query_from_selected.adoc[]
+

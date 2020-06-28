@@ -1,0 +1,12 @@
+:sourcesdir: ../../../../source
+
+[[front_in_studio]]
+==== 使用 Studio 添加前端 UI
+
+如需在项目中添加前端客户端模块：
+
+* 在 CUBA Studio 中打开 CUBA 项目树；
+* 右键点击 *Modules* 节点；
+* 选择 *Manage modules > Create 'front' module* 条目。
+
+Studio 会在 `modules/front/generation` 目录安装 https://github.com/cuba-platform/frontend[前端生成器] （也许要花一些时间）。然后会出现提示，需要选择前端使用什么技术：<<react_ui,React>> 或 <<polymer_ui, Polymer（废弃）>>。

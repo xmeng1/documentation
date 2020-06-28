@@ -1,0 +1,558 @@
+:sourcesdir: ../../../../../source
+
+[[gui_attributes]]
+===== 组件的 XML 属性
+
+[[gui_attr_align]]
+align - 对齐:: 
++
+--
+定义组件跟父容器的相对位置，可选值有：
+
+* `++TOP_RIGHT++`
+* `++TOP_LEFT++`
+* `++TOP_CENTER++`
+* `++MIDDLE_RIGHT++`
+* `++MIDDLE_LEFT++`
+* `++MIDDLE_CENTER++`
+* `++BOTTOM_RIGHT++`
+* `++BOTTOM_LEFT++`
+* `++BOTTOM_CENTER++`
+--
+
+[[gui_attr_expandRatio]]
+box.expandRatio - 箱式占比率::
++
+--
+在 <<gui_BoxLayout_vbox,vbox>> 和 <<gui_BoxLayout_hbox,hbox>> 容器中，组件放置在预定义的槽段里。`box.expandRatio` 属性指定每个槽段的延展比率。比率必须大于等于 0。
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/expandRatio.xml[]
+----
+如果我们为一个组件设置 `box.expandRatio=1`，并且它的<<gui_attr_height,高>>或<<gui_attr_width,宽>>是 100% （依据布局样式），该组件会被延展至使用组件放置方向的所有可用空间。
+
+默认情况下，所有放置组件的槽段有相等的宽度或高度（即，`box.expandRatio = 1`）。如果至少有一个组件的该属性设置成别的值，则会忽略所有的隐式值，只考虑设置了的显式值。
+
+也可参阅 <<gui_attr_expand,expand>> 属性。
+--
+
+[[gui_attr_caption]]
+caption - 标题:: 
++
+--
+设置组件的标题
+
+这个属性的值可以是一段文本，或者<<message_packs,消息包>>里的一个消息键名。如果是用的消息键名，那么这个值需要以 `msg://` 前缀开头。
+
+有两种方式设置键名：
+
+* 短键名 – 这种情况下，只在当前界面的消息包中搜索这个键名：
++
+[source, properties]
+----
+caption="msg://infoFieldCaption"
+----
+
+* 包含包名的长键名：
++
+[source, properties]
+----
+caption="msg://com.company.sample.gui.screen/infoFieldCaption"
+----
+--
+
+[[gui_attr_captionAsHtml]]
+captionAsHtml - HTML 标题::
++
+--
+定义是否在组件的<<gui_attr_caption,标题>>中启用 HTML。如果设置为 `true`，标题在浏览器中按照 HTML 做渲染，开发者需要保证没有使用有害的 HTML。如果设置为 `false`，内容将会按照普通文本显示。
+
+可选值 − `true` 、 `false`。默认值 `false`。
+--
+
+[[gui_attr_captionProperty]]
+captionProperty - 属性名称:: 
++
+--
+定义组件显示的实体属性的名称。`captionProperty` 只能用在关联了数据源的实体（比如，<<gui_LookupField,LookupField>> 组件的关联 <<gui_attr_optionsDatasource,optionsDatasource>> 数据源的属性）。
+
+如果 `captionProperty` 没定义 ，组件会显示实体的<<namePattern_annotation,实例名称>>。
+
+--
+
+[[gui_attr_colspan]]
+colspan - 占列数目:: 
++
+--
+设置组件应占用的网格（grid columns）列数，默认是 1
+
+这个属性可以给任何在 <<gui_GridLayout,GridLayout>> 容器中的组件定义列宽。
+--
+
+[[gui_attr_contextHelpText]]
+contextHelpText - 内容提示文字::
++
+--
+++++
+<div class="manual-since-container">
+    <a href="http://files.cuba-platform.com/cuba/release-notes/7.0/" class="since-btn" target="_blank">
+        <span class="since-btn-caption">最低版本</span><span class="since-btn-version">7.0</span>
+    </a>
+</div>
+++++
+
+设置内容提示文字，如果设置了，那么一个特别的 *?* 图标会添加在组件里。如果组件有外部的标题，比如设置了 <<gui_attr_caption,caption>> 或者 <<gui_attr_icon,icon>> 属性，那么这个内容提示的图标会显示在标题旁边，否则会显示在这个控件本身的旁边：
+
+image::gui_attr_contextHelpIcon.png[align="center"]
+
+在 *web* 客户端当用户光标悬浮到内容提示的 *?* 图标时，会显示内容提示。
+
+[source, xml]
+----
+<textField id="textField"
+           contextHelpText="msg://contextHelp"/>
+----
+
+image::gui_attr_contextHelp.png[align="center"]
+--
+
+[[gui_attr_contextHelpTextHtmlEnabled]]
+contextHelpTextHtmlEnabled - 是否启用 HTML 格式内容提示::
++
+--
+++++
+<div class="manual-since-container">
+    <a href="http://files.cuba-platform.com/cuba/release-notes/7.0/" class="since-btn" target="_blank">
+        <span class="since-btn-caption">最低版本</span><span class="since-btn-version">7.0</span>
+    </a>
+</div>
+++++
+
+定义内容提示是否可以通过 HTML 格式显示。
+
+[source, xml]
+----
+<textField id="textField"
+           description="Description"
+           contextHelpText="<p><h1>Lorem ipsum dolor</h1> sit amet, <b>consectetur</b> adipiscing elit.</p><p>Donec a lobortis nisl.</p>"
+           contextHelpTextHtmlEnabled="true"/>
+----
+
+image::gui_attr_contextHelpHtml.png[align="center"]
+
+可选值： `true` 、 `false`.
+--
+
+[[gui_attr_css]]
+css::
++
+--
+++++
+<div class="manual-since-container">
+    <a href="http://files.cuba-platform.com/cuba/release-notes/7.0/" class="since-btn" target="_blank">
+        <span class="since-btn-caption">最低版本</span><span class="since-btn-version">7.0</span>
+    </a>
+</div>
+++++
+
+为 UI 组件提供声明式的方式来设置 CSS 属性。这个属性可以跟 <<gui_attr_stylename,stylename>> 属性一起使用，参阅下面的例子。
+
+.XML 定义:
+[source, xml]
+----
+<cssLayout css="display: grid; grid-gap: 10px; grid-template-columns: 33% 33% 33%"
+           stylename="demo"
+           width="100%"
+           height="100%">
+    <label value="A" css="grid-column: 1 / 3; grid-row: 1"/>
+    <label value="B" css="grid-column: 3; grid-row: 1 / 3;"/>
+    <label value="C" css="grid-column: 1; grid-row: 2;"/>
+    <label value="D" css="grid-column: 2; grid-row: 2;"/>
+</cssLayout>
+----
+
+.附加的 CSS:
+[source, css]
+----
+  .demo > .v-label {
+    display: block;
+    background-color: #444;
+    color: #fff;
+    border-radius: 5px;
+    padding: 20px;
+    font-size: 150%;
+  }
+----
+--
+
+[[gui_attr_dataContainer]]
+dataContainer::
++
+--
+在界面的 XML 描述中的 `data` 部分定义一个<<gui_data_containers,数据容器>>。
+
+当为组件设置 `dataContainer` 属性的时候，<<gui_attr_property,property>> 属性也需要同时设置。
+--
+
+[[gui_attr_dataLoader]]
+dataLoader - 数据加载器::
++
+--
+设置<<gui_data_loaders,数据加载器>>，为界面 XML 描述的 `data` 部分定义一个数据容器。
+--
+
+[[gui_attr_datasource]]
+datasource - 数据源:: 
++
+--
+在 XML 描述的 `dsContext` 段定义一个<<datasources,数据源>>。
+
+当给实现了 `DatasourceComponent` 接口的组件设置 `datasource` 属性的时候，<<gui_attr_property,property>> 属性也需要同时设置。
+--
+
+[[gui_attr_datatype]]
+datatype - 数据类型::
++
+--
+如果控件不与实体属性相关联（比如没有设置数据容器和属性名称），则需要设置数据类型。该属性的值可以是注册在应用程序元数据中的一个数据类型 - 参考 <<datatype>>。
+
+这些组件可以使用该属性： <<gui_TextField,TextField>>，<<gui_DateField,DateField>>，<<gui_DatePicker,DatePicker>>，<<gui_TimeField,TimeField>>，<<gui_Slider,Slider>> 。
+--
+
+[[gui_attr_description]]
+description - 组件描述:: 
+当用户光标悬浮或者点击一个组件的区域的时候，在弹出框显示组件的描述信息。
+
+[[gui_attr_descriptionAsHtml]]
+descriptionAsHtml - HTML 组件描述::
++
+--
+定义是否在组件的<<gui_attr_description,描述>>中启用 HTML。如果设置为 `true`，描述在浏览器中使用 HTML 做渲染，开发者需要保证没有使用有害的 HTML。如果设置为 `false`，内容将会按照普通文本显示。
+
+可选值 − `true` 、`false`。默认值 `false`。
+--
+
+[[gui_attr_editable]]
+editable - 是否可编辑:: 
++
+--
+标明这个组件的内容是否可编辑（不要跟 <<gui_attr_enable,enable>> 混淆）
+
+可选值： `true` 、 `false`。默认值 `true`。
+
+是否能编辑绑定数据的组件（继承了 `DatasourceComponent` 或者 `ListComponent`）的内容也收到 <<security_subsystem,security subsystem>> 的影响。如果安全子系统示意这个组件不能编辑，那么 `editable` 属性的值会被忽略。
+--
+
+[[gui_attr_enable]]
+enable - 是否启用:: 
++
+--
+定义组件的启用/禁用状态。
+
+如果一个组件被禁用，那么这个组件将不能操作。禁用一个容器会禁用容器内的所有组件。可选值： `true` 、 `false`。默认所有组件都是启用的。
+--
+
+[[gui_attr_expand]]
+expand - 延展:: 
+定义容器内的组件是否可以按照组件放置的方向延展占用位置至所有可用的空间。对于垂直布局的容器，这个属性会设置组件的高度（height）到 100%；对于水平布局的容器，则是 100%宽度（width）。还有，重新设置容器的大小也会影响到自动延展的组件。参考 <<gui_attr_expandRatio,box.expandRatio>>。
+
+[[gui_attr_height]]
+height - 组件高度:: 
++
+--
+设置组件的高度。可以用像素（pixels）或者父容器的高度的百分比。比如 `100px` 、  `100%` 、 `50`。如果数字没有单位，默认是用像素。
+
+按照 `%` 来设置值表示组件会占用父容器可用空间的相应比例的高度。
+
+当设置成 `AUTO` 或者 `-1px` 的时候，组件的高度会使用默认值。对于容器来说，默认的高度是由内容定义的，也就是所有嵌入组件的高度之和。
+--
+
+[[gui_attr_icon]]
+icon - 图标:: 
++
+--
+设置组件的图标
+
+这个属性的值需要指定一个图标的路径，这个路径相对于<<gui_themes,主题>>文件夹。
+
+[source, xml]
+----
+icon="icons/create.png"
+----
+
+或者<<icon_set,图标集>>里面的图标名称:
+
+[source, xml]
+----
+icon="CREATE_ACTION"
+----
+
+如果希望根据用户的语言显示不同的图标，可以在消息包里面配置图标的路径，然后在 `icon` 属性指定这个消息的键名，比如：
+
+[source, xml]
+----
+icon="msg://addIcon"
+---- 
+
+在用了 Halo <<gui_themes,主题>> （或者继承了这个主题）的 web 客户端，可以用 *Font Awesome* 来替代图标文件。在 `icon` 属性中定义所需要的图标名称，名称可以从 `com.vaadin.server.FontAwesome` 类的常量中找到，然后用 `font-icon:` 前缀来设置，比如：
+
+[source, xml]
+----
+icon="font-icon:BOOK"
+----
+
+参阅 <<gui_icons>>  章节了解使用图标的更多细节。
+--
+
+[[gui_attr_id]]
+id - 组件标识符::
++
+--
+设置组件的标识符。
+
+推荐使用 Java 标识符的规则和驼峰命名法来给组件创建标识符，比如：`userGrid` 、  `filterPanel`。任何组件都可以使用 `id` 属性，但是需要保证在一个界面中每个组件的标识符是唯一的。
+--
+
+[[gui_attr_inputPrompt]]
+inputPrompt - 输入提示::
++
+--
+定义当组件的值是 `null` 的时候在这个组件显示的文字。
+
+[source, xml]
+----
+<suggestionField inputPrompt="Let's search something!"/>
+----
+
+这个属性只能在 <<gui_TextField,TextField>> 、<<gui_LookupField,LookupField>> 、 <<gui_LookupPickerField,LookupPickerField>> 、 <<gui_SearchPickerField,SearchPickerField>> 、 <<gui_SuggestionPickerField,SuggestionPickerField>> 这些组件中使用，并且只支持 web 客户端。
+
+--
+
+[[gui_attr_margin]]
+margin - 边距:: 
++
+--
+定义组件的外边框和容器内容之间的留白。
+
+可以有两种形式的值设置：
+
+* `margin="true"` − 给所有方向都加了边距。
+
+* `margin="true,false,true,false"` − 只给上下两边加了边距（值格式是：“上，右，下，左”）。
+
+默认情况下没有边距设置。
+--
+
+[[gui_attr_nullName]]
+nullName - null 名称::
++
+--
+选择 `nullName` 属性定义的名称相当于设置组件的值为 `null`。换言之，`nullName` 就是组件 `null` 选项的显示名称。
+
+这个属性可以在 <<gui_LookupField,LookupField>> 、 <<gui_LookupPickerField,LookupPickerField>>  和 <<gui_SearchPickerField,SearchPickerField>> 组件使用。
+
+在 <<screen_xml_glossentry,XML 描述>>内设置这个属性的值：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/nullname_1.xml[]
+---- 
+
+在<<screen_controller_glossentry,控制器>>中设置这个属性的值：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/nullname_2.xml[]
+----
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/nullname_3.java[]
+---- 
+--
+
+[[gui_attr_openType]]
+openType - 界面打开类型::
++
+--
+定义一个界面要以什么方式打开。对应 `WindowManager.OpenType` 枚举类型的值：`NEW_TAB`、`THIS_TAB`、`NEW_WINDOW`、`DIALOG`。默认是 `THIS_TAB`。
+--
+
+[[gui_attr_optionsContainer]]
+optionsContainer - 选项容器::
++
+--
+设置一个<<gui_data_containers,数据容器>>的名称，这个容器包含一个选项列表。
+
+<<gui_attr_captionProperty,captionProperty>> 属性可以跟 `optionsContainer` 一起使用。
+--
+
+[[gui_attr_optionsDatasource]]
+optionsDatasource - 选项数据源:: 
++
+--
+设置包含一个选项列表的<<datasources,数据源>>。
+
+<<gui_attr_captionProperty,captionProperty>> 属性可以跟 `optionsDatasource` 一起使用。
+--
+
+[[gui_attr_optionsEnum]]
+optionsEnum - 选项枚举类型::
++
+--
+设置一个含有选项列表的<<enum_attributes,枚举>>类名称，一个枚举值就是一个选项。
+--
+
+[[gui_attr_property]]
+property - 属性名称:: 
++
+--
+设置实体属性的名称，这个属性会在这个组件用来编辑和显示。
+
+`property` 属性总是和<<gui_attr_datasource,数据源>>属性一起使用。
+--
+
+[[gui_attr_required]]
+required - 必须有值:: 
++
+--
+表示是这个字段必须要有值。
+
+可选值： `true` 、 `false`。默认是 `false`。
+
+可以和 <<gui_attr_requiredMessage,requiredMessage>> 属性一起使用。
+--
+
+[[gui_attr_requiredMessage]]
+requiredMessage - 必须有值提醒:: 
++
+--
+总是跟 <<gui_attr_required,required>> 一起使用。这个属性设置一个消息，当组件没有值的时候会弹出这个消息提示。
+
+这个属性也可以用消息包的键名，比如：
+`requiredMessage="msg://infoTextField.requiredMessage"`
+--
+
+[[gui_attr_responsive]]
+responsive - 响应式::
++
+--
+设置组件是否可以根据可用的空间的大小自动适应。可以通过 <<web_theme_extension,styles>> 来定制自适应的方式。
+
+可选值：`true`  、 `false`。默认值 `false`。
+--
+
+[[gui_attr_rowspan]]
+rowspan - 占用行数::
++
+--
+设置组件占据的网格行数（grid lines），默认是 1。
+
+这个属性可以给直接放在在 <<gui_GridLayout,GridLayout>>  容器内的任何组件使用。
+--
+
+[[gui_attr_settingsEnabled]]
+settingsEnabled - 设置开启::
++
+--
+定义用户是否可以保存/恢复对组件的设置。只有组件有 <<gui_attr_id,id>>，才能保存组件的设置。
+
+可选值：`true` 、 `false`。默认值 `true`。
+--
+
+[[gui_attr_spacing]]
+spacing - 留白:: 
++
+--
+设置容器内组件之间是否留白。
+
+可选值：`true`  、 `false`。默认值 `false`。
+--
+
+[[gui_attr_stylename]]
+stylename - 样式名称:: 
+定义组件的 CSS 类名称，更多细节，参考 <<gui_themes>>。
++
+--
+在 `halo` 主题中，有一些为组件预定义的 CSS 类名称：
+
+[[gui_attr_stylename_huge]]
+* `huge` - 设置组件大小为默认值的 160%
+
+[[gui_attr_stylename_large]]
+* `large` - 设置组件大小为默认值的 120%
+
+[[gui_attr_stylename_small]]
+* `small` - 设置组件大小为默认值的 85%
+
+[[gui_attr_stylename_tiny]]
+* `tiny` - 设置组件大小为默认值的 75%
+--
+
+[[gui_attr_tabCaptionsAsHtml]]
+tabCaptionsAsHtml - 标签名称是否 HTML 格式::
++
+--
+定义标签的标题是否可以用 HTML。如果设置成 `true`，标题在浏览器里会以 HTML 的方式渲染，开发者需要保证没有使用有害的 HTML。如果设置成 `false`，内容会按照纯文本来渲染。
+
+可选值：`true` 、 `false`。默认值 `false`。
+--
+
+[[gui_attr_tabIndex]]
+tabIndex - tab 键索引::
++
+--
+定义组件是否可以获得焦点，同时也可以设置组件在界面上所有可获得焦点组件内部的顺序值。
+
+可以使用正负整数：
+
+* `负值` 表示组件可以获得焦点，但是不能被顺序的键盘导航访问到；
+
+* `0` 表示组件可以获得焦点，也可以被顺序的键盘访问访问到；但是它的访问顺序是由它在界面中的相对位置来定；
+
+* `正值` 表示组件可以获得焦点，也可以被顺序的键盘导航访问到；它被访问的相对顺序是通过这个属性的值来定义的：按照 `tabIndex` 升序来访问。如果几个组件有相同的 `tabIndex` 值，它们的相对访问顺序由它们在界面的相对位置来确定。
+--
+
+[[gui_attr_tabsVisible]]
+tabsVisible - 标签可见::
++
+--
+设置在标签页面板中是否显示标签选择部分。
+
+可选值：`true` 、 `false`。默认值 `true`。
+--
+
+[[gui_attr_textSelectionEnabled]]
+textSelectionEnabled - 文本选择启用::
++
+--
+定义在表格单元格中是否能选择文本。
+
+可选值：`true` 、 `false`。默认值 `false`。
+--
+
+[[gui_attr_visible]]
+visible - 组件是否可见:: 
++
+--
+设置组件是否可见。
+
+如果容器被设置成不可见，那么他里面的所有组件也不可见。默认所有组件都是可见。
+
+可选值：`true` 、 `false`。默认值 `true`。
+--
+
+[[gui_attr_width]]
+width - 组件宽度:: 
++
+--
+定义组件的宽度
+
+可以用像素（pixels）或者父容器的宽度的百分比。比如 `100px` 、 `100%` 、 `50`。如果数字没有单位，默认是用像素。
+
+按照 `%` 来设置值表示组件会占用父容器可用空间的相应比例的宽度。
+
+当设置成 `AUTO` 或者 `-1px` 的时候，组件的宽度会使用默认值。对于容器来说，默认的宽度是由内容定义的，也就是所有嵌入组件的宽度之和。
+--
+

@@ -1,0 +1,7 @@
+:sourcesdir: ../../../../../source
+
+[[build.gradle_restart]]
+===== 重启服务
+
+`restart` – 此任务会关停本地 Tomcat 服务，然后运行<<fast_deployment,快速部署>>，再启动本地 Tomcat 服务。
+

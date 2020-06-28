@@ -1,0 +1,53 @@
+:sourcesdir: ../../../../source
+
+[[data_model]]
+==== 数据模型
+
+数据模型实体分为两类：
+
+* 持久化实体 - 使用 <<orm,ORM>> 将此类实体的实例存储在数据库中。
+* 非持久化实体 – 实例仅存在于内存中，或通过不同的机制存储在某处。
+
+实体通过其属性描述。属性对应到实体代码的字段以及字段的访问方法（get / set）。如果省略 setter，则该属性变为只读。
+
+持久化实体可能包含未存储在数据库中的属性。对于非持久化属性，Java 字段不是必须的，可以只创建访问方法。
+
+实体类应满足以下要求：
+
+* 继承自平台提供的基类之一（参阅<<base_entity_classes,下面的描述>>）。
+
+* 有一组对应于属性的字段和访问方法。
+
+* 类及其字段（或访问方法，有的属性没有对应的字段）必须是<<entity_annotations,带注解的>>，用于为 <<orm, ORM>> （持久化实体）和<<metadata_framework,元数据>>框架提供信息。
+
+以下类型可用于实体属性：
+
+* `java.lang.String`
+* `java.lang.Boolean`
+* `java.lang.Integer`
+* `java.lang.Long`
+* `java.lang.Double`
+* `java.math.BigDecimal`
+* `java.time.LocalDate`
+* `java.time.LocalTime`
+* `java.time.LocalDateTime`
+* `java.time.OffsetTime`
+* `java.time.OffsetDateTime`
+* `java.util.Date`
+* `java.sql.Date`
+* `java.sql.Time`
+* `java.util.UUID`
+* `byte[]`
+* `enum`
+* `Entity`
+
+基础实体类（见下文）重写 `equals()` 和 `hashCode()` 方法，这样可以通过比较它们的标识符来检查实体实例是否相同。即，如果它们的标识符相等，则认为他们是同一个实例。
+
+include::data_model/base_entity_classes.adoc[]
+
+include::data_model/entity_annotations.adoc[]
+
+include::data_model/enum_attributes.adoc[]
+
+include::data_model/soft_deletion.adoc[]
+

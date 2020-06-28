@@ -1,0 +1,60 @@
+:sourcesdir: ../../../../../source
+
+[[url_navigation_api_usage]]
+===== 使用 URL 历史和导航 API
+
+本章节包含使用 URL 历史和导航 API 的示例。
+
+假设有 `Task - 任务` 实体和 `TaskInfo` 界面，用来展示选中任务的信息。
+
+`TaskInfo` 界面控制器包含 `@Route` 注解，用来指定此界面的路由：
+
+[source, java]
+----
+include::{sourcesdir}/gui/url_taskStatistic_screen.java[]
+----
+
+然后，用户可以在浏览器的地址栏输入 `++http://localhost:8080/app/#main/task-info++` 来打开此界面：
+
+image::url_screen_by_route.png[align="center"]
+
+当界面打开时，地址还包含一个状态标记。
+
+[[mapping_state_to_url]]
+状态与 URL 的映射::
++
+--
+假设 `TaskInfo` 界面每次展示一个任务的信息，并且能控制切换选取的任务。也许需要在 URL 中反应当前查看的任务，这样可以拷贝 URL，以便之后可以在浏览器的地址栏粘贴 URL 就能打开查看此特定任务的界面。
+
+下面的代码实现了选中任务和 URL 的映射：
+
+[source, java]
+----
+include::{sourcesdir}/gui/url_mapStateToUrl.java[]
+----
+
+<1> - 从 `LookupField` 获取当前任务
+<2> - 如果没有选中任务，移除 URL 参数
+<3> - 使用 `UrlIdSerializer` 来序列化任务的 id
+<4> - 用包含序列化任务 id 参数的新状态替换当前的 URL 状态。
+
+结果是，当用户选中任务然后点击 *Select Task* 按钮时，应用程序 URL 会变化：
+
+image::url_reflection_state.png[align="center"]
+--
+
+[[using_urlParamsChangedEvent]]
+UrlParamsChangedEvent::
++
+--
+现在实现最后一个需求：当用户输入带路由和 `task_id` 参数的 URL 时，应用程序必须展示相应任务的界面。下面是完整的界面控制器代码。
+
+[source, java]
+----
+include::{sourcesdir}/gui/url_paramsChangedEvent_listener.java[]
+----
+
+<1> - 从 `UrlParamsChangedEvent` 获取参数值
+<2> - 对任务 id 进行反序列化
+<3> - 加载任务实例并设置到界面控件
+--

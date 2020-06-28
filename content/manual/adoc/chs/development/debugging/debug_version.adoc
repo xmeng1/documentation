@@ -1,0 +1,32 @@
+:sourcesdir: ../../../../source
+
+[[debug_version]]
+==== 调试 Widgetset 版本
+
+不使用 *GWT Super Dev Mode* 在客户端最容易调试应用程序的方法就是使用 *web* 模块设置里面的调试配置（configuration）。
+
+. 在 `webModule` 中添加新调试配置：
++
+[source, groovy]
+----
+include::{sourcesdir}/development/debug_1.groovy[]
+----
+
+. 在 `webModule` 里的 `dependencies` 部分添加调试的依赖：
++
+[source, groovy]
+----
+include::{sourcesdir}/development/debug_2.groovy[]
+----
++
+如果使用了 *charts* 组件，那么必须添加 `debug("com.haulmont.charts:charts-web-toolkit:$cubaVersion:debug@zip")`。
+
+. 在 `webModule` 的配置部分添加 `deploy.doLast` 任务：
++
+[source, groovy]
+----
+include::{sourcesdir}/development/debug_3.groovy[]
+----
+
+调试场景会被部署在项目的 `$cuba.tomcat.dir/webapps/app/VAADIN/widgetsets/com.haulmont.cuba.web.toolkit.ui.WidgetSet` 目录。
+

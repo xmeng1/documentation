@@ -1,0 +1,40 @@
+:sourcesdir: ../../../../../source
+
+[[persistenceTools]]
+===== PersistenceTools
+
+<<managed_beans, Spring bean>>，包含了与数据存储功能相关的辅助方法。可以通过调用 `Persistence.getTools()` 方法获得，或者像任何其它 bean 一样，通过注入或 `AppBeans` 类来获得。
+
+`PersistenceTools` bean 有以下方法：
+
+* `getDirtyFields()` – 返回自最后一次从数据库加载实例以来已更改的实体属性的名称集合，对于新实例，返回空集合。
+
+* `isLoaded()` – 检查是否从数据库加载了指定的实例属性。如果在加载实例时指定的<<views,视图>>中不存在该属性，则可能没有加载该属性。
++
+此方法仅适用于<<entity_states,托管>>状态的实例.
+
+* `getReferenceId()` – 返回关联实体的 ID 而不需要从数据库加载关联实体的数据。
++
+假设在<<persistence_context,持久化上下文>>中加载了一个 `Order` 实体并且需要获得这个 `Order` 关联的 `Customer` 实例的 ID 值。如果调用 `order.getCustomer().getId()` 方法，将执行数据库查询来加载 `Customer` 实例，但此时这个数据库查询是没必要的，因为 Customer ID 的值作为外键也存在于 `Order` 表中。而执行
++
+[source, java]
+----
+include::{sourcesdir}/middleware/persistencetools_1.java[]
+----
++
+则不会向数据库发送任何其它查询。
++
+此方法仅适用于<<entity_states,托管>>状态的实例。
+
+在应用程序中，可以通过<<bean_extension,重写>> `PersistenceTools` bea 来扩展默认的辅助方法的集合。使用扩展接口的示例如下所示：
+
+[source, java]
+----
+include::{sourcesdir}/middleware/persistencetools_2.java[]
+----
+
+[source, java]
+----
+include::{sourcesdir}/middleware/persistencetools_3.java[]
+----
+

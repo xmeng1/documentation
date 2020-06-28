@@ -1,0 +1,34 @@
+:sourcesdir: ../../../../../source
+
+[[screen_controllers]]
+===== 界面控制器
+
+界面控制器是一个 Java 或 Groovy 类，包含界面初始化和事件处理逻辑。通常，控制器链接到<<screen_descriptors,XML 描述>>，XML 描述中定义了界面布局和数据容器，但也可以以编程方式创建所有可视化组件和非可视化组件。
+
+所有界面控制器都实现了 `FrameOwner` 标记接口。此接口的名称表示它引用了一个框架（frame），框架是一个在主应用程序窗口中显示界面的可视化组件。框架有两种类型：
+
+* `Window` -  一个独立的窗口，可以显示在应用程序主窗口内的标签页中，也可以显示为模式对话框。
+* `Fragment` -  一个轻量级组件，可以被添加到窗口或其它 Fragment。
+
+根据所使用的框架，控制器被分为两个不同的类别：
+
+* `Screen` - 窗口控制器的基类。
+* `ScreenFragment` - fragment 控制器的基类。
+
+.控制器和框架
+image::gui_screens/screens.svg[align="center"]
+
+`Screen` 类为所有独立界面提供大部分基本的功能。还有其它一些特定的界面基类可用于处理实体：
+
+* `StandardEditor` - 实体编辑界面的基类。
+* `StandardLookup` - 实体浏览和查找界面的基类。
+* `MasterDetailScreen` - 组合界面，在左侧显示实体列表、在右侧显示所选实体的详细信息。
+
+.控制器基类
+image::gui_screens/controller_base_classes.svg[align="center"]
+
+include::screen_controllers/screen_controller_annotations.adoc[]
+
+include::screen_controllers/screen_controller_events.adoc[]
+
+include::screen_controllers/screen_fragment_events.adoc[]

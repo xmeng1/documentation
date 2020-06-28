@@ -1,0 +1,25 @@
+:sourcesdir: ../../../../../source
+
+[[timeSource]]
+===== TimeSource
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/global/TimeSource.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`TimeSource` 接口用于获取当前时间。不建议在应用程序代码中使用 `new Date()` 或类似的方法来获取当时时间。
+
+例如:
+
+[source, java]
+----
+include::{sourcesdir}/common/timesource_1.java[]
+----
+
+[source, java]
+----
+include::{sourcesdir}/common/timesource_2.java[]
+----
+

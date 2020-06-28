@@ -1,0 +1,4 @@
+[[association_mtm_recipe_1]]
+=== 直接多对多关联
+
+参阅 https://www.cuba-platform.com/guides/data-modelling-many-to-many-association#direct_many_to_many_association[直接多对多关联] 向导。

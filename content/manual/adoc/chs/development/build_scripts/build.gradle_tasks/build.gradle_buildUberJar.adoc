@@ -1,0 +1,100 @@
+:sourcesdir: ../../../../../source
+
+[[build.gradle_buildUberJar]]
+===== 构建 UberJar
+
+`buildUberJar` – `CubaUberJarBuilding` 类型的任务，会创建一个包含应用程序代码和所有依赖包在一起并且还有嵌入的 Jetty Http 服务的 JAR 包。可以选择创建一个大而全的包含所有的 JAR 包，或者选择给每一个应用程序 <<app_tiers,block>> 创建单独的 JAR 包，例如可以给中间件（middleware）创建 `app-core.jar`，给 web 客户端创建 `app.jar`。
+
+这个任务需要在 `build.gradle` 的根节点声明。生成的 JAR 包会放在项目的 `build/distributions` 目录。参考 <<uberjar_deployment>> 章节了解怎么运行生成的 JAR 包。
+
+[TIP]
+====
+可以通过 Studio 里的 *Deployment > UberJAR settings* 界面配置这个任务。
+====
+
+任务参数：
+
+* `appProperties` - 应用程序属性的键值对。这里面提供的属性键值对会以生成的 JAR 包里的 `WEB-INF/local.app.properties` 文件定义的属性为基础添加。
++
+[source, groovy]
+----
+task buildUberJar(type: CubaUberJarBuilding) {
+    appProperties = ['cuba.automaticDatabaseUpdate' : true]
+    // ...
+}
+----
+
+* `singleJar` - 如果设置成 `true`，会创建一个包含所有模块（core，web，portal）的 JAR 包。默认是 `false`。
++
+[source, groovy]
+----
+task buildUberJar(type: CubaUberJarBuilding) {
+    singleJar = true
+    // ...
+}
+----
+
+* `webPort` - 单一 JAR 包（`singleJar=true`）或者 Web 模块的 JAR 包的 Http 服务端口，默认是 `8080`。也可以在运行时通过 `-port` 命令行参数动态指定。
+
+* `corePort` - core 模块 JAR 包的 Http 服务端口，默认是 `8079`。也可以在运行时启动相应的 JAR 包的时候用命令行参数 `-port` 来指定。
+
+* `portalPort` - partal 模块 JAR 包的 Http 服务端口，默认是 `8081`。也可以在运行时启动相应的 JAR 包的时候用命令行参数 `-port` 来指定。
+
+* `appName` - 应用程序名称，默认是 `app`。可以在 Studio 中通过 *Project Properties* 窗口里的 *Module prefix* 来给整个项目设置名称，或者也可以通过这个参数只给 `buildUberJar` 任务设置。例如：
++
+[source, groovy]
+----
+task buildUberJar(type: CubaUberJarBuilding) {
+    appName = 'sales'
+    // ...
+}
+----
++
+当把应用程序名称改成 `sales` 之后，这个任务会生成 `sales-core.jar` 和 `sales.jar` 文件，web 客户端可以通过 `++http://localhost:8080/sales++` 访问。还能通过运行时的 `-contextName` <<uberjar_deployment,命令行>>参数改变 web 上下文，而不需要修改应用程序名称，甚至直接修改 JAR 包的名字也行。
+
+* `logbackConfigurationFile` - 日志配置文件的相对目录。
++
+比如:
++
+[source, groovy]
+----
+logbackConfigurationFile = "/modules/global/src/logback.xml"
+----
+
+* `useDefaultLogbackConfiguration` - 当设置成 `true` （也是默认值）的时候，这个任务会拷贝标准的 `logback.xml` 配置文件。
+
+* `coreJettyEnvPath` - 定义一个相对路径（相对于项目根目录），指向包含 JNDI 资源的文件，用来为 Jetty HTTP 服务。
++
+[source, groovy]
+----
+task buildUberJar(type: CubaUberJarBuilding) {
+    coreJettyEnvPath = 'modules/core/web/META-INF/jetty-env.xml'
+    // ...
+}
+----
+
+* `webJettyConfPath` - Jetty Server 配置文件的相对路径，可以给 UberJar（`singleJar=true`）或者 web JAR（`singleJar=false`）配置。参考： https://www.eclipse.org/jetty/documentation/9.4.x/jetty-xml-config.html
+
+* `coreJettyConfPath` - core JAR（`singleJar=false`）的 Jetty Server 配置文件相对目录，要注意跟上面描述的 `coreJettyEnvPath` 相区别。
+
+* `portalJettyConfPath` - portal JAR `singleJar=false`）的 Jetty Server 配置文件相对目录。
+
+* `coreWebXmlPath` - 用来作为 core 模块 `web.xml` 的文件的相对目录。
+
+* `webWebXmlPath` - 用来作为 web 模块 `web.xml` 的文件的相对目录。
+
+* `portalWebXmlPath` - 用来作为 portal 模块 `web.xml` 的文件的相对目录。
+
+* `excludeResources` - 正则表达式，表示不需要包含在 JAR 包里面的那些 resource 文件。
+
+* `mergeResources` - 正则表达式，表示需要整合在 JAR 包里面的那些 resource 文件。
+
+* `webContentExclude` - 正则表达式，表示不需要包含在 web content 里面的那些文件。
+
+* `coreProject` - 用来作为 core 模块（Middleware）的 Gradle 项目。如果没定义，则会使用标准的 *core* 模块。
+
+* `webProject` - 用来作为 web 模块（Web Client）的 Gradle 项目。如果没定义，则会使用标准的 *web* 模块。
+
+* `portalProject` - 用来作为 portal 模块（Web Portal）的 Gradle 项目。如果没定义，则会使用标准的 *portal* 模块。
+
+* `frontProject` - 用来作为 <<front_ui>> 模块的 Gradle 项目。如果没定义，则会使用标准的 *front* 模块。

@@ -1,0 +1,19 @@
+:sourcesdir: ../../../../source
+
+[[localization]]
+==== 消息本地化
+
+基于 CUBA 框架的应用程序支持消息本地化，这意味着所有用户界面元素都可以以用户选择的语言显示。
+
+语言选择选项由 <<cuba.localeSelectVisible,cuba.localeSelectVisible>> 和 <<cuba.availableLocales,cuba.availableLocales>> 应用程序属性共同确定。
+
+本节介绍本地化机制和本地化消息创建规则。有关获取消息的说明，请参阅 <<getting_messages>>。
+
+include::localization/message_packs.adoc[]
+
+include::localization/main_message_pack.adoc[]
+
+include::localization/entity_localization.adoc[]
+
+include::localization/enum_localization.adoc[]
+

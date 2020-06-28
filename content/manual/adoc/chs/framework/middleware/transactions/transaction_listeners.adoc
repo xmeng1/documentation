@@ -1,0 +1,36 @@
+:sourcesdir: ../../../../../source
+
+[[transaction_listeners]]
+===== 事务监听器
+
+
+事务监听器旨在对事务生命周期事件做出响应。与<<entity_listeners,实体监听器>>不同，它们不与何实体类型绑定，可以被每个事务调用。
+
+监听器是一个<<managed_beans, Spring bean>>，它实现了 `BeforeCommitTransactionListener` 或 `AfterCompleteTransactionListener` 接口或者同时实现这两个接口。
+
+BeforeCommitTransactionListener::
++
+--
+如果事务不是只读的，则在所有<<entity_listeners,实体监听器>>之后，事务提交之前调用 `beforeCommit()` 方法。该方法接受当前持久化上下文中的实体集合和当前的<<entityManager,EntityManager>>作为参数。
+
+监听器可用于执行涉及多个实体的复杂业务规则。在下面的例子中，`Order` 实体的 `amount` 属性必须根据订单中的 `discount` 值计算，`OrderLine` 实体的 `price` 和 `quantity` 构成订单。
+
+[source,java]
+----
+include::{sourcesdir}/middleware/tx_listener_1.java[]
+----
+--
+
+AfterCompleteTransactionListener::
++
+--
+事务完成后调用 `afterComplete()` 方法。该方法接受一个参数，该参数表明事务是否已成功提交，以及已完成事务的持久化上下文中包含的已分离实体的集合。
+
+用法示例:
+
+[source,java]
+----
+include::{sourcesdir}/middleware/tx_listener_2.java[]
+----
+--
+

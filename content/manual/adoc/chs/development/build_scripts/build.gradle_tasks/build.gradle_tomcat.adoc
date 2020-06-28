@@ -1,0 +1,7 @@
+:sourcesdir: ../../../../../source
+
+[[build.gradle_tomcat]]
+===== 打开 Tomcat 窗口
+
+`tomcat` – `Exec` 类型的任务，在打开的终端窗口内运行本地 Tomcat 服务，即便启动失败，终端窗口也会打开。这个任务在调试 Tomcat 问题的时候会很有用，比如在服务启动时由于 Java 版本不匹配引起的启动失败。
+

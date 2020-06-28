@@ -1,0 +1,23 @@
+:sourcesdir: ../../../source
+
+[[health_check_url]]
+=== 应用程序健康检查 URL
+
+每个作为 web 应用程序部署的应用程序模块都提供了健康检查的 URL。对这个 URL 进行 HTTP GET 操作，如果返回是 `ok` 的话，表明这个模块可以开始运行了。
+
+不同 block 的 URL 路径列表如下：
+
+* Middleware: `/remoting/health`
+* Web Client: `/dispatch/health`
+* Web Portal: `/rest/health` （需要 {rest_man_url}[REST API 扩展]）
+
+所以对于名称叫 `app` 并且部署在 `++localhost:8080++` 的应用程序，这些 URL 将会是：
+
+* `\http://localhost:8080/app-core/remoting/health`
+* `\http://localhost:8080/app/dispatch/health`
+* `\http://localhost:8080/app-portal/rest/health`
+
+可以使用 <<cuba.healthCheckResponse,cuba.healthCheckResponse>> 应用程序属性将返回的 `ok` 替换成任意字符串。
+
+监控检查的控制器也会发送类型为 `HealthCheckEvent` 的<<events,事件>>。因此可以添加自定义的检查应用健康的逻辑。 https://github.com/cuba-platform/sample-base/blob/master/modules/web/src/com/haulmont/addon/samplebase/web/HealthCheckListener.java[GitHub 的这个例子] 演示了 web 层的一个 bean 监听健康检查的事件，并且调用中间件服务，最后在数据库做了一次操作。
+

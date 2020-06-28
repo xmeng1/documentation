@@ -1,0 +1,43 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_instance_container]]
+====== 单一实例容器
+
+`InstanceContainer` 接口是数据容器层次结构的根节点。用来容纳单一实体实例，有下列方法：
+
+--
+* `setItem()` - 为容器设置一个实体实例。
+
+* `getItem()` - 返回容器中保存的实例。如果容器是空的，此方法会抛出异常。所以需要在确保容器有设置实体的时候才使用此方法，然后就不需要检查返回值是否为 null。
+
+* `getItemOrNull()` - 返回容器中保存的实例。如果容器是空的，此方法会返回 null。所以在使用此方法返回值之前总是需要先检查返回的是否是 null。
+
+* `getEntityMetaClass()` - 返回能存储在此容器的实体的<<metaClass,元类>>。
+
+* `setView()` - 设置在加载容器实体时需要使用的视图。需要注意的是，容器本身不会加载数据，所以这个属性只是为此容器关联的<<gui_data_loaders,数据加载器>>设定视图。
+
+* `getView()` - 返回在加载容器实体时需要使用的视图。
+
+--
+
+[[gui_instance_container_events]]
+InstanceContainer 事件::
++
+--
+使用 `InstanceContainer` 接口可以注册以下事件的监听器。
+
+* `ItemPropertyChangeEvent` 会在容器中存储的实例的属性值发生变化时发送。下面例子展示了订阅容器的事件，该容器在界面 XML 中使用 `customerDc` id定义：
++
+[source, java]
+----
+include::{sourcesdir}/gui/data_containers/instance_events_1.java[]
+----
+
+* `ItemChangeEvent` 会在另一个实例（或者null）设置到容器时发送。下面例子展示了订阅容器的事件，该容器在界面 XML 中使用 `customerDc` id定义：
++
+[source, java]
+----
+include::{sourcesdir}/gui/data_containers/instance_events_2.java[]
+----
+--
+

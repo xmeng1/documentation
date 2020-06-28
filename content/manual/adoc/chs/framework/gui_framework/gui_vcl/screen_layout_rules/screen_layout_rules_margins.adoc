@@ -1,0 +1,49 @@
+:sourcesdir: ../../../../../../source
+
+[[screen_layout_rules_margins]]
+====== 外边距和间距
+
+[[screen_layout_rules_margin]]
+界面边框的外边距::
++
+--
+<<gui_attr_margin,margin>> 属性允许在容器边框和嵌套组件之间设置边距。
+
+如果 `margin` 设置为 `true`，则容器所有的边都会有边距。
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/screen_layout_rules_margin.xml[]
+----
+
+image::cookbook/screen_layout_rules_12.png[align="center"]
+
+也可以单独为每个的边（上、右、下、左）设置边距。为顶部和底部启用外边距的示例：
+
+[source, xml]
+----
+<vbox margin="true,false,true,false">
+----
+--
+
+[[screen_layout_rules_spacing]]
+组件之间的间距::
++
+--
+<<gui_attr_spacing,spacing>> 属性表明是否应在容器扩展方向上的嵌套组件之间添加间距。
+
+image::cookbook/screen_layout_rules_13.png[align="center"]
+
+[TIP]
+====
+在某些嵌套组件变得不可见的情况下，间距也会正常工作，所以不要使用 `margin` 来模拟间距。
+====
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/screen_layout_rules_spacing.xml[]
+----
+
+image::cookbook/screen_layout_rules_14.png[align="center"]
+--
+

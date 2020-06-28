@@ -1,0 +1,77 @@
+:sourcesdir: ../../../../../source
+
+[[message_packs]]
+===== 语言消息包
+
+
+消息包是一组位于单个 Java 包中名称为 `++messages{_XX}.properties++` 格式的属性文件。`XX` 后缀表示在此文件中消息的语言，对应 `Locale.getLanguage()` 中的语言代码。也能够使用其它 `Locale` 属性，例如，`country`。在这种情况下，消息包文件名看起来像 `++messages{_XX_YY}.properties++`。如果包中的某个消息文件没有语言后缀 - 则是默认消息文件。消息的包名称对应于包含消息文件的 Java 包的名称。
+
+我们看看以下示例：
+
+[source, properties]
+----
+/com/abc/sales/gui/customer/messages.properties
+/com/abc/sales/gui/customer/messages_fr.properties
+/com/abc/sales/gui/customer/messages_ru.properties
+/com/abc/sales/gui/customer/messages_en_US.properties
+----
+
+
+这个包由 4 个文件组成 - 一个用于俄语，一个用于法语，一个用于美式英语（带有美国国家代码），以及一个默认文件。包名是 `com.abc.sales.gui.customer`。
+
+
+消息文件包含键/值对，其中键是应用程序代码中引用消息的标识符，值是对应语言的消息本身。配对规则与 `java.util.Properties` 属性文件类似，同时具有以下特点：
+
+* 文件编码 – 仅限 `UTF-8`。
+
+
+* 可以使用 `@include` 键引入其它消息包。可以使用以逗号分隔的列表包含多个包。在这种情况下，如果在当前包和引入包中都找到某个消息键，则使用来自当前包的消息。引入包的示例：
+
++
+[source, properties]
+----
+@include=com.haulmont.cuba.web, com.abc.sales.web
+
+someMessage=Some Message
+...
+----
+
+
+根据以下规则使用 <<messages,Messages>> 接口方法来从包中检索消息：
+
+
+* 首先在应用的<<conf_dir,配置目录>>中执行搜索。
+
+
+** 在消息包名称指定的目录中搜索 `++messages_XX.properties++` 文件，其中 `XX` 是所需语言的代码。
+
+
+** 如果没有这样的文件，则在同一目录中搜索默认的 `messages.properties` 文件。
+
+
+** 如果找到所需的语言文件或默认文件，则将其与所有 `@include` 文件一起加载，并在其中搜索消息键名。
+
+
+** 如果没有找到文件或者文件中没有正确的消息键，则将目录更改为父目录并重复搜索过程。搜索将继续，直到到达配置目录的根目录。
+
+
+* 如果在配置目录中没有找到该消息，则根据相同的算法在类路径中执行搜索。
+
+
+* 如果找到该消息，则将其缓存并返回。如果没有，则消息不存在的事实也被缓存并返回搜索时传递的键。因此，复杂搜索过程仅执行一次，后续将从应用程序模块的本地高速缓存中加载结果。
+
+
+
+[TIP]
+====
+
+建议按如下方式组织消息包：
+
+
+* 如果应用程序不是用于国际化，可以将消息字符串直接包含在应用程序代码中，而不是使用包或使用 `messages.properties` 默认文件将资源从源码中分离。
+
+
+* 如果应用程序是国际化应用程序，则可以使用应用程序主要受众的语言或用英语为默认文件，以便在找不到所需语言的消息时向用户显示这些默认文件的消息。
+
+====
+

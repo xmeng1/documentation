@@ -1,0 +1,2683 @@
+[[app_properties_reference]]
+[appendix]
+== 应用程序属性
+
+本附录章节按字母顺序介绍所有可用的<<app_properties,应用程序属性>>。
+
+[[cuba.additionalStores]]
+cuba.additionalStores::
++
+--
+定义应用中使用的附加<<data_store,数据存储>>的名称。
+
+在所有标准的 <<app_tiers,blocks>> 中都可以使用。
+
+示例：
+
+[source, properties]
+----
+cuba.additionalStores = db1, mem1
+----
+--
+
+[[cuba.allowQueryFromSelected]]
+cuba.allowQueryFromSelected::
++
+--
+启用<<gui_Filter,通用过滤器>>的级联过滤模式。参考 <<query_from_selected,>>。
+
+默认值： `true`
+
+保存在数据库。
+
+配置接口： `GlobalConfig`
+
+可以在 Web 客户端和 Middleware 这两个 block 使用。
+--
+
+[[cuba.anonymousLogin]]
+cuba.anonymousLogin::
++
+--
+用来创建匿名用户会话的用户名称。
+
+默认值： `anonymous`
+
+保存在数据库。
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.automaticDatabaseUpdate]]
+cuba.automaticDatabaseUpdate::
++
+--
+定义服务器是否在应用程序启动时运行<<db_update_server,数据库更新脚本>>。
+
+从 CUBA 7.2 开始，可以控制为主数据存储和附加数据存储分别执行数据库更新脚本：对主数据存储，使用 `cuba.automaticDatabaseUpdate_MAIN` 应用程序属性，对于附加数据存储，使用 `cuba.automaticDatabaseUpdate_<store_name>` 格式的应用程序属性。特定的属性比通用的邮件及更高。
+
+默认值： `false`
+
+保存在数据库。
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.availableLocales]]
+cuba.availableLocales::
++
+--
+支持的用户界面语言列表。
+
+属性格式： `++{language_name1}|{language_code_1};{language_name2}|{language_code_2};++`...
+
+示例：
+
+[source, properties]
+----
+cuba.availableLocales=French|fr;English|en
+----
+
+`++{language_name}++` – 显示在可用语言列表中的语言名称。比如这个列表会被用在登录界面提供给用户选择系统语言，也在用户编辑界面，编辑用户的语言。
+
+`++{language_code}++` – 对应于 `Locale.getLanguage()` 方法返回的语言代码。用来作为<<message_packs,语言包>>文件名称的后缀，比如，`++messages_fr.properties++`。
+
+如果语言列表中没有跟用户操作系统语言相匹配的条目，那么 `cuba.availableLocales` 属性定义的语言列表的第一个语言将被用来作为默认语言。否则，即会选择跟用户操作系统语言相匹配的做为默认语言。
+
+默认值： `English|en;Russian|ru;French|fr`
+
+配置接口： `GlobalConfig`
+
+在所有标准的 <<app_tiers,blocks>> 中都可以使用。
+--
+
+[[cuba.backgroundWorker.maxActiveTasksCount]]
+cuba.backgroundWorker.maxActiveTasksCount::
++
+--
+活跃的<<background_tasks,后台任务>>的最大值。
+
+默认值： `100`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.backgroundWorker.timeoutCheckInterval]]
+cuba.backgroundWorker.timeoutCheckInterval::
++
+--
+定义检查<<background_tasks,后台任务>>超时的间隔，单位是毫秒。
+
+默认值： `5000`
+
+配置接口： `ClientConfig`
+
+可以在 web 客户端使用。
+--
+
+[[cuba.bruteForceProtection.enabled]]
+cuba.bruteForceProtection.enabled::
++
+--
+启用针对野蛮破解密码的保护措施。
+
+默认值： `false`
+
+保存在数据库。
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.bruteForceProtection.blockIntervalSec]]
+cuba.bruteForceProtection.blockIntervalSec::
++
+--
+超过最大失败登录尝试次数之后屏蔽登录的时间间隔，单位是秒，需要先启用 <<cuba.bruteForceProtection.enabled,cuba.bruteForceProtection.enabled>>。
+
+默认值： 60
+
+保存在数据库。
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.bruteForceProtection.maxLoginAttemptsNumber]]
+cuba.bruteForceProtection.maxLoginAttemptsNumber::
++
+--
+针对用户名和登录 IP 设定的最大失败登录尝试次数，需要先启用 <<cuba.bruteForceProtection.enabled,cuba.bruteForceProtection.enabled>>。
+
+默认值： 5
+
+保存在数据库。
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.checkConnectionToAdditionalDataStoresOnStartup]]
+cuba.checkConnectionToAdditionalDataStoresOnStartup::
++
+--
+如果设置为 `true`，框架会在应用程序启动时检查所有附加数据存储的连接。如果连接失败，日志会记录失败消息。注意，这种检查会使得启动过程变慢。
+
+默认值： `false`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.checkPasswordOnClient]]
+cuba.checkPasswordOnClient::
++
+--
+++++
+<div class="manual-since-container">
+    <a href="http://files.cuba-platform.com/cuba/release-notes/7.0/" class="since-btn" target="_blank">
+        <span class="since-btn-caption">最低版本</span><span class="since-btn-version">7.0</span>
+    </a>
+</div>
+++++
+
+当设置为 false（默认值）时，客户端块 block 的 `LoginPasswordLoginProvider` 将用户密码明文发送给中间件的 `AuthenticationService.login()` 方法。在客户端和中间件 block 共同位于同一 JVM 中的情况下，这是合适的处理方式。对于客户端块(block)位于网络上的其它计算机上的分布式部署的情况，客户端和中间件之间的连接应使用 SSL 加密。
+
+如果设置为 true，`LoginPasswordLoginProvider` 本身将通过输入的登录名加载 `User` 实体并检查密码。如果密码与加载的密码哈希匹配，则提供程序使用<<cuba.trustedClientPassword,cuba.trustedClientPassword>> 属性中指定的密码作为可信客户端执行登录。此模式使您无需在受信任网络中的客户端和中间件之间设置 SSL 连接，同时不会向网络公开用户密码：仅传输哈希值。但请注意，可信客户端密码仍然通过网络传输，因此受 SSL 保护的连接仍然更加安全。
+
+默认值： `false`
+
+接口： `WebAuthConfig`，`PortalConfig`
+
+可在 Web 和 Porta block 使用。
+--
+
+[[cuba.cluster.enabled]]
+cuba.cluster.enabled::
++
+--
+启用 Middleware 服务集群中各个服务之间的互相交互。参考 <<cluster_mw_server,>>。
+
+默认值： `false`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.cluster.jgroupsConfig]]
+cuba.cluster.jgroupsConfig::
++
+--
+JGroups 配置文件的路径。平台使用 <<resources,Resource - 资源接口>>来加载此文件，所以这个文件可以放在 classpath 或者<<conf_dir,配置文件目录>>。
+
+示例：
+
+[source, properties]
+----
+cuba.cluster.jgroupsConfig = my_jgroups_tcp.xml
+----
+
+默认值： `jgroups.xml`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.cluster.messageSendingQueueCapacity]]
+cuba.cluster.messageSendingQueueCapacity::
++
+--
+限制 Middleware 集群中消息队列的长度。当消息队列超过了最大长度，新消息会被拒绝。
+
+默认值： `Integer.MAX_VALUE`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.cluster.stateTransferTimeout]]
+cuba.cluster.stateTransferTimeout::
++
+--
+设置节点启动时从集群接收最新状态的超时时间。单位是毫秒。
+
+默认值： `10000`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.confDir]]
+cuba.confDir::
++
+--
+为应用程序 <<app_tiers,block>> 设置<<conf_dir,配置文件目录>>的位置。
+
+默认值： `${app.home}/${<<cuba.webContextName,cuba.webContextName>>}/conf`，指向<<app_home,应用程序根目录>>下的一个目录。
+
+配置接口： `GlobalConfig`
+
+在所有标准的 <<app_tiers,blocks>> 中都可以使用。
+--
+
+[[cuba.connectionReadTimeout]]
+cuba.connectionReadTimeout::
++
+--
+在客户端 block 设置连接 Middleware 读取超时的时限。平台会将非负值传递给 `URLConnection` 的 `setReadTimeout()` 方法。
+
+也可参考 <<cuba.connectionTimeout,cuba.connectionTimeout>>。
+
+默认值： `-1`
+
+可以在 Web 客户端，Web Portal blocks 使用。
+--
+
+[[cuba.connectionTimeout]]
+cuba.connectionTimeout::
++
+--
+在客户端 block 设置连接 Middleware 超时的时限。平台会将非负值传递给 `URLConnection` 的 `setConnectTimeout()` 方法。
+
+也可参考 <<cuba.connectionReadTimeout,cuba.connectionReadTimeout>>。
+
+默认值： `-1`
+
+可以在 Web 客户端，Web Portal blcoks 使用。
+--
+
+[[cuba.connectionUrlList]]
+cuba.connectionUrlList::
++
+--
+为客户端 blocks 设置连接 Middleware 服务的 URL。
+
+此属性的值应该包含多个用英文逗号分隔 URL `http[s]://host[:port]/app-core`，`host` 是服务器名称，`port` 是服务器端口，`app-core` 是 Middleware web app 的名称。比如：
+
+[source, properties]
+----
+cuba.connectionUrlList = http://localhost:8080/app-core
+----
+
+当使用 Middleware 服务集群的时候，这些服务的地址需要用英文逗号分隔：
+
+[source, properties]
+----
+cuba.connectionUrlList = http://server1:8080/app-core,http://server2:8080/app-core
+----
+
+细节参考 <<cluster_mw_client>>。
+
+也可参考 <<cuba.useLocalServiceInvocation,cuba.useLocalServiceInvocation>>。
+
+配置接口： `ClientConfig`
+
+可以在 Web 客户端，Web Portal blcoks 使用。
+--
+
+[[cuba.creditsConfig]]
+cuba.creditsConfig::
++
+--
+<<additive_app_properties,累加属性>>定义 `credits.xml` 文件。此文件包含应用程序使用的<<credits,软件组件信息>>
+
+平台使用 <<resources,Resource - 资源接口>>来加载此文件，所以这个文件可以放在 classpath 或者<<conf_dir,配置文件目录>>。
+
+可以在 Web 客户端 block 使用。
+
+示例：
+
+[source, properties]
+----
+cuba.creditsConfig = +com/company/base/credits.xml
+----
+--
+
+[[cuba.crossDataStoreReferenceLoadingBatchSize]]
+cuba.crossDataStoreReferenceLoadingBatchSize::
++
+--
+<<dataManager,DataManager>> 从<<cross_datastore_ref,不同数据存储>>批量加载关联实体的最大值。
+
+默认值： `50`
+
+保存在数据库。
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.dataManagerBeanValidation]]
+cuba.dataManagerBeanValidation::
++
+--
+++++
+<div class="manual-since-container">
+    <a href="http://files.cuba-platform.com/cuba/release-notes/7.1/" class="since-btn" target="_blank">
+        <span class="since-btn-caption">最低版本</span><span class="since-btn-version">7.1</span>
+    </a>
+</div>
+++++
+
+设置 <<dataManager,DataManager>> 在保存实体时需要进行 <<bean_validation,bean 验证>> 。
+
+默认值： `false`
+
+保存在数据库。
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.dataManagerChecksSecurityOnMiddleware]]
+cuba.dataManagerChecksSecurityOnMiddleware::
++
+--
+配置在 Middleware，确定 <<dataManager,DataManager>> 是否检查实体操作的 <<permissions,权限>> 和内存<<constraints,约束>>
+
+默认值： `false`
+
+保存在数据库。
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.dataSourceJndiName]]
+cuba.dataSourceJndiName::
++
+--
+定义应用数据库连接中使用的 `javax.sql.DataSource` 的 JNDI 名称。
+
+默认值： `java:comp/env/jdbc/CubaDS`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.dataDir]]
+cuba.dataDir::
++
+--
+为应用程序 <<app_tiers,block>> 设置<<work_dir,工作目录>>的位置。
+
+默认值： `${app.home}/${<<cuba.webContextName,cuba.webContextName>>}/work`，指向<<app_home,应用程序根目录>>下的一个目录。
+
+配置接口： `GlobalConfig`
+
+在所有标准的 <<app_tiers,blocks>> 中都可以使用。
+--
+
+[[cuba.dbDir]]
+cuba.dbDir::
++
+--
+设置<<db_dir,数据库脚本目录>>的位置。
+
+对于 <<fast_deployment>>，默认值：`${catalina.home}/webapps/${cuba.webContextName}/WEB-INF/db`，指向 Tomcat 中 web app 的 `WEB-INF/db` 子目录。
+
+对于 WAR 和 UberJAR 部署情况：`web-inf:db`，指向 WAR 或者 UberJAR 内的 `WEB-INF/db` 目录。
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.dbmsType]]
+cuba.dbmsType::
++
+--
+定义 DBMS 类型。跟 <<cuba.dbmsVersion,cuba.dbmsVersion>> 一起作用，影响对于 DBMS 集成接口实现的选取，以及查找数据库初始化和更新脚本。
+
+参考 <<dbms_types,>> 了解细节。
+
+默认值： `hsql`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.dbmsVersion]]
+cuba.dbmsVersion::
++
+--
+可选属性，设置数据库版本。跟 <<cuba.dbmsType,cuba.dbmsType>> 一起作用，影响对于 DBMS 集成接口实现的选取，以及查找数据库初始化和更新脚本。
+
+参考 <<dbms_types,>> 了解细节。
+
+默认值： `none`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.defaultPermissionValuesConfig]]
+cuba.defaultPermissionValuesConfig::
++
+--
+当使用<<legacy_roles>>时，定义包含用户默认权限的一组文件。当没有为许可对象设置<<roles,角色>>的时候，会使用默认权限值。通常用来为“拒绝”角色使用，参考 <<default-permission-values.xml,default-permission-values.xml>> 章节了解更多信息。
+
+默认值： `cuba-default-permission-values.xml`
+
+可以在 Middleware block 使用。
+
+示例：
+
+[source, properties]
+----
+cuba.defaultPermissionValuesConfig = +my-default-permission-values.xml
+----
+--
+
+[[cuba.defaultQueryTimeoutSec]]
+cuba.defaultQueryTimeoutSec::
++
+--
+设置默认的<<transaction_timeout,数据库事务超时时限>>.
+
+默认值： `0` (no timeout).
+
+保存在数据库。
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.disableEntityEnhancementCheck]]
+cuba.disableEntityEnhancementCheck::
++
+--
+禁用启动检查，该检查用来确保所有实体都已经加强。
+
+默认值： `true`
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.disableEscapingLikeForDataStores]]
+cuba.disableEscapingLikeForDataStores::
++
+--
+定义一组<<data_store,数据存储>>，对于这些数据存储，平台会在 <<gui_Filter,filters>> 中对使用了 LIKE 操作符的 JPQL 查询禁用转义。
+
+保存在数据库。
+
+配置接口： `GlobalConfig`
+
+在所有标准的 <<app_tiers,blocks>> 中都可以使用。
+--
+
+[[cuba.disableOrmXmlGeneration]]
+cuba.disableOrmXmlGeneration::
++
+--
+对<<extension,扩展>>实体，禁用自动生成 `orm.xml` 文件的功能。
+
+默认值： `false`（如果存在扩展实体，则会自动创建 `orm.xml`）。
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.dispatcherSpringContextConfig]]
+cuba.dispatcherSpringContextConfig::
++
+--
+<<additive_app_properties,累加属性>>，为客户端 block 定义 <<dispatcher-spring.xml,dispatcher-spring.xml>> 文件。
+
+平台使用 <<resources,Resource - 资源接口>>来加载此文件，所以这个文件可以放在 classpath 或者<<conf_dir,配置文件目录>>。
+
+可以在 Web 客户端和 Web Portal blocks 使用。
+
+示例：
+
+[source, properties]
+----
+cuba.dispatcherSpringContextConfig = +com/company/sample/portal-dispatcher-spring.xml
+----
+--
+
+[[cuba.download.directories]]
+cuba.download.directories::
++
+--
+定义一组文件目录，Middleware 可以从这些文件目录通过 `com.haulmont.cuba.core.controllers.FileDownloadController` 下载文件。比如，web 客户端系统菜单的 *Administration* > *Server Log* 就是利用这个机制下载 log 文件进行展示。
+
+目录列表需要使用英文分号分隔。
+
+默认值： `${cuba.tempDir};${cuba.logDir}` (可以从<<temp_dir,临时文件夹>> and the <<log_dir,日志文件夹>>目录下载文件)。
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.email._]]
+cuba.email.*::
+在 <<email_sending_properties,>> 有关于发送邮件参数的介绍。
+
+[[cuba.fileStorageDir]]
+cuba.fileStorageDir::
++
+--
+定义文件存储目录结构的根目录。更多信息，参考 <<file_storage_impl,>>。
+
+默认值： `null`
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.enableDeleteStatementInSoftDeleteMode]]
+cuba.enableDeleteStatementInSoftDeleteMode::
++
+--
+向后兼容的开关。如果设置为 `true`，在软删除模式开启的情况下，开启为软删除的实体执行 `delete from` 的 JPQL 语句（软删除开启的情况，对实体只是运行 `update` 而非 `delete`）。这样的 delete 语句会被转换成删除所有没有标记为“已删除”的数据。这样的话，有点违反直观理解，所以默认情况下是关闭此功能的。
+
+默认值： `false`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.enableSessionParamsInQueryFilter]]
+cuba.enableSessionParamsInQueryFilter::
++
+--
+向后兼容的开关。如果设置为 `false`，在数据源<<datasource_query_filter,查询过滤器>>和<<gui_Filter,界面过滤器组件>>的过滤条件会被应用一次，至少会使用一个参数；会话（session）参数不会起作用。
+
+默认值： `true`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.entityAttributePermissionChecking]]
+cuba.entityAttributePermissionChecking::
++
+--
+如果设置为 `true`，<<dataManager,DataManager>>会做实体属性权限检查。如果设置为 `false`，属性权限检查则在 <<gui_framework,Generic UI>>中的数据感知组件和 {rest_man_url}[REST API] 中。
+
+默认值： `false`
+
+保存在数据库。
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.entityLog.enabled]]
+cuba.entityLog.enabled::
++
+--
+开启<<entity_log,实体日志>>机制。
+
+默认值： `true`
+
+保存在数据库。
+
+配置接口： `EntityLogConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.groovyEvaluationPoolMaxIdle]]
+cuba.groovyEvaluationPoolMaxIdle::
++
+--
+在执行 `Scripting.evaluateGroovy()` 方法的过程中，设置资源池中未使用的编译过的 Groovy 表达式的最大值。当需要集中执行 Groovy 表达式的时候，推荐将这个值设置得大一些，比如，按照<<application_folder,应用程序目录>>的数量来设置。
+
+默认值： 8
+
+在所有标准的 <<app_tiers,blocks>> 中都可以使用。
+--
+
+[[cuba.groovyEvaluatorImport]]
+cuba.groovyEvaluatorImport::
++
+--
+在执行<<scripting,脚本>>的时候，定义一组需要被所有 Groovy 表达式引入的类。
+
+列表中的类名需要使用英文逗号或者分号分隔。
+
+默认值： `com.haulmont.cuba.core.global.PersistenceHelper`
+
+在所有标准的 <<app_tiers,blocks>> 中都可以使用。
+
+示例：
+
+[source, properties]
+----
+cuba.groovyEvaluatorImport = com.haulmont.cuba.core.global.PersistenceHelper,com.abc.sales.CommonUtils
+----
+--
+
+[[cuba.gui.genericFilterApplyImmediately]]
+cuba.gui.genericFilterApplyImmediately::
++
+--
+++++
+<div class="manual-since-container">
+    <a href="http://files.cuba-platform.com/cuba/release-notes/7.1/" class="since-btn" target="_blank">
+        <span class="since-btn-caption">最低版本</span><span class="since-btn-version">7.1</span>
+    </a>
+</div>
+++++
+
+当设置成 `true` 时，过滤器会以即时模式工作，每个对于过滤器参数的调整都会立即生效，数据会自动刷新。当设置成 `false` 时，过滤器会使用显式操作模式。此时，过滤器只有在点击 *Search* 按钮时才会生效。参阅 <<gui_filter_immediately,applyImmediately>> 过滤器属性。
+
+默认值： `true`
+
+保存在数据库。
+
+配置接口： `ClientConfig`
+
+可以在 Web 客户端 block 使用。
+--
+
+[[cuba.gui.genericFilterChecking]]
+cuba.gui.genericFilterChecking::
++
+--
+影响的<<gui_Filter,过滤器组件>>行为。
+
+当设置为 `true`，不允许执行不指定参数的过滤器。
+
+默认值： `false`
+
+保存在数据库。
+
+配置接口： `ClientConfig`
+
+可以在 Web 客户端 block 使用。
+--
+
+[[cuba.gui.genericFilterColumnsCount]]
+cuba.gui.genericFilterColumnsCount::
++
+--
+为<<gui_Filter,过滤器组件>>定义含有过滤条件的列的数量。
+
+默认值： `3`
+
+保存在数据库。
+
+配置接口： `ClientConfig`
+
+可以在 Web 客户端 block 使用。
+--
+
+[[cuba.gui.genericFilterConditionsLocation]]
+cuba.gui.genericFilterConditionsLocation::
++
+--
+定义在<<gui_Filter,过滤器组件>>中条件面板的位置。两种位置可以选择：`top`（在过滤器控制器元素之上）和 `bottom`（在过滤器控制器元素之下）。
+
+默认值： `top`
+
+保存在数据库。
+
+配置接口： `ClientConfig`
+
+可以在 Web 客户端 block 使用。
+--
+
+[[cuba.gui.genericFilterControlsLayout]]
+cuba.gui.genericFilterControlsLayout::
++
+--
+为<<gui_Filter,过滤器组件>>的控制器布局设置模板。每个控制器有这样的格式：`++[component_name | options-comma-separated]++`，比如，`[pin | no-caption, no-icon]`。
+
+可用的控制器：
+
+* `++filters_popup++` - 选择过滤器的弹窗按钮，整合了 *Search* 按钮功能。
+
+* `++filters_lookup++` - 选择过滤器的查找字段。需要单独添加 *Search* 按钮。
+
+* `search` - *Search* 按钮。如果使用 `++filters_popup++` 则不需要添加。
+
+* `++add_condition++` - 添加新条件的按钮。
+
+* `spacer` - 控制器之间空白的分隔符。
+
+* `settings` - *Settings* 按钮。设置在 Settings 弹窗中显示的 action 选项的名称。（参考下面）。
+
+* `++max_results++` - 控制器组，用来设置选择记录的最大值。
+
+* `++fts_switch++` - 用来切换到全文检索（Full-Text Search）模式的复选框。
+
+以下这些操作可以在 `settings` 中作为选项使用：`save - 保存`, `++save_as - 另存为++`, `edit - 编辑`, `remove - 删除`, `pin - 固定位置`, `++make_default - 设置默认++`, `++save_search_folder - 保存搜索目录++`, `++save_app_folder - 保存应用目录++`, `++clear_values - 清空++`。
+
+这些操作也可以在 Settings 弹窗外作为单独的控制器使用。这种情况下，它们可以做如下设置：
+
+* `no-icon` - 设置动作按钮是否不带图标，示例： `[save | no-icon]`。
+
+* `no-caption` - 设置动作按钮是否不带名称，示例： `[pin | no-caption]`。
+
+默认值：
+
+[source, plain]
+----
+[filters_popup] [add_condition] [spacer] \
+[settings | save, save_as, edit, remove, make_default, pin, save_search_folder, save_app_folder, clear_values] \
+[max_results] [fts_switch]
+----
+
+保存在数据库。
+
+配置接口： `ClientConfig`
+
+可以在 Web 客户端 block 使用。
+--
+
+[[cuba.gui.genericFilterManualApplyRequired]]
+cuba.gui.genericFilterManualApplyRequired::
++
+--
+影响<<gui_Filter,过滤器组件>>的行为。
+
+当设置为 `true`，包含过滤器的界面不会在打开时触发相应的数据加载器，需要用户手动点击过滤器的 *Apply* 按钮。
+
+当使用应用或者查找目录打开界面的时候，`cuba.gui.genericFilterManualApplyRequired` 的设置会被忽略，因为此时过滤器已经生效了。但是对于某个查找目录如果它的 `applyDefault` 设置为 `false`，过滤器不会生效。
+
+默认值： `false`
+
+保存在数据库。
+
+配置接口： `ClientConfig`
+
+可以在 Web 客户端 block 使用。
+--
+
+[[cuba.gui.genericFilterMaxResultsOptions]]
+cuba.gui.genericFilterMaxResultsOptions::
++
+--
+定义<<gui_Filter,过滤器组件>>中 *Show rows* 下拉框中的选项值。
+
+NULL 选项表示这个列表需要包含一个空值。
+
+默认值： `NULL, 20, 50, 100, 500, 1000, 5000`
+
+保存在数据库。
+
+配置接口： `ClientConfig`
+
+可以在 Web 客户端 block 使用。
+--
+
+[[cuba.gui.genericFilterPopupListSize]]
+cuba.gui.genericFilterPopupListSize::
++
+--
+定义在 *Search* 按钮的弹窗列表中显示项目的数量。如果过滤器的数量超过了这个值，则会添加 `Show more...` 到列表最后，这个行为会打开一个新的弹窗用来显示其它的过滤器。
+
+默认值： `10`
+
+保存在数据库。
+
+配置接口： `ClientConfig`
+
+可以在 Web 客户端 block 使用。
+--
+
+[[cuba.gui.genericFilterPropertiesHierarchyDepth]]
+cuba.gui.genericFilterPropertiesHierarchyDepth::
++
+--
+定义“添加查询条件”对话框窗口中属性层级的深度。例如，如果深度是 2，那么可以选择实体属性 `contractor.city.country`，如果深度是 3，可以选择 `contractor.city.country.name` 等。
+
+默认值： `2`
+
+保存在数据库。
+
+配置接口： `ClientConfig`
+
+可以在 Web 客户端 block 使用。
+--
+
+[[cuba.gui.genericFilterTrimParamValues]]
+cuba.gui.genericFilterTrimParamValues::
++
+--
+定义所有的通用过滤器是否需要去掉输入值两端的空格。当设置为 `false`，文本过滤器将保留空格。
+
+默认值： `true`
+
+保存在数据库。
+
+配置接口： `ClientConfig`
+
+可以在 Web 客户端 block 使用。
+--
+
+[[cuba.gui.layoutAnalyzerEnabled]]
+cuba.gui.layoutAnalyzerEnabled::
++
+--
+可以禁用主窗口标签页以及模式窗口标题的右键菜单中的界面分析器。
+
+默认值： `true`
+
+保存在数据库。
+
+配置接口： `ClientConfig`
+
+可以在 Web 客户端 block 使用。
+--
+
+[[cuba.gui.lookupFieldPageLength]]
+cuba.gui.lookupFieldPageLength::
++
+--
+定义在<<gui_LookupField,下拉框控件>>和<<gui_LookupPickerField,下拉框选择器控件>>中下拉列表一页显示的选项默认数量。可以通过 XML 属性 <<gui_LookupField_pageLength,pageLength>> 在具体实例中覆盖这个参数的设置。
+
+默认值： 10
+
+保存在数据库。
+
+配置接口： `ClientConfig`
+
+可以在 Web 客户端使用。
+--
+
+[[cuba.gui.manualScreenSettingsSaving]]
+cuba.gui.manualScreenSettingsSaving::
++
+--
+如果此属性设置为 `true`，界面不会在关闭时自动保存界面设置。在这个模式下，用户可以通过右键点击界面 tab 标签或者弹窗的标题类保存或者重置界面设置。
+
+默认值： `false`
+
+配置接口： `ClientConfig`
+
+保存在数据库。
+
+可以在 Web 客户端 block 使用。
+--
+
+[[cuba.gui.showIconsForPopupMenuActions]]
+cuba.gui.showIconsForPopupMenuActions::
++
+--
+启用在 <<gui_Table,Table>> 右键菜单和 <<gui_PopupButton,PopupButton>> 中显示动作的图标。
+
+默认值： `false`
+
+保存在数据库。
+
+配置接口： `ClientConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.gui.systemInfoScriptsEnabled]]
+cuba.gui.systemInfoScriptsEnabled::
++
+--
+启用在 *System Information* 窗口创建/更新/获取实体实例的时候显示 SQL 脚本。
+
+这些脚本实际上显示的选中实体实例的数据库行内容，而不管是否有安全设置可能禁止显示某些实体属性。所以这就是为什么除了 administrator 用户之外需要取消其它所有用户<<roles,角色>>的 CUBA / Generic UI / System Information 特殊权限。也可以通过设置 `cuba.gui.systemInfoScriptsEnabled` 为 `false` 在整个应用级别禁止这个功能。
+
+默认值： `true`
+
+保存在数据库。
+
+配置接口： `ClientConfig`
+
+可以在 Web 客户端 block 使用。
+--
+
+[[cuba.gui.useSaveConfirmation]]
+cuba.gui.useSaveConfirmation::
++
+--
+当用户关闭带有未保存改动数据源的<<screens,界面>>时，定义对话框的布局样式。
+
+`true` 对应带有三个功能的布局：Save changes - 保存修改, Don't Save - 不保存修改, Don't close the screen - 不关窗口。
+
+`false` 对应带有两个功能的布局：Close the screen without saving changes - 关闭窗口不保存修改, Don't close the screen - 不关窗口。
+
+默认值： `true`
+
+保存在数据库。
+
+配置接口： `ClientConfig`
+
+可以在 Web 客户端 block 使用。
+--
+
+[[cuba.gui.validationNotificationType]]
+cuba.gui.validationNotificationType::
++
+--
+定义标准的界面<<abstractWindow_showValidationErrors,验证错误>>的通知消息类型。
+
+可选值是 `com.haulmont.cuba.gui.components.Frame.NotificationType` 枚举类型的元素：
+
+** `TRAY` - 右下角的通知消息，带有普通消息文本。
+** `TRAY_HTML` - 右下角的通知消息，带有 HTML 消息文本。
+** `HUMANIZED` - 标准通知消息，显示在界面中间，带有普通消息文本。
+** `HUMANIZED_HTML` - 标准通知消息，显示在界面中间，带有 HTML 消息文本。
+** `WARNING` - 警告通知消息，显示在界面中间，带有普通消息文本，点击时消失。
+** `WARNING_HTML` - 警告通知消息，显示在界面中间，带有 HTML 消息文本，点击时消失。
+** `ERROR` - 错误通知消息，显示在界面中间，带有普通消息文本，点击时消失。
+** `ERROR_HTML` - 错误通知消息，显示在界面中间，带有 HTML 消息文本，点击时消失。
+
+默认值： `TRAY`.
+
+配置接口： `ClientConfig`
+
+可以在 Web 客户端 block 使用。
+--
+
+[[cuba.hasMultipleTableConstraintDependency]]
+cuba.hasMultipleTableConstraintDependency::
++
+--
+针对实体组合采用 `JOINED` 的<<entity_inheritance,继承策略>>。如果设置为 `true`，为在数据库插入新实体提供正确的顺序。
+
+默认值： `false`
+--
+
+[[cuba.healthCheckResponse]]
+cuba.healthCheckResponse::
++
+--
+定义从<<health_check_url,应用健康检查 URL>> 请求返回的文本。
+
+默认值： `ok`
+
+配置接口： `GlobalConfig`
+
+可以用在所有 blocks。
+--
+
+[[cuba.httpSessionExpirationTimeoutSec]]
+cuba.httpSessionExpirationTimeoutSec::
++
+--
+定义 HTTP 会话非活动状态的超时时限，单位为秒
+
+默认值： `1800`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+
+[TIP]
+====
+推荐对于 <<cuba.userSessionExpirationTimeoutSec, cuba.userSessionExpirationTimeoutSec>> 和 `cuba.httpSessionExpirationTimeoutSec` 属性使用相同的值。
+====
+
+[WARNING]
+====
+不要在 `web.xml` 中配置 HTTP 会话超时时限，系统会忽略这个设置。
+====
+--
+
+[[cuba.iconsConfig]]
+cuba.iconsConfig::
++
+--
+<<additive_app_properties,累加属性>>用来定义<<icon_set,图标集合>>.
+
+可以在 Web 客户端 block 使用。
+
+示例：
+
+[source, plain]
+----
+cuba.iconsConfig = +com.company.demo.web.MyIconSet
+----
+--
+
+[[cuba.inMemoryDistinct]]
+cuba.inMemoryDistinct::
++
+--
+启用基于内存的重复记录过滤，而不使用数据库级别的 `select distinct`。用在 <<dataManager,DataManager>> 中。
+
+默认值： `false`
+
+保存在数据库。
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.jmxUserLogin]]
+cuba.jmxUserLogin::
++
+--
+定义可以用在<<system_authentication,系统认证>>的用户名。
+
+默认值： `admin`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.keyForSecurityTokenEncryption]]
+cuba.keyForSecurityTokenEncryption::
++
+--
+
+作为实体安全令牌（security token）AES 加密的密钥。当实体通过下面方式在 Middleware 加载的时候，这个令牌会放置在实体实例内发送：
+
+* <<cuba.entityAttributePermissionChecking,cuba.entityAttributePermissionChecking>> 应用程序属性设置成 true，也就是说在 Middleware 对实体属性权限进行了加强。（参考 <<dm_security>> 了解详情）
+
+* 行级的<<constraints,安全限制>>过滤了集合一组属性中的部分元素。这种情况下，安全令牌也会包含在 REST API 的返回 JSON 中，参考 {rest_man_url}#rest_api_v2_security_constraints[REST API documentation]。
+
+* 实体设置了动态 <<entity_attribute_access, 属性访问控制>>。
+
+尽管安全令牌不包含任何属性值（只有属性名称和过滤了的实体标识符），仍然高度建议在生产环境中修改默认的加密密钥值。
+
+默认值： `CUBA.Platform`
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.numberIdCacheSize]]
+cuba.numberIdCacheSize::
++
+--
+当继承了 `BaseLongIdEntity` 或者 `BaseIntegerIdEntity` 的实体实例通过 `Metadata.create()` 方法在内存创建的时候，会给创建的实体分配一个唯一标识符。这个值通过从数据序列取下一个值的机制得到的。为了减少对 Middleware 和数据库调用的次数，序列每次的增加值默认是设置的 100，也就是说平台每次从数据库调用一次能获取 100 个 id。也就是说按照这种方式“缓存”了序列值，直到 100 个 id 用完之前都可以直接从内存获取 id。
+
+这个属性定义了每次序列自增的值，以及对应的内存中缓存的大小。
+
+[WARNING]
+====
+如果在数据库已经有部分实体存在的情况下需要修改这个属性的值，此时会重新创建所有已经存在的序列：用新的自增值（必须等于 `cuba.numberIdCacheSize`），起始值是目前已经存在 id 的最大值。
+
+别忘了在应用的所有 block 都设置这个属性。比如，如果有 Web 客户端，Portal 客户端和 Middleware，需要在 `web-app.properties`, `portal-app.properties` 和 `app.properties` 中将这个属性设置成相同的值。
+====
+
+默认值： 100
+
+配置接口： `GlobalConfig`
+
+在所有标准的 <<app_tiers,blocks>> 中都可以使用。
+--
+
+[[cuba.legacyPasswordEncryptionModule]]
+cuba.legacyPasswordEncryptionModule::
++
+--
+与<<cuba.passwordEncryptionModule,cuba.passwordEncryptionModule>> 相同，但这个配置是用于为在旧版本中（版本 7 之前）创建并且 `SEC_USER.PASSWORD_ENCRYPTION` 字段为空的用户定义用于用户密码哈希的 bean 的名称。
+
+默认值： `++cuba_Sha1EncryptionModule++`
+
+用于所有所标准 <<app_tiers,block>>。
+--
+
+[[cuba.localeSelectVisible]]
+cuba.localeSelectVisible::
++
+--
+登录时禁用用户界面语言选择。
+
+如果 `cuba.localeSelectVisible` 设置成 false，用户会话的 locale 会按照下面方式选择：
+
+* 如果 `User` 实例定义了 `language` 属性，系统会使用这个属性定义的语言。
+
+* 如果用户的操作系统语言在可选的区域列表里（通过 <<cuba.availableLocales,cuba.availableLocales>> 设置），系统会使用这个语言。
+
+* 其它情况下，系统会使用定义在 <<cuba.availableLocales,cuba.availableLocales>> 属性中的第一个语言。
+
+默认值： `true`
+
+配置接口： `GlobalConfig`
+
+在所有标准的 <<app_tiers,blocks>> 中都可以使用。
+--
+
+[[cuba.logDir]]
+cuba.logDir::
++
+--
+为应用程序 <<app_tiers,block>> 设置<<log_dir,日志目录>>的位置。
+
+默认值： `${app.home}/logs`，指向<<app_home,应用程序根目录>>下的 `logs` 目录。
+
+配置接口： `GlobalConfig`
+
+在所有标准的 <<app_tiers,blocks>> 中都可以使用。
+--
+
+[[cuba.mainMessagePack]]
+cuba.mainMessagePack::
++
+--
+<<additive_app_properties,累加属性>>，为一个 block 定义<<main_message_pack,主语言包>>。
+
+属性值可以包含单一语言包，或者用空格分隔的语言包列表。
+
+在所有标准的 <<app_tiers,blocks>> 中都可以使用。
+
+示例：
+
+[source, properties]
+----
+cuba.mainMessagePack = +com.company.sample.gui com.company.sample.web
+----
+--
+
+[[cuba.maxUploadSizeMb]]
+cuba.maxUploadSizeMb::
++
+--
+定义可以使用<<gui_FileUploadField,文件上传控件>>和<<gui_FileMultiUploadField,多个文件上传控件>>组件能上传的文件大小的最大值，单位是 MB。
+
+默认值： `20`
+
+保存在数据库。
+
+配置接口： `ClientConfig`
+
+可以在 Web 客户端 block 使用。
+--
+
+[[cuba.menuConfig]]
+cuba.menuConfig::
++
+--
+<<additive_app_properties,累加属性>>，定义 <<menu.xml,menu.xml>> 文件。
+
+平台使用 <<resources,Resource - 资源接口>>来加载此文件，所以这个文件可以放在 classpath 或者<<conf_dir,配置文件目录>>。
+
+可以在 Web 客户端 block 使用。
+
+示例：
+
+[source, properties]
+----
+cuba.menuConfig = +com/company/sample/web-menu.xml
+----
+--
+
+[[cuba.metadataConfig]]
+cuba.metadataConfig::
++
+--
+<<additive_app_properties,累加属性>>，定义 <<metadata.xml,metadata.xml>> 文件。
+
+平台使用 <<resources,Resource - 资源接口>>来加载此文件，所以这个文件可以放在 classpath 或者<<conf_dir,配置文件目录>>。
+
+在所有标准的 <<app_tiers,blocks>> 中都可以使用。
+
+示例：
+
+[source, properties]
+----
+cuba.metadataConfig = +com/company/sample/metadata.xml
+----
+--
+
+[[cuba.passwordEncryptionModule]]
+cuba.passwordEncryptionModule::
++
+--
+++++
+<div class="manual-since-container">
+    <a href="http://files.cuba-platform.com/cuba/release-notes/7.0/" class="since-btn" target="_blank">
+        <span class="since-btn-caption">最低版本</span><span class="since-btn-version">7.0</span>
+    </a>
+</div>
+++++
+
+定义用作用户密码 Hash 的 bean 名称。创建新用户或更新用户密码时，将在 `SEC_USER.PASSWORD_ENCRYPTION` 数据库字段中为该用户存储此属性的值。
+
+参阅 <<cuba.legacyPasswordEncryptionModule,cuba.legacyPasswordEncryptionModule>>。
+
+默认值：`++cuba_BCryptEncryptionModule++`
+
+在所有标准的 <<app_tiers,blocks>> 中都可以使用。
+--
+
+[[cuba.passwordPolicyEnabled]]
+cuba.passwordPolicyEnabled::
++
+--
+启用强制密码策略。如果此属性设置为 `true`，所有新的用户密码都会按照 <<cuba.passwordPolicyRegExp,cuba.passwordPolicyRegExp>> 属性定义的策略检查。
+
+默认值： `false`
+
+保存在数据库。
+
+配置接口： `ClientConfig`
+
+使用在所有的客户端 blocks：web 客户端，web Portal。
+--
+
+[[cuba.passwordPolicyRegExp]]
+cuba.passwordPolicyRegExp::
++
+--
+定义一个正则表达式，用来做密码检查策略。
+
+默认值：
+
+`++((?=.*\\d)(?=.*\\p{javaLowerCase}) (?=.*\\p{javaUpperCase}).{6,20})++`
+
+上面这个表达式确保密码需要包含 6～20 个字符，使用数字和英文字母，包含至少一个数字，一个小写字母，一个大写字母。更多关于正则表达式语法可以参考 https://en.wikipedia.org/wiki/Regular_expression 和 http://docs.oracle.com/javase/6/docs/api/java/util/regex/Pattern.html 。
+
+保存在数据库。
+
+配置接口： `ClientConfig`
+
+使用在所有的客户端 blocks：web 客户端，web Portal。
+--
+
+[[cuba.performanceLogDisabled]]
+cuba.performanceLogDisabled::
++
+--
+如果需要禁用 `PerformanceLogInterceptor`，此参数必须要设置为 `true`。
+
+`PerformanceLogInterceptor` 通过类或者方法的 `@PerformanceLog` 注解触发，此拦截器会在 `perfstat.log` 文件中记录每次方法的调用记录以及执行时间。如果不需要这些日志，建议禁用 `PerformanceLogInterceptor` 以提高性能。如需重新启用，删除此参数或者设置为 `false`。
+
+默认值： `false`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.performanceTestMode]]
+cuba.performanceTestMode::
++
+--
+应用程序在做性能测试的时候必须设置成 true。
+
+配置接口： `GlobalConfig`
+
+默认值： `false`
+
+可以用在 Middleware 和 web 客户端。
+--
+
+[[cuba.permissionConfig]]
+cuba.permissionConfig::
++
+--
+<<additive_app_properties,累加属性>>，用来定义 <<permissions.xml,permissions.xml>> 文件。
+
+可以在 Web 客户端 block 使用。
+
+示例：
+
+[source, properties]
+----
+cuba.permissionConfig = +com/company/sample/web-permissions.xml
+----
+--
+
+[[cuba.persistenceConfig]]
+cuba.persistenceConfig::
++
+--
+<<additive_app_properties,累加属性>>，用来定义 <<persistence.xml,persistence.xml>> 文件。
+
+平台使用 <<resources,Resource - 资源接口>>来加载此文件，所以这个文件可以放在 classpath 或者<<conf_dir,配置文件目录>>。
+
+在所有标准的 <<app_tiers,blocks>> 中都可以使用。
+
+示例：
+
+[source, properties]
+----
+cuba.persistenceConfig = +com/company/sample/persistence.xml
+----
+--
+
+[[cuba.portal.anonymousUserLogin]]
+cuba.portal.anonymousUserLogin::
++
+--
+定义在 Web Portal block 可以做匿名用户会话的用户名称。
+
+此属性设置的用户名需要在安全子弟痛存在，并且有需要的权限。不需要为此用户设置密码，因为匿名用户会话是通过 <<login,loginTrusted()>> 方法创建的，使用的是 <<cuba.trustedClientPassword,cuba.trustedClientPassword>> 属性定义的密码。
+
+配置接口： `PortalConfig`
+
+可以在 Web Portal block 使用。
+--
+
+[[cuba.queryCache.enabled]]
+cuba.queryCache.enabled::
++
+--
+如果设置为 `false`，<<entity_cache,查询缓存>>功能禁用。
+
+默认值： `true`
+
+配置接口： `QueryCacheConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.queryCache.maxSize]]
+cuba.queryCache.maxSize::
++
+--
+设置<<entity_cache,查询缓存>>实体数量的最大值。一条缓存记录是通过查询语句文本，查询语句参数，分页参数以及软删除配置确定。
+
+由于缓存大小会慢慢增长到最大值，所以缓存机制会清除掉那些不大可能会被再次使用的记录。
+
+默认值： 100
+
+配置接口： `QueryCacheConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.rememberMeExpirationTimeoutSec]]
+cuba.rememberMeExpirationTimeoutSec::
++
+--
+定义 "记住我" cookie 和 `RememberMeToken` 实体实例的过期时间。
+
+默认值： `30 * 24 * 60 * 60` (30 days)
+
+配置接口： `GlobalConfig`
+
+可以在 Web 客户端和 Middleware block 使用。
+--
+
+[[cuba.remotingSpringContextConfig]]
+cuba.remotingSpringContextConfig::
++
+--
+<<additive_app_properties,累加属性>>，用来定义 Middleware block 的 <<remoting-spring.xml,remoting-spring.xml>> 文件。
+
+平台使用 <<resources,Resource - 资源接口>>来加载此文件，所以这个文件可以放在 classpath 或者<<conf_dir,配置文件目录>>。
+
+可以在 Middleware block 使用。
+
+示例：
+
+[source, properties]
+----
+cuba.remotingSpringContextConfig = +com/company/sample/remoting-spring.xml
+----
+--
+
+[[cuba.schedulingActive]]
+cuba.schedulingActive::
++
+--
+启用 CUBA <<scheduled_tasks,计划任务>>机制。
+
+默认值： `false`
+
+保存在数据库。
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.security.defaultPermissionValuesConfigEnabled]]
+cuba.security.defaultPermissionValuesConfigEnabled::
++
+--
+如需向后兼容，开启使用 <<default-permission-values.xml>> 配置文件。参阅 <<legacy_roles>> 了解细节。
+
+默认值： `false`
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.security.rolesPolicyVersion]]
+cuba.security.rolesPolicyVersion::
++
+--
+如需向后兼容，该参数决定安全角色的行为。参阅 <<legacy_roles>> 了解细节。
+
+可能值：
+
+* 1 - CUBA 7.2 之前：如果未定义某种许可，则可访问许可目标；使用角色类型。
+* 2 - CUBA 7.2 之后：如果未定义某种许可，则拒绝访问许可目标；只能使用 “允许” 许可；可使用设计时角色。
+
+默认值： 2
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.serialization.impl]]
+cuba.serialization.impl::
++
+--
+指定 `Serialization` 接口的实现类，用来在应用程序 blocks 之间做对象传递时做序列化。平台包含两个实现类：
+
+* `com.haulmont.cuba.core.sys.serialization.StandardSerialization` - 标准 Java 序列化。
+
+* `com.haulmont.cuba.core.sys.serialization.KryoSerialization` - 基于 Kryo 框架的序列化实现。
+
+默认值： `com.haulmont.cuba.core.sys.serialization.StandardSerialization`
+
+在所有标准的 <<app_tiers,blocks>> 中都可以使用。
+--
+
+[[cuba.springContextConfig]]
+cuba.springContextConfig::
++
+--
+<<additive_app_properties,累加属性>>，用来为各个 block 定义 <<spring.xml,spring.xml>> 文件。
+
+平台使用 <<resources,Resource - 资源接口>>来加载此文件，所以这个文件可以放在 classpath 或者<<conf_dir,配置文件目录>>。
+
+在所有标准的 <<app_tiers,blocks>> 中都可以使用。
+
+示例：
+
+[source, properties]
+----
+cuba.springContextConfig = +com/company/sample/spring.xml
+----
+--
+
+[[cuba.supportEmail]]
+cuba.supportEmail::
++
+--
+定义一个 email 地址。从默认异常处理界面发送的异常报告，从 *Help* > *Feedback* 界面发送的用户消息都会被发送到这个地址。
+
+如果这个属性没有设置，系统会隐藏异常处理界面的 *Report* 按钮。
+
+为了成功的发送邮件，<<email_sending_properties,>> 中描述的参数也必须设置。
+
+默认值： empty string.
+
+保存在数据库。
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.tempDir]]
+cuba.tempDir::
++
+--
+为应用程序 <<app_tiers,block>> 设置<<temp_dir,临时目录>>的位置。
+
+默认值： `${app.home}/${<<cuba.webContextName,cuba.webContextName>>}/temp`，指向<<app_home,应用程序根目录>>下的一个目录。
+
+配置接口： `GlobalConfig`
+
+在所有标准的 <<app_tiers,blocks>> 中都可以使用。
+--
+
+[[cuba.testMode]]
+cuba.testMode::
++
+--
+如果在运行自动化用户界面测试，这个属性必须设置成 true。
+
+配置接口： `GlobalConfig`
+
+默认值： `false`
+
+可以用在 Web 客户端和 Middleware blcoks。
+--
+
+[[cuba.themeConfig]]
+cuba.themeConfig::
++
+--
+定义一组 `++*-theme.properties++` 文件，存储 <<gui_themes,theme>> 变量，比如默认的对话框范围以及文本输入框的宽度。
+
+这个属性的值是一组用空格分隔的文件列表，文件通过使用 <<resources,Resource - 资源接口>>来加载。
+
+Web 客户端的默认值： `com/haulmont/cuba/havana-theme.properties com/haulmont/cuba/halo-theme.properties com/haulmont/cuba/hover-theme.properties`
+
+
+可以在 Web 客户端使用。
+--
+
+[[cuba.triggerFilesCheck]]
+cuba.triggerFilesCheck::
++
+--
+启用对 bean 调用触发器文件的处理。
+
+触发器文件是放在应用程序 block 的<<temp_dir,临时文件夹>>的 `triggers` 子目录。触发器文件命名是包含使用“点“分隔的两部分。前半部分是 <<managed_beans,bean>> 名称，后半部分是 bean 中需要调用的方法名称。示例： `++cuba_Messages.clearCache++`。触发器文件处理器会监控这个目录是否有新文件，如果有的话，会调用指定的方法，然后删除这些文件。
+
+默认情况下，触发器文件的处理是配置在 `cuba-web-spring.xml` 文件中，并且只在 Web 客户端配置。在项目级别，其它模块的处理可以通过<<scheduled_tasks,周期性的调用>> `++cuba_TriggerFilesProcessor++` bean 的 `process()` 方法来做。
+
+默认值： `true`
+
+可以在配置了需要处理的 blocks 中使用，默认是 web 客户端。
+--
+
+[[cuba.triggerFilesCheckInterval]]
+cuba.triggerFilesCheckInterval::
++
+--
+定义检查触发器文件的时间间隔，需要开启 <<cuba.triggerFilesCheck,cuba.triggerFilesCheck>> 参数。单位是毫秒。
+
+默认值： `5000`
+
+可以在配置了需要处理的 blocks 中使用，默认是 web 客户端。
+--
+
+[[cuba.trustedClientPassword]]
+cuba.trustedClientPassword::
++
+--
+定义创建 `TrustedClientCredentials` 要使用的密码。Middleware 层可以对使用信任的客户端 <<app_tiers,block>> 连接的用户进行认证，而不需要检查用户的密码。
+
+这个属性在用户的密码不存在数据库的时候使用，客户端 block 会自己做实际的认证。比如，集成 *Active Directory* 的时候。
+
+配置接口： `ServerConfig`, `WebAuthConfig`, `PortalConfig`
+
+可以使用的 blocks：Middleware，Web 客户端，Web Portal。
+--
+
+[[cuba.trustedClientPermittedIpList]]
+cuba.trustedClientPermittedIpList::
++
+--
+定义一组 IP 地址，这些 IP 地址与 `TrustedClientCredentials` 和 `TrustedClientService` 一起使用。示例：
+
+[source, plain]
+----
+cuba.trustedClientPermittedIpList = 127.0.0.1, 10.17.*.*
+----
+
+默认值： `127.0.0.1`
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.uniqueConstraintViolationPattern]]
+cuba.uniqueConstraintViolationPattern::
++
+--
+正则表达式，用来找出由于数据库违反唯一性约束造成的异常。约束的名称会从表达式的第一个非空组获得，示例：
+
+[source, plain]
+----
+ERROR: duplicate key value violates unique constraint "(.+)"
+----
+
+约束的名称可以用来显示本地化消息，以便找出是什么实体引起的。因此，需要在<<main_message_pack,主语言包>>中包含为约束名定义的键值。示例：
+
+[source, properties]
+----
+IDX_SEC_USER_UNIQ_LOGIN = A user with the same login already exists
+----
+
+根据 DBMS locale 和版本的不同，这个属性还可以定义针对违反唯一性约束需要作出的响应。
+
+当前 DBMS 的默认值通过 `PersistenceManagerService.getUniqueConstraintViolationPattern()` 方法返回。
+
+可以定义在数据库。
+
+可以在所有的客户端 blocks 使用。
+--
+
+[[cuba.useCurrentTxForConfigEntityLoad]]
+cuba.useCurrentTxForConfigEntityLoad::
++
+--
+对于通过<<config_interfaces,配置接口>>加载实体实例，如果当前已经有事务了，则使用当前事务加载。这个对性能有提高。否则，会创建一个新的连接，并且做提交，然后会返回游离（detached）的实体实例。
+
+默认值： `false`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.useEntityDataStoreForIdSequence]]
+cuba.useEntityDataStoreForIdSequence::
++
+--
+如果此属性设置为 true，为 `BaseLongIdEntity` 和 `BaseIntegerIdEntity` 子类生成唯一标识符的序列会创建在相应实体存在的<<data_store,数据存储>>中。否则，这些序列存在主数据存储中。
+
+默认值： `false`
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.useInnerJoinOnClause]]
+cuba.useInnerJoinOnClause::
++
+--
+EclipseLink <<orm,ORM>> 会在 inner join 中使用 `JOIN ON` 从句，而不会在 `WHERE` 从句中使用条件语句。
+
+默认值： false
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.useLocalServiceInvocation]]
+cuba.useLocalServiceInvocation::
++
+--
+当设置为 `true`，Web 客户端和 Web Portal <<app_tiers,blocks>> 会在本地调用 Middleware 服务，避开网络堆栈，这样有利于提高系统性能。这个情况在 <<fast_deployment,快速部署>>、单一 <<build.gradle_buildWar,WAR>> 或者单一 <<build.gradle_buildUberJar,UberJAR>> 部署的时候可以用到。对于其它的部署形式，这个值需要设置成 false。
+
+默认值： `true`
+
+可以在 Web 客户端和 Web Portal blocks 使用。
+--
+
+[[cuba.useReadOnlyTransactionForLoad]]
+cuba.useReadOnlyTransactionForLoad::
++
+--
+<<dataManager,DataManager>> 中的所有 `load` 方法都会使用<<transaction_read_only,只读事务>>。
+
+默认值： `true`
+
+保存在数据库。
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.user.fullNamePattern]]
+cuba.user.fullNamePattern::
++
+--
+为用户定义显示全部名称的模式。
+
+默认值： `{FF| }{LL}`
+
+全名称模式可以用用户的姓，名，和中间名（外国人）来构成。模式需要按照下面的规则：
+
+* 模式的各部分通过 `{}` 来分隔。
+
+* 在 `{}` 内的部分必须包含一下列出的字符的一种，然后紧跟一个 `|`，没有空格：
++
+`LL` – 用户姓的长格式 (Smith)
++
+`L` – 用户姓的短格式 (S)
++
+`FF` – 用户名的长格式 (John)
++
+`F` – 用户名的短格式 (J)
++
+`MM` – 用户中间名的长格式 (Paul)
++
+`M` – 用户中间名的短格式 (P)
+
+* `|` 字符后面可以跟任何符号，也可以包含空格。
+
+可以在 Web 客户端 block 使用。
+--
+
+[[cuba.user.namePattern]]
+cuba.user.namePattern::
++
+--
+为 `User` 实体定义显示名称模式。显示名称用在几个不同的地方，包括显示在系统主窗口右上角。
+
+默认值： `{1} [{0}]`
+
+`{0}` 会用 `login` 属性替换, `{1}` 会用 `name` 属性替换。
+
+可以在 Middleware，Web 客户端 blocks 使用。
+--
+
+[[cuba.userSessionExpirationTimeoutSec]]
+cuba.userSessionExpirationTimeoutSec::
++
+--
+定义用户会话超时的时限。单位是秒。
+
+默认值： `1800`
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+
+[TIP]
+====
+建议为 `cuba.userSessionExpirationTimeoutSec` 和 <<cuba.httpSessionExpirationTimeoutSec, cuba.httpSessionExpirationTimeoutSec>> 设置相同的值。
+====
+
+--
+
+[[cuba.userSessionLogEnabled]]
+cuba.userSessionLogEnabled::
++
+--
+开启<<userSession_log,用户会话日志>>功能。
+
+默认值： `false`
+
+保存在数据库。
+
+配置接口： `GlobalConfig`.
+
+在所有标准的 <<app_tiers,blocks>> 中都可以使用。
+--
+
+
+[[cuba.userSessionProviderUrl]]
+cuba.userSessionProviderUrl::
++
+--
+定义 Middleware <<app_tiers,block>> 的 URL 来作为用户登录服务。
+
+这个参数需要在额外的 middleware blcoks 中设置，这些 middleware 可以执行客户端请求，但是不分享用户会话缓存。如果在请求发起的时候，在本地的缓存中没有需要的会话，这个 block 会在指定的 URL 执行 `TrustedClientService.findSession()` 方法，然后将取到的会话缓存到本地。
+
+配置接口： `ServerConfig`
+
+可以在 Middleware block 使用。
+--
+
+[[cuba.viewsConfig]]
+cuba.viewsConfig::
++
+--
+<<additive_app_properties,累加属性>>，用来定义 <<views.xml,views.xml>> 文件。参考 <<views,>>。
+
+平台使用 <<resources,Resource - 资源接口>>来加载此文件，所以这个文件可以放在 classpath 或者<<conf_dir,配置文件目录>>。
+
+在所有标准的 <<app_tiers,blocks>> 中都可以使用。
+
+示例：
+
+[source, properties]
+----
+cuba.viewsConfig = +com/company/sample/views.xml
+----
+--
+
+[[cuba.webAppUrl]]
+cuba.webAppUrl::
++
+--
+定义 web 客户端应用的 URL。
+
+在特殊情况下，这个属性也用来生成外部应用程序的<<link_to_screen,界面链接>>，也会被 `ScreenHistorySupport` 类使用。
+
+默认值： `++http://localhost:8080/app++`
+
+保存在数据库。
+
+配置接口： `GlobalConfig`
+
+在所有标准的 <<app_tiers,blocks>> 中都可以使用。
+--
+
+[[cuba.windowConfig]]
+cuba.windowConfig::
++
+--
+<<additive_app_properties,累加属性>>，用来定义 <<screens.xml,screens.xml>> 文件。
+
+<<resources,Resource - 资源接口>>来加载此文件，所以这个文件可以放在 classpath 或者<<conf_dir,配置文件目录>>。
+
+可以在 Web 客户端 block 使用。
+
+示例：
+
+[source, properties]
+----
+cuba.windowConfig = +com/company/sample/web-screens.xml
+----
+--
+
+[[cuba.web.allowAnonymousAccess]]
+cuba.web.allowAnonymousAccess::
++
+--
+允许使用非认证用户访问应用程序界面。如果设置该参数为 `true`，确保 `Anonymous` 角色是 `Denying - 拒绝` 类型，即，匿名用户默认不能打开任何界面。
+
+参阅 <<gui_anonymous_access>>。
+
+默认值： `false`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.allowHandleBrowserHistoryBack]]
+cuba.web.allowHandleBrowserHistoryBack::
++
+--
+如果登录界面和/或者主窗口实现了 `CubaHistoryControl.HistoryBackHandler` 接口的话，用此参数开启对于浏览器 *Back - 返回* 按钮的处理。如果此属性设置为 true，浏览器标准的行为会替换成调用接口的处理方法。
+
+参考 <<gui_web,>>。
+
+默认值： `true`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.appFoldersRefreshPeriodSec]]
+cuba.web.appFoldersRefreshPeriodSec::
++
+--
+定义<<folders_pane,应用程序目录>>刷新时间间隔，单位是秒。
+
+默认值： `180`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.appWindowMode]]
+cuba.web.appWindowMode::
++
+--
+定义主应用窗口的初始化模式 - “标签式”还是“单页式”（`TABBED` 或者 `SINGLE`）。在“单页式”模式下，当使用 `++NEW_TAB++` 参数打开界面时，新界面会完全替换现有界面而不是打开一个新的标签页。
+
+用户之后可以在 *Help > Settings* 界面更改此模式。
+
+默认值： `TABBED`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.closeIdleHttpSessions]]
+cuba.web.closeIdleHttpSessions::
++
+--
+当上一次 <<cuba.web.uiHeartbeatIntervalSec,非心跳>>请求之后，<<cuba.httpSessionExpirationTimeoutSec,会话超时>>也已经过期，Web 客户端是否可以关闭 UI 和会话。
+
+默认值： `false`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.componentsConfig]]
+cuba.web.componentsConfig::
++
+--
+<<additive_app_properties,累加属性>>，用来定义包含应用程序组件信息的配置文件，这些文件由不同的 Jar 包提供或者在 *web* 模块的 `cuba-ui-component.xml` 中描述。
+
+示例：
+
+[source, plain]
+----
+cuba.web.componentsConfig =+demo-web-components.xml
+----
+--
+
+[[cuba.web.customDeviceWidthForViewport]]
+cuba.web.customDeviceWidthForViewport::
++
+--
+自定义 HTML 页面的 viewport 宽度。影响 Vaadin HTML 页面上的 "viewport" 元标签(viewport meta tag)。
+
+默认值： `-1`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.defaultScreenCanBeClosed]]
+cuba.web.defaultScreenCanBeClosed::
++
+--
+定义默认界面是否也可以通过关闭按钮、ESC 按钮或者标签页右键菜单（当使用 `TABBED` <<cuba.web.appWindowMode,工作区模式>>）进行关闭。
+
+默认值： true
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.defaultScreenId]]
+cuba.web.defaultScreenId::
++
+--
+定义登录后默认打开的界面。这个设置对所有用户生效。
+
+示例：
+
+[source, plain]
+----
+cuba.web.defaultScreenId = sys$SendingMessage.browse
+----
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.foldersPaneDefaultWidth]]
+cuba.web.foldersPaneDefaultWidth::
++
+--
+为<<folders_pane,文件夹面板>>设置默认的宽度，单位是像素。
+
+默认值： `200`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.foldersPaneEnabled]]
+cuba.web.foldersPaneEnabled::
++
+--
+启用<<folders_pane,文件夹面板>>功能并在文件夹中使用<<shortcuts,键盘快捷键>>。
+
+默认值： `false`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.foldersPaneVisibleByDefault]]
+cuba.web.foldersPaneVisibleByDefault::
++
+--
+设置是否要默认展开<<folders_pane,文件夹面板>>。
+
+默认值： `false`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.htmlSanitizerEnabled]]
+cuba.web.htmlSanitizerEnabled::
++
+--
+设置实现了 `HasHtmlSanitizer` 接口的 UI 组件是否使用 `HtmlSanitizer` bean 在 HTML 中防止跨站脚本（XSS）。该配置也可以在单独的组件中启用或禁用。
+
+默认值： `true`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.initialScreenId]]
+cuba.web.initialScreenId::
++
+--
+定义非认证用户第一次打开应用程序 URL 地址时，系统会打开什么界面。需要 <<cuba.web.allowAnonymousAccess,cuba.web.allowAnonymousAccess>> 设置为 `true`。
+
+参阅 <<gui_anonymous_access>>。
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.ldap.enabled]]
+cuba.web.ldap.enabled::
++
+--
+在 Web 客户端启用/禁用 LDAP 登录机制。
+
+示例：
+
+[source]
+----
+cuba.web.ldap.enabled = true
+----
+
+配置接口： `WebLdapConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.ldap.urls]]
+cuba.web.ldap.urls::
++
+--
+设置 LDAP 服务器 URL。
+
+示例：
+
+[source]
+----
+cuba.web.ldap.urls = ldap://192.168.1.1:389
+----
+
+配置接口： `WebLdapConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.ldap.base]]
+cuba.web.ldap.base::
++
+--
+为在 LDAP 中搜索用户设置基本域名称（DN）。
+
+示例：
+
+[source]
+----
+cuba.web.ldap.base = ou=Employees,dc=mycompany,dc=com
+----
+
+配置接口： `WebLdapConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.ldap.user]]
+cuba.web.ldap.user::
++
+--
+
+系统用户别名，系统用户有权限从目录读取信息。
+
+示例：
+
+[source]
+----
+cuba.web.ldap.user = cn=System User,ou=Employees,dc=mycompany,dc=com
+----
+
+配置接口： `WebLdapConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.ldap.password]]
+cuba.web.ldap.password::
++
+--
+<<cuba.web.ldap.user,cuba.web.ldap.user>> 属性定义的系统用户的密码。
+
+示例：
+
+[source]
+----
+cuba.web.ldap.password = system_user_password
+----
+
+配置接口： `WebLdapConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.ldap.userLoginField]]
+cuba.web.ldap.userLoginField::
++
+--
+LDAP 用户的用来匹配登录名的属性名称。默认是 `sAMAccountName` （使用于 Active Directory）。
+
+示例：
+
+[source]
+----
+cuba.web.ldap.userLoginField = username
+----
+
+配置接口： `WebLdapConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.linkHandlerActions]]
+cuba.web.linkHandlerActions::
++
+--
+定义一组可以由 `LinkHandler` bean 处理的 URL 命令。参考 <<link_to_screen,>> 了解更多信息。
+
+值需要用 `|` 字符分隔。
+
+默认值： `open|o`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.loginDialogDefaultUser]]
+cuba.web.loginDialogDefaultUser::
++
+--
+设置默认的用户名称，会在登录窗口自动填充。这个在开发阶段会非常有用。这个属性在生产环境需要设置成 `<disabled>` 的值。
+
+默认值： `admin`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.loginDialogDefaultPassword]]
+cuba.web.loginDialogDefaultPassword::
++
+--
+设置默认的用户密码，会在登录窗口自动填充。这个在开发阶段会非常有用。这个属性在生产环境需要设置成 `<disabled>` 的值。
+
+默认值： `admin`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.loginDialogPoweredByLinkVisible]]
+cuba.web.loginDialogPoweredByLinkVisible::
++
+--
+设置成 `false` 在登录窗口隐藏 "powered by CUBA Platform"。
+
+默认值： `true`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.loginScreenId]]
+cuba.web.loginScreenId::
++
+--
+用来作为应用程序<<gui_LoginScreen,登录界面>>的界面标识符。
+
+默认值： `login`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.mainScreenId]]
+cuba.web.mainScreenId::
++
+--
+用来作为应用程序<<gui_MainScreen,主界面>>的界面标识符。
+
+默认值： `main`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.mainTabSheetMode]]
+cuba.web.mainTabSheetMode::
++
+--
+
+定义在主窗口的 <<cuba.web.appWindowMode,标签页>>模式使用哪个组件管理界面。可以选取 `MainTabSheetMode` 枚举类型中的一个值：
+
+* `DEFAULT`：使用 `CubaTabSheet` 组件。会在每次用户切换标签页的时候加载和卸载界面组件。
+
+* `MANAGED`： 使用 `CubaManagedTabSheet` 组件。这个不会在用户切换标签页的时候卸载界面组件。
+
+默认值： `DEFAULT`.
+
+配置接口： `WebConfig`.
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.managedMainTabSheetMode]]
+cuba.web.managedMainTabSheetMode::
++
+--
+如果 <<cuba.web.mainTabSheetMode,cuba.web.mainTabSheetMode>> 属性设置为 `MANAGED`，定义主 TabSheet 怎么切换标签页：隐藏还是只卸载它们的组件。
+
+默认值： `HIDE_TABS`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.maxTabCount]]
+cuba.web.maxTabCount::
++
+--
+定义可以在应用程序主窗口打开的标签页的最大数量。`0` 值表示不限制。
+
+默认值： `7`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.pageInitialScale]]
+cuba.web.pageInitialScale::
++
+--
+定义当设置了 <<cuba.web.customDeviceWidthForViewport,cuba.web.customDeviceWidthForViewport>> 或者 <<cuba.web.useDeviceWidthForViewport,cuba.web.useDeviceWidthForViewport>> 是 `true` 的时候 HTML 界面的初始化缩放比。影响 Vaadin HTML 界面的 "viewport" 元标签。
+
+默认值： `0.8`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.productionMode]]
+cuba.web.productionMode::
++
+--
+可以完全关闭通过在 URL 中添加 `?debug` 打开的 Vaadin 开发者模式。因此，也同时关闭了 JavaScript 调试模式，减少了从浏览器获取的服务器信息。
+
+默认值： `false`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.pushEnabled]]
+cuba.web.pushEnabled::
++
+--
+可以完全禁用<<server_push_settings,服务器推送>>。但是<<background_tasks,后台任务>>机制不受此影响。
+
+默认值： `true`
+
+配置接口： `WebConfig`
+
+可以在 Web 客户端使用。
+--
+
+[[cuba.web.pushLongPolling]]
+cuba.web.pushLongPolling::
++
+--
+对于<<server_push_settings,服务器推送>>实现，从 WebSocket 切换成长轮询（long polling）。
+
+默认值： `false`
+
+配置接口： `WebConfig`
+
+可以在 Web 客户端使用。
+--
+
+[[cuba.web.pushLongPollingSuspendTimeoutMs]]
+cuba.web.pushLongPollingSuspendTimeoutMs::
++
+--
+定义服务器推送的超时时限，单位是毫秒。当<<server_push_settings,服务器推送>>实现切换成长轮询的时候会用到。比如当 `cuba.web.pushLongPolling="true"` 时。
+
+默认值： `-1`
+
+配置接口： `WebConfig`
+
+可以在 Web 客户端使用。
+--
+
+[[cuba.web.rememberMeEnabled]]
+cuba.web.rememberMeEnabled::
++
+--
+在 web 客户端的登录界面显示 *Remember Me - 记住我* 复选框。
+
+默认值： `true`
+
+配置接口： `WebConfig`
+
+可以在 Web 客户端使用。
+--
+
+[[cuba.web.resourcesCacheTime]]
+cuba.web.resourcesCacheTime::
++
+--
+启用是否缓存 web 资源。单位是秒。0 值表示不做缓存。示例：
+
+[source, properties]
+----
+cuba.web.resourcesCacheTime = 136
+----
+
+默认值： 60 * 60 (1 小时).
+
+配置接口： `WebConfig`
+
+可以在 Web 客户端使用。
+--
+
+[[cuba.web.webJarResourcesCacheTime]]
+cuba.web.webJarResourcesCacheTime::
++
+--
+启用是否缓存 <<using_webjars,WebJar>> 资源。单位是秒。0 值表示不做缓存。示例：
+
+[source, properties]
+----
+cuba.web.webJarResourcesCacheTime = 631
+----
+
+默认值： 60 * 60 * 24 * 365 (1 年).
+
+配置接口： `WebConfig`
+
+可以在 Web 客户端使用。
+--
+
+[[cuba.web.resourcesRoot]]
+cuba.web.resourcesRoot::
++
+--
+设置用来显示 <<gui_Embedded,Embedded>> 组件的文件目录。示例：
+
+[source, properties]
+----
+cuba.web.resourcesRoot = ${cuba.confDir}/resources
+----
+
+默认值： `null`
+
+配置接口： `WebConfig`
+
+可以在 Web 客户端使用。
+--
+
+[[cuba.web.requirePasswordForNewUsers]]
+cuba.web.requirePasswordForNewUsers::
++
+--
+如果设置为 `true`，在 Web 客户端创建用户的时候需要密码。如果是使用 <<ldap_basic,LDAP>> 认证的话，建议将此参数设置为 `false`。
+
+默认值： `true`
+
+配置接口： `WebAuthConfig`
+
+可以在 web 客户端 block 使用。
+
+--
+
+[[cuba.web.showBreadCrumbs]]
+cuba.web.showBreadCrumbs::
++
+--
+设置是否在主窗口的工作区显示面包屑（breadcrumbs）面板。
+
+默认值： `true`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.showFolderIcons]]
+cuba.web.showFolderIcons::
++
+--
+启用<<folders_pane,文件夹面板>>图标。当启用时，会使用下面这些样式文件：
+
+* `icons/app-folder-small.png` – 用于应用目录
+
+* `icons/search-folder-small.png` – 用户查找目录
+
+* `icons/set-small.png` – 用于记录集合
+
+默认值： `false`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.standardAuthenticationUsers]]
+cuba.web.standardAuthenticationUsers::
++
+--
+以英文逗号分隔的用户列表，这些用户不允许使用外部认证（比如 <<ldap,LDAP>> 或者 <<sso,IDP SSO>>），需要使用标准认证登录系统。
+
+空列表表示所有用户都可以用外部认证来登录系统。
+
+默认值： `<empty list>`
+
+配置接口： `WebAuthConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.table.cacheRate]]
+cuba.web.table.cacheRate::
++
+--
+调整网页浏览器中的 <<gui_Table,Table>> 缓存。缓存行的数量是由 `cacheRate` * <<cuba.web.table.pageLength,pageLength>> 的值决定。
+
+默认值： `2`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.table.pageLength]]
+cuba.web.table.pageLength::
++
+--
+当 <<gui_Table,Table>> 刷新第一次渲染的时候，设置从服务端获取数据的行数。也可参考 <<cuba.web.table.cacheRate,cuba.web.table.cacheRate>>。
+
+默认值： `15`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.theme]]
+cuba.web.theme::
++
+--
+定义 web 客户端使用的默认<<gui_themes,主题>>的名称。也可参考 <<cuba.themeConfig,cuba.themeConfig>>。
+
+默认值： `halo`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.uiHeartbeatIntervalSec]]
+cuba.web.uiHeartbeatIntervalSec::
++
+--
+定义 Web 客户端用户界面心跳请求的间隔。如果没设置，则会使用 <<cuba.httpSessionExpirationTimeoutSec,cuba.httpSessionExpirationTimeoutSec>> / 3。
+
+默认值： HTTP-session 非活动状态超时时限 / 3，单位为秒
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.unsupportedPagePath]]
+cuba.web.unsupportedPagePath::
++
+--
+定义<<unsupported_browser_page, HTML 界面>>的路径，这个界面用来在应用程序不支持当前浏览器版本时显示。
+
+[source, properties]
+----
+cuba.web.unsupportedPagePath = /com/company/sales/web/sys/unsupported-browser-page.html
+----
+
+默认值： `/com/haulmont/cuba/web/sys/unsupported-page-template.html`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.urlHandlingMode]]
+cuba.web.urlHandlingMode::
++
+--
+定义如何处理 URL 更改。
+
+可选值为 `UrlHandlingMode` 枚举类型的元素：
+
+* `NONE` – 不会处理 URL 改动；
+
+* `BACK_ONLY` – 使用 `CubaHistoryControl` 来处理改动。这个值替换旧的<<cuba.web.allowHandleBrowserHistoryBack,cuba.web.allowHandleBrowserHistoryBack>>属性；
+
+* `URL_ROUTES` – 使用<<url_history_navigation>>功能处理改动。
+
+默认值： `URL_ROUTES`
+
+配置接口： `WebConfig`
+--
+
+[[cuba.web.useFontIcons]]
+cuba.web.useFontIcons::
++
+--
+如果在 Halo <<gui_themes,主题>>中开启了这个属性，link:http://fortawesome.github.io/Font-Awesome[Font Awesome] 的象形图标会被用来作为平台界面标准行为的图标，而不是使用图片。
+
+可视化组件或者操作的 <<gui_attr_icon,icon>> 属性和字体元素之间的关联关系通过平台的 `halo-theme.properties` 文件定义。以 `cuba.web.icons` 为前缀的键值对应图标名称，然后它们的值，用 `com.vaadin.server.FontAwesome` 枚举类型常量定义。比如，标准 `create` 动作的字体元素定义如下：
+
+[source, properties]
+----
+cuba.web.icons.create.png = font-icon:FILE_O
+----
+
+默认值： `true`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.useInverseHeader]]
+cuba.web.useInverseHeader::
++
+--
+控制使用了 Halo <<gui_themes,主题>>和它的<<web_theme_extension,扩展主题>>的 Web 客户端应用程序的 header。如果是 `true`，header 会使用暗色调（反色），如果是 `false`，header 采用主程序背景色。
+
+这个熟悉忽略大小写。
+
+[source, css]
+----
+$v-support-inverse-menu: false;
+----
+
+属性在应用的主题内设置。如果用户能选择亮色和暗色主题的话，这个选项对于暗色主题有效。此时，在暗色主题中，header 会作为亮色主题的反色，主程序的背景也会相应的作反色处理。
+
+默认值： `true`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.userCanChooseDefaultScreen]]
+cuba.web.userCanChooseDefaultScreen::
++
+--
+Defines whether a user is able to choose the <<cuba.web.defaultScreenId,default screen>>. If the `false` value is set, the *Default screen* field in the *Settings* screen is read-only.
+
+默认值： true
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.useDeviceWidthForViewport]]
+cuba.web.useDeviceWidthForViewport::
++
+--
+处理 viewport 的宽度。如果需要使用设备宽度作为 viewport 宽度时设置为 `true`。这个属性影响 Vaadin HTML 界面 viewport 的元标签。
+
+默认值： `false`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.web.viewFileExtensions]]
+cuba.web.viewFileExtensions::
++
+--
+当使用 `ExportDisplay.show()` 方法<<file_download,下载文件时>>，定义一组浏览器直接显示的文件后缀名的列表。使用 `|` 字符来分隔列表中的后缀名。
+
+默认值： `htm|html|jpg|png|jpeg|pdf`
+
+配置接口： `WebConfig`
+
+可以在 web 客户端 block 使用。
+--
+
+[[cuba.webContextName]]
+cuba.webContextName::
++
+--
+定义 web 应用的上下文（context）名称。通常跟包含此<<app_tiers,应用程序 block>> 的目录或者 WAR 文件同名。
+
+配置接口： `GlobalConfig`
+
+可以使用的 blocks：Middleware，Web 客户端，Web Portal。
+
+比如，对 Middleware block 来说，如果放置的目录是 `tomcat/webapps/app-core`，并且可以通过 `++http://somehost:8080/app-core++` 访问，则此属性应该设置为：
+
+[source, properties]
+----
+cuba.webContextName = app-core
+----
+--
+
+[[cuba.webHostName]]
+cuba.webHostName::
++
+--
+定义运行<<app_tiers,应用程序 block>> 的机器主机名称。
+
+默认值： `localhost`
+
+配置接口： `GlobalConfig`
+
+可以使用的 blocks：Middleware，Web 客户端，Web Portal。
+
+比如，对 Middleware block 来说，可以通过 `++http://somehost:8080/app-core++` 访问，则此属性应该设置为：
+
+[source, properties]
+----
+cuba.webHostName = somehost
+----
+--
+
+[[cuba.webPort]]
+cuba.webPort::
++
+--
+定义运行<<app_tiers,应用程序 block>> 的端口。
+
+默认值： `8080`
+
+配置接口： `GlobalConfig`
+
+可以使用的 blocks：Middleware，Web 客户端，Web Portal。
+
+比如，对 Middleware block 来说，可以通过 `++http://somehost:8080/app-core++` 访问，则此属性应该设置为：
+
+[source, properties]
+----
+cuba.webPort = 8080
+----
+--
+

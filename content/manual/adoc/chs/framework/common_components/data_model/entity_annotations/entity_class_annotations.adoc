@@ -1,0 +1,353 @@
+:sourcesdir: ../../../../../../source
+
+[[entity_class_annotations]]
+====== 类注解
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/Embeddable.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[embeddable_annotation]]
+@Embeddable::
++
+--
+定义一个与所属实体存储在同一表中的嵌入实体。
+
+应使用 <<metaclass_annotation,@MetaClass>> 注解来指定实体名称。
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/annotation/EnableRestore.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[enableRestore_annotation]]
+@EnableRestore::
+
+表示软删除的实体实例是否可以通过 *Administration > Data Recovery* 菜单打开的 `core$Entity.restore` 界面进行恢复。
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/Entity.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[entity_annotation]]
+@Entity::
++
+--
+声明一个类是一个数据模型实体。
+
+参数:
+
+* `name` – 实体的名称,必须带有前缀，以 `_` 符号分隔前缀。建议使用项目的简称作为前缀来形成单独的命名空间。
+
+例如:
+
+[source, java]
+----
+@Entity(name = "sales_Customer")
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/annotation/Extends.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[extends_annotation]]
+@Extends::
+表示该实体是一个对基础实体的扩展，在应用程序中应该使用它来代替其基础实体。参阅 <<extension>>。
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/DiscriminatorColumn.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[discriminatorColumn_annotation]]
+@DiscriminatorColumn::
++
+--
+在 `++SINGLE_TABLE++` 和 `JOINED` 继承策略的情况下，用于定义负责区分实体类型的数据库列。
+
+参数:
+
+* `name` – 鉴别器列名。
+* `discriminatorType` – 鉴别器列的类型。
+
+例如:
+
+[source, java]
+----
+@DiscriminatorColumn(name = "TYPE", discriminatorType = DiscriminatorType.INTEGER)
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/DiscriminatorValue.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[discriminatorValue_annotation]]
+@DiscriminatorValue::
++
+--
+定义此实体的鉴别器列值。
+
+例如:
+
+[source, java]
+----
+@DiscriminatorValue("0")
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/annotation/IdSequence.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[idsequence_annotation]]
+@IdSequence::
++
+--
+如果实体是 `BaseLongIdEntity` 或 `BaseIntegerIdEntity` 的子类，则应明确定义用于生成标识符的数据库序列名称。如果实体没有此注解，则框架将自动生成名称并创建一个序列。
+
+参数:
+
+* `name` – 序列名称。
+* `cached` - 可选参数，定义序列应该以 <<cuba.numberIdCacheSize,cuba.numberIdCacheSize>> 递增，并将未使用的 ID 值缓存在内存中。默认为 False。
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/Inheritance.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[inheritance_annotation]]
+@Inheritance::
++
+--
+定义实体类的继承策略。此注解在实体继承层次的根类上指定。
+
+参数:
+
+* `strategy` – 继承策略，默认为 `++SINGLE_TABLE++`。
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/annotation/Listeners.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[listeners_annotation]]
+@Listeners::
++
+--
+定义监听器列表，用来响应中间<<app_tiers,层>>的实体实例生命周期事件。
+
+在注解值中指定监听器 bean 名称，可以是字符串或字符串数组。请参阅<<entity_listeners>>。
+
+例如:
+[source, java]
+----
+@Listeners("sample_UserEntityListener")
+----
+
+[source, java]
+----
+@Listeners({"sample_FooListener","sample_BarListener"})
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/MappedSuperclass.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[mappedSuperclass_annotation]]
+@MappedSuperclass::
++
+--
+表示该类用作其它实体类的父类，其属性必须用作后代实体的一部分。这种类不关联任何特定的数据库表。
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/chile/core/annotations/MetaClass.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[metaclass_annotation]]
+@MetaClass::
++
+--
+用于声明非持久化或<<embeddable_annotation,嵌入>>实体（也就是不能用 `@javax.persistence.Entity` 注解）
+
+参数:
+
+* `name` – 实体名称，必须以一个前缀开头，以 `_` 符号分隔前缀。建议使用项目的简称作为前缀来形成单独的命名空间。
+
+例如:
+
+[source, java]
+----
+@MetaClass(name = "sales_Customer")
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/chile/core/annotations/NamePattern.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[namePattern_annotation]]
+@NamePattern::
++
+--
+定义如何创建表示单一实体的字符串。可以认为是应用程序级别的 `toString()` 方法。在 UI 中到处都用得上，比如在类似 `TextField` 或者 `LookupField` 的单一字段中需要展示一个实体。也可以通过编程的方式使用 `MetadataTools.getInstanceName()` 方法获取实例名称。
+
+注解值应该是 `{0}|{1}` 格式的字符串，其中：
+
+* `{0}` – 可以有两种类型的格式化字符串：
+** 带有 `%s` 占位符的字符串，用来对实体属性进行格式化。属性值会根据其 <<datatype,datatypes>> 被格式化成字符串。
+** 带有 `#` 前缀的对象方法名称。方法必须返回 `String`，并且没有参数。
+
+* `{1}` - 使用逗号分隔的属性名称列表， `{0}` 部分定义的字符串格式中的变量与这部分的字段名对应。即使在 `{0}` 中使用的是方法名，仍然需要此字段列表，因为这个列表也被用于构造 `_minimal` <<views,视图>>。
+
+例如:
+
+[source, java]
+----
+@NamePattern("%s|name")
+----
+
+[source, java]
+----
+@NamePattern("%s - %s|name,date")
+----
+
+[source, java]
+----
+@NamePattern("#getCaption|login,name")
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://docs.oracle.com/javaee/7/api/javax/annotation/PostConstruct.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[postConstruct_entity_annotation]]
+@PostConstruct::
++
+--
+可以为方法指定此注解。在使用 <<metadata,Metadata.create()>> 或者类似的 `DataManager.create()` 和 `DataContext.create()` 方法创建实体实例之后将立即调用带此注解的方法。
+
+使用此注解的方法可以使用在 `global` 模块可用的 Spring bean 作为参数。示例：
+
+[source,java]
+----
+@PostConstruct
+public void postConstruct(Metadata metadata, SomeBean someBean) {
+    // ...
+}
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://docs.oracle.com/javaee/7/api/javax/persistence/PrimaryKeyJoinColumn.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[primaryKeyJoinColumn_annotation]]
+@PrimaryKeyJoinColumn::
++
+--
+在 `JOINED` 继承策略的情况下用于为实体指定外键列，该外键是父类实体主键的引用。
+
+参数:
+
+* `name` – 实体的外键列的名称
+* `referencedColumnName` – 父类实体的主键列的名称
+
+例如:
+
+[source, java]
+----
+@PrimaryKeyJoinColumn(name = "CARD_ID", referencedColumnName = "ID")
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/annotation/PublishEntityChangedEvents.html" class="api-docs-btn" target="_blank">API DOCS</a>
+</div>
+++++
+
+[[publishEntityChangedEvents_annotation]]
+@PublishEntityChangedEvents::
+表示实体在数据库改动时，框架会发送 <<entityChangedEvent,EntityChangedEvent>> 事件。
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/annotation/SystemLevel.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[systemLevel_annotation]]
+@SystemLevel::
+表示该实体是系统级别的实体，不能在各种实体列表中进行选择，例如<<gui_Filter,通用过滤器>>参数类型或<<dynamic_attributes,动态属性>>类型。
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://docs.oracle.com/javaee/7/api/javax/persistence/Table.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[table_annotation]]
+@Table::
++
+--
+定义实体的数据库表。
+
+参数:
+
+* `name` – 表名
+
+例如:
+
+[source, java]
+----
+@Table(name = "SALES_CUSTOMER")
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/annotation/TrackEditScreenHistory.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[trackEditScreenHistory_annotation]]
+@TrackEditScreenHistory::
+表示系统将会保存<<screen_edit,编辑界面>>的打开历史记录，并能够在 `sec$ScreenHistory.browse` 展示。界面可以使用下面的 <<menu.xml,web-menu.xml>> 元素添加到主菜单：
+[source, xml]
+----
+<item id="sec$ScreenHistory.browse" insertAfter="settings"/>
+----
+
+

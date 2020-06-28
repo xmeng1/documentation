@@ -1,0 +1,39 @@
+:sourcesdir: ../../../../source
+
+[[polymer_ui]]
+==== Polymer 用户界面（废弃）
+
+[WARNING]
+====
+从平台 7.2 开始，Polymer UI 会被废弃，推荐使用 <<react_ui,React UI>>。
+====
+
+基于 https://polymer-library.polymer-project.org[Polymer] 库，提供跟手机端浏览器紧密集成的功能，可以添加 web 应用程序到设备主页面或者离线工作。
+
+CUBA 框架 Polymer UI 有如下功能：
+
+* Polymer 构建系统完全整合到基于 Gradle 的项目构建环境，因此所有的构建工具都会自动下载并安装。同时，一旦在项目中创建了 Polymer 模块，它可以由前端工程师使用 Polymer 标准的工具单独进行进一步开发。
+
+* 平台提供了一组 web 组件，可以通过标准 CUBA {rest_man_url}[REST API] 跟中间件层通信。<<cuba_web_components,之后>>有这些组件的描述。
+
+* 通过 CUBA Studio 可以很容易创建 Polymer 客户端模块并且围绕项目数据模型和中间件服务搭建应用程序 web 组件。Studio 包含一组可扩展的模板用来创建应用级别的组件。
+
+平台目前的策略还是关注用来创建 https://developers.google.com/web/progressive-web-apps/[Progressive Web Apps] 的 Polymer https://polymer-library.polymer-project.org/2.0/start/install-2-0[技术和工具]。目标是为了按照 Polymer 的规范和最佳实践，提供 CUBA 用户类似的学习曲线和开发体验。Polymer 应用具有基于组件的架构，由 https://www.webcomponents.org/[Web 组件] 构成。
+
+要快速开始开发，需要熟悉 Polymer 的基本概念。这里有个关于 Polymer 的非常快速的介绍： https://github.com/Polymer/polymer#polymer-in-1-minute 。但是，最好还是进行深入了解： ttps://polymer-library.polymer-project.org/2.0/start/ 。因为 Polymer 是按照大多数情况下学习 web 平台本身的标准构建的。
+
+include::polymer/polymer_requirements.adoc[]
+
+include::polymer/polymer_supported_browsers.adoc[]
+
+include::polymer/polymer_build_and_structure.adoc[]
+
+include::polymer/cuba_web_components.adoc[]
+
+include::polymer/polymer_styling.adoc[]
+
+include::polymer/polymer_offline.adoc[]
+
+include::polymer/polymer2_typescript/polymer2_typescript.adoc[]
+
+include::polymer/polymer_troubleshooting.adoc[]

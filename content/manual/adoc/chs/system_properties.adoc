@@ -1,0 +1,49 @@
+[[system_properties]]
+[appendix]
+== 系统参数
+
+系统参数可以在 JVM 启动的时候通过命令行参数 `-D` 指定。此外，系统参数可以通过 `System` 类的 `getProperty()` 和 `setProperty()` 方法来读写。
+
+可以用系统参数来设置或者覆盖<<app_properties,应用程序属性>>的值。比如，下面命令行参数就会覆盖 <<cuba.connectionUrlList,cuba.connectionUrlList>> 属性的值，这个属性一般在 `web-app.properties` 文件中设置：
+
+[source,plain]
+----
+-Dcuba.connectionUrlList=http://somehost:8080/app-core
+----
+
+[WARNING]
+====
+牢记于心，系统参数是会影响整个 JVM 的，也就是说，在此 JVM 上运行的所有 blocks 对于同一个参数，都读取的同一个值。
+====
+
+[WARNING]
+====
+框架会在服务启动时缓存系统参数，所以应用程序不应该依赖在运行时修改系统参数来改变应用程序属性。如果确实需要这么做，使用 <<cachingFacadeMBean,CachingFacadeMBean>> JMX bean 的 `clearSystemPropertiesCache()` 方法在改变系统参数之后清一下缓存。
+====
+
+以下是平台使用的系统参数，这些参数不是应用程序属性。
+
+[[logback.configurationFile]]
+logback.configurationFile::
++
+--
+定义 *Logback* 框架配置文件位置。
+
+对于运行在 Tomcat web 服务的应用程序 <<app_tiers,blocks>>，这个系统参数配置在 `tomcat/bin/setenv.bat` 和 `tomcat/bin/setenv.sh` 文件。默认值是指向 `tomcat/conf/logback.xml` 配置文件。
+--
+
+[[cuba.unitTestMode]]
+cuba.unitTestMode:: 
++
+--
+在 `CubaTestCase` 基类运行集成测试的时候，这个系统参数设置成 `true`。
+
+示例：
+
+[source, java]
+----
+if (!Boolean.valueOf(System.getProperty("cuba.unitTestMode")))
+  return "Not in test mode";
+----
+--
+

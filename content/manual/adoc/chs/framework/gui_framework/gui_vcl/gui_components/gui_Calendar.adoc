@@ -1,0 +1,216 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_Calendar]]
+====== 日历控件
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=month-calendar" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/Calendar.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`Calendar` - 日历控件用来组织和展示日历事件。
+
+image::gui_calendar_1.png[align="center"]
+
+该组件的 XML 名称是： `calendar`
+
+以下为界面中日历组件定义的示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/gui_calendar_1.xml[]
+----
+
+该组件在界面上的外观取决于日历的日期范围，日期范围由开始日期和结束日期定义。默认外观为周视图，对应的日期范围上限是一周七天。如果需要按天展示则把日期范围定义为一天以内。如果日期范围在七天以上，该组件将以月视图展示。
+
+用来将日历控件往前或往后调一周的导航按钮默认不可见。可以通过设置属性 `navigationButtonsVisible` 使导航按钮可见（在周视图中）:
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/gui_calendar_9.xml[]
+----
+
+image::gui_calendar_2.png[align="center"]
+
+`calendar` 日历控件的属性:
+
+[[gui_Calendar_endDate]]
+* `endDate` -  日期范围中的结束日期。
+
+[[gui_Calendar_endDateProperty]]
+* `endDateProperty` - 包含结束日期的实体属性名称。
+
+[[gui_Calendar_descriptionProperty]]
+* `descriptionProperty` - 包含事件描述的实体属性名称。
+
+[[gui_Calendar_isAllDayProperty]]
+* `isAllDayProperty` - 标识是否为全天事件的实体属性名称。
+
+[[gui_Calendar_startDate]]
+* `startDate` - 日期范围中的开始日期。
+
+[[gui_Calendar_startDateProperty]]
+* `startDateProperty` - 包含开始时间的是实体属性名称。
+
+[[gui_Calendar_stylenameProperty]]
+* `stylenameProperty` - 标识事件样式名称的实体属性名称。
+
+[[gui_Calendar_timeFormat]]
+* `timeFormat` - 时间格式: 12H 或 24H。
+
+如何使用日历事件: ::
++
+--
+[[gui_Calendar_addEvent]]
+需要在日历控件单元格中显示事件时，可以通过 `addEvent()` 方法添加一个事件到 `Calendar` 对象；也可以使用 `CalendarEventProvider` 接口操作。
+直接添加事件到对象的示例：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gui_calendar_1.java[]
+----
+
+[[gui_Calendar_removeEvent]]
+`CalendarEventProvider` 接口的 `removeEvent()` 方法可以通过指定索引删除事件：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gui_calendar_11.java[]
+----
+
+[[gui_Calendar_removeAllEvents]]
+`removeAllEvents` 方法依次删除所有事件：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gui_calendar_12.java[]
+----
+
+[[gui_Calendar_setEventProvider]]
+有两个给日历控件添加事件数据的接口：`ListCalendarEventProvider` (默认创建) 和 `EntityCalendarEventProvider`。
+
+`ListCalendarEventProvider` 的 `addEvent()` 方法需要 `CalendarEvent` 对象做为输入参数：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gui_calendar_2.java[]
+----
+
+`EntityCalendarEventProvider` 可以直接将事件实体对象添加为日历的事件。事件实体对象必须 *至少* 包含事件开始日期（DateTime 类型）、事件结束日期（DateTime 类型）和事件标题（String 类型）。
+
+以下示例中假设事件数据源包含了所有需要的属性： `eventCaption` 、 `eventDescription` 、 `eventStartDate` 、 `eventEndDate` 、 `eventStylename`, 他们的值将会设置到 `calendar` 组件的属性中:
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/gui_calendar_2.xml[]
+----
+--
+
+`Calendar` 组件支持几个用来响应用户交互事件的监听器，比如日期、周标题，日期/事件范围选择，事件拖拽或者事件大小调整，往前或往后调日期的导航按钮。以下是监听器列表：
+
+[[gui_Calendar_CalendarDateClickListener]]
+* `addDateClickListener(CalendarDateClickListener listener);` - 日期点击监听器：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gui_calendar_3.java[]
+----
+
+[[gui_Calendar_CalendarWeekClickListener]]
+* `addWeekClickListener()` - 周点击监听器。
+
+[[gui_Calendar_CalendarEventClickListener]]
+* `addEventClickListener()` - 日历事件点击监听器。
+
+[[gui_Calendar_CalendarEventResizeListener]]
+* `addEventResizeListener()` - 日历事件大小调整监听器。
+
+[[gui_Calendar_CalendarEventMoveListener]]
+* `addEventMoveListener()` - 事件拖拽、释放监听器。
+
+[[gui_Calendar_CalendarForwardClickListener]]
+* `addForwardClickListener()` - 往前调日期导航钮的监听器。
+
+[[gui_Calendar_CalendarBackwardClickListener]]
+* `addBackwardClickListener()` - 往后调日期导航钮的监听器。
+
+[[gui_Calendar_CalendarRangeSelectListener]]
+* `addRangeSelectListener()` - 日历日期范围选择监听器。
+
+日历事件可以通过 CSS 配置样式。需要配置 CSS 的样式时，创建一个样式名字，然后在 `.scss` 文件中设置需要的参数。例如，需要配置事件的背景颜色时：
+[source, scss]
+----
+include::{sourcesdir}/gui_vcl/gui_calendar_1.scss[]
+----
+然后通过事件的 `setStyleName` 方法设置样式名字：
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gui_calendar_8.java[]
+----
+然后，事件的背景会被设置为绿色：
+
+image::gui_calendar_3.png[align="center"]
+
+[[gui_Calendar_setDayNames]]
+如果需要改变  `Calendar` 日历控件上日期和月份的名称，可以通过方法 `setDayNames()` 和 `setMonthNames()` 实现，传入带新名称的 map 即可：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gui_calendar_10.java[]
+----
+
+'''
+
+`Calendar` 日历控件的属性列表::
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_captionProperty,captionProperty>> -
+<<gui_attr_colspan,colspan>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_Calendar_descriptionProperty,descriptionProperty>> -
+<<gui_Calendar_endDateProperty,endDateProperty>> -
+<<gui_Calendar_endDate,endDate>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_Calendar_isAllDayProperty,isAllDayProperty>> -
+<<gui_attr_rowspan,rowspan>> -
+<<gui_Calendar_startDate,startDate>> -
+<<gui_Calendar_startDateProperty,startDateProperty>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_Calendar_stylenameProperty,stylenameProperty>> -
+<<gui_Calendar_timeFormat,timeFormat>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+API::
+<<gui_Calendar_addEvent,addEvent>> -
+<<gui_Calendar_removeAllEvents,removeAllEvents>> -
+<<gui_Calendar_removeEvent,removeEvent>> -
+<<gui_Calendar_setEventProvider,setEventProvider>> -
+<<gui_Calendar_setDayNames,setDayNames>>
+
+监听器::
+<<gui_Calendar_CalendarBackwardClickListener,CalendarBackwardClickListener>> -
+<<gui_Calendar_CalendarDateClickListener,CalendarDateClickListener>> -
+<<gui_Calendar_CalendarEventClickListener,CalendarEventClickListener>> -
+<<gui_Calendar_CalendarEventMoveListener,CalendarEventMoveListener>> -
+<<gui_Calendar_CalendarEventResizeListener,CalendarEventResizeListener>> -
+<<gui_Calendar_CalendarForwardClickListener,CalendarForwardClickListener>> -
+<<gui_Calendar_CalendarRangeSelectListener,CalendarRangeSelectListener>> -
+<<gui_Calendar_CalendarWeekClickListener,CalendarWeekClickListener>>
+
+'''
+

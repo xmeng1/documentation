@@ -1,0 +1,43 @@
+:sourcesdir: ../../../../../source
+
+[[fileLoader]]
+===== FileLoader 接口
+
+使用 `FileLoader` 接口可以在中间层和客户端层使用相同的一组方法处理文件存储。文件的上传和下载是使用“流”的方式执行的：
+
+* `saveStream()` – 将 `InputStream` 内容保存到文件存储中。
+
+* `openStream()` – 返回输入流以从文件存储加载文件内容。
+
+[TIP]
+====
+`FileLoader` 的客户端和服务端实现遵循通用规则：始终通过在输入和输出流之间复制数据来进行文件传输。在应用程序的任何层，文件都不会完全加载到内存中，从而可以传输几乎任何大小的文件。
+====
+
+作为使用 `FileLoader` 的一个例子，我们考虑一个简单的任务，将用户输入的内容保存到文本文件中，并在同一界面上的另一个字段中显示文件内容。
+
+该界面包含两个 `textArea` 字段。假设用户在第一个 `textArea` 中输入文本，单击下面的 `buttonIn`，文本将保存到 `FileStorage`。通过单击 `buttonOut`，第二个 `textArea` 将显示保存文件的内容。
+
+下面是上述界面的 XML 描述片段：
+
+
+[source, xml]
+----
+include::{sourcesdir}/features/fileLoader_1.xml[]
+----
+界面控制器包含两个按钮上调用的方法：
+
+
+* 在 `onButtonInClick()` 方法中，我们用第一个 `textArea` 的输入内容创建一个字节数组。然后我们创建一个 `FileDescriptor` 对象，并使用其属性定义新文件名、扩展名、大小和创建日期。
++
+然后我们使用 `FileLoader` 的 `saveStream()` 方法保存新文件，将 `FileDescriptor` 传递给它，并使用 `InputStream` supplier 提供文件内容。最后使用 `DataManager` 接口将 `FileDescriptor` 提交到数据存储。
+
+* 在 `onButtonOutClick()` 方法中，我们使用 `FileLoader` 的 `openStream()` 方法提取保存的文件的内容。然后我们在第二个 `textArea` 中显示文件的内容。
+
+[source, java]
+----
+include::{sourcesdir}/features/fileLoader_1.java[]
+----
+
+image::fileLoader_recipe.png[align="center"]
+

@@ -1,0 +1,14 @@
+:sourcesdir: ../../../source
+
+[[architecture]]
+=== 架构
+
+本节从不同的角度介绍 CUBA 应用程序的体系结构，将按层(tier)、块(block)、模块(module)和组件(component)来介绍。
+
+include::architecture/app_tiers.adoc[]
+
+include::architecture/app_modules.adoc[]
+
+include::architecture/app_components.adoc[]
+
+include::architecture/app_structure.adoc[]

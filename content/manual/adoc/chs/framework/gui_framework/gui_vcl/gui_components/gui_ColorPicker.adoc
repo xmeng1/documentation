@@ -1,0 +1,116 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_ColorPicker]]
+====== 颜色选择器
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-colorpicker" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/ColorPicker.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`ColorPicker` - 颜色选择器可以让用户预览并选择一种颜色。以 String 类型返回所选颜色的十六进制值。
+
+image::gui_color_picker.png[align="center"]
+
+以下为颜色选择器示例，它的标题取自本地化消息包：
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/colorpicker_1.xml[]
+----
+
+下图为一个颜色选择弹窗关闭状态下的颜色选择器示例。
+
+image::gui_color_picker_mini.png[align="center"]
+
+如果需要将颜色选择器与数据关联，需要使用 <<gui_attr_dataContainer,dataContainer>> 和 <<gui_attr_property,property>> 属性。
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/colorpicker_2.xml[]
+----
+
+`colorPicker` - 颜色选择器的属性:
+
+[[gui_ColorPicker_buttonCaption]]
+* `buttonCaption` - 显示在组件按钮上的标题。
+
+[[gui_ColorPicker_defaultCaptionEnabled]]
+* `defaultCaptionEnabled` - 这个属性设置为 `true` 并且 `buttonCaption` 未设置时, 控件按钮上的标题为颜色的 HEX 值。
+
+[[gui_ColorPicker_historyVisible]]
+* `historyVisible` - 标识是否在弹出窗口显示最近选择过的颜色。
+
+[[gui_ColorPicker_tabVisibility]]
+以下属性用来控制哪些标签页可见：
+
+* `rgbVisible` - 控制 RGB 标签页是否可见。
+* `hsvVisible` - 控制 HSV 标签页是否可见。
+* `swatchesVisible` - 控制调色板标签页是否可见。
+
+默认情况下只有 RGB 标签页可见。
+
+[[gui_ColorPicker_captions]]
+如果需要在弹出窗口重新定义标签上的文字，可以使用以下属性：
+
+* `popupCaption` - 弹出窗口标题。
+* `confirmButtonCaption` - 确认按钮的标题。
+* `cancelButtonCaption` - 取消按钮的标题。
+* `swatchesTabCaption` - 调色板标签页标题。
+* `lookupAllCaption` - 查找所有颜色的标题。
+* `lookupRedCaption` - 查找红色的标题。
+* `lookupGreenCaption` - 查找绿色的标题。
+* `lookupBlueCaption` - 查找蓝色的标题。
+
+`getValue()` 方法返回 String 类型，其中包含所选颜色的 HEX 码。
+
+'''
+
+colorPicker - 颜色选择器的属性列表::
+<<gui_attr_align,align>> -
+<<gui_ColorPicker_buttonCaption,buttonCaption>> -
+<<gui_ColorPicker_captions,cancelButtonCaption>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_ColorPicker_captions,confirmButtonCaption>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_ColorPicker_defaultCaptionEnabled,defaultCaptionEnabled>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_ColorPicker_historyVisible,historyVisible>> -
+<<gui_ColorPicker_tabVisibility,hsvVisible>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_ColorPicker_captions,lookupAllCaption>> -
+<<gui_ColorPicker_captions,lookupBlueCaption>> -
+<<gui_ColorPicker_captions,lookupGreenCaption>> -
+<<gui_ColorPicker_captions,lookupRedCaption>> -
+<<gui_ColorPicker_captions,popupCaption>> -
+<<gui_ColorPicker_tabVisibility,rgbVisible>> -
+<<gui_attr_required,required>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_ColorPicker_captions,swatchesTabCaption>> -
+<<gui_ColorPicker_tabVisibility,swatchesVisible>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+API::
+<<gui_api_addValueChangeListener,addValueChangeListener>> -
+<<gui_api_contextHelp,setContextHelpIconClickHandler>>
+
+'''
+

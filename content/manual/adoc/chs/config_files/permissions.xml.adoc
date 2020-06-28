@@ -1,0 +1,39 @@
+:sourcesdir: ../../../source
+
+[[permissions.xml]]
+=== permissions.xml
+
+这个类型的文件用在 Web 客户端 block,用来注册特殊的用户<<permissions,权限>>。
+
+文件的路径通过 <<cuba.permissionConfig,cuba.permissionConfig>> 应用程序属性指定。当通过 Studio 创建新项目的时候，会在 *web* 模块包的根目录创建 `web-permissions.xml` 文件，比如 `modules/web/src/com/company/sample/web-permissions.xml`。
+
+XML schema： {xsd_url}/permissions.xsd。
+
+这个文件有如下结构：
+
+`permission-config` - 根节点元素。
+
+`permission-config` 的元素：
+
+* `specific` - 特殊权限描述符。
++
+`specific` 的元素：
+
+** `category` - 权限种类，用来给<<roles,角色>>编辑界面的权限做分组。`id` 属性用来作为从<<main_message_pack,主语言包>>种获取种类的本地化语言翻译的键值。
+
+** `permission` - 已配置的权限。`id` 属性用来通过 `Security.isSpecificPermitted()` 方法获取权限值，也作为从<<main_message_pack,主语言包>>种获取权限名称本地化语言翻译的键值，作为显示在<<roles,角色>>编辑界面权限的名称。
+
+示例：
+
+[source, xml]
+----
+<permission-config xmlns="http://schemas.haulmont.com/cuba/permissions.xsd">
+    <specific>
+        <category id="app">
+            <permission id="app.doSomething"/>
+            <permission id="app.doSomethingOther"/>
+        </category>
+    </specific>
+</permission-config>
+---- 
+

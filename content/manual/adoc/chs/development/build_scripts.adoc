@@ -1,0 +1,25 @@
+:sourcesdir: ../../../source
+
+[[build_scripts]]
+=== 构建脚本
+
+基于 CUBA 框架的项目采用 *Gradle* 系统来构建。构建脚本是在项目根目录下的两个文件：
+
+* `settings.gradle` – 定义项目名称和<<app_modules,模块组>>。
+
+* `build.gradle` – 构建配置文件。
+
+本章节介绍构建脚本的结构以及 Gradle 任务参数说明。
+
+include::build_scripts/build.gradle.adoc[]
+
+include::build_scripts/access_to_repo.adoc[]
+
+include::build_scripts/support_for_kotlin.adoc[]
+
+include::build_scripts/build.gradle_tasks.adoc[]
+
+include::build_scripts/build_task_start.adoc[]
+
+include::build_scripts/private_repo.adoc[]
+

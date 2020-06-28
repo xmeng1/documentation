@@ -1,0 +1,30 @@
+:sourcesdir: ../../../../../source
+
+[[configuration]]
+===== Configuration
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/global/Configuration.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+该接口有助于获取<<config_interfaces,配置接口>>的引用。
+
+例如:
+
+[source, java]
+----
+include::{sourcesdir}/common/configuration_1.java[]
+----
+
+[source, java]
+----
+include::{sourcesdir}/common/configuration_2.java[]
+----
+
+[source, java]
+----
+include::{sourcesdir}/common/configuration_3.java[]
+----
+

@@ -1,0 +1,87 @@
+:sourcesdir: ../../../../source
+
+[[roles]]
+==== 角色
+
+角色包含<<permissions,权限许可>>集合，可以给用户分配角色。
+
+一个用户可以有多个角色，角色之间以组合（逻辑或）的关系进行计算。例如，一个用户拥有角色 A 和 B，角色 A 未设置对 X 的权限，角色 B 允许 X，那么，X 对用户是允许的。
+
+一个角色可以对单独客体赋予权限，也可以为一个种类的客体：界面、实体操作、实体属性、特殊功能权限。比如，可以很容易的配置所有实体的读取权限以及这些实体属性的查看权限。
+
+但是界面组件权限却是上面规则的例外：只能给具体组件定义，而且如果没有角色定义组件的权限，则该组件对用户没有限制。
+
+对于用户来说，可以有一个 “默认” 角色，也就是说这个角色会自动分配给新创建的用户，以便默认给每个新用户一组特定的权限。
+
+[[roles_design_time]]
+设计时（Design-time）定义角色::
++
+--
+推荐定义角色的方式是创建一个继承 `AnnotatedRoleDefinition` 的类，重写返回不同客体类型权限的方法，并添加注解指定角色所包含的权限。该类必须存在于 `core` 模块。例如，一个能赋予使用 `Customer` 实体及其浏览和编辑界面的角色可以如下配置：
+
+[source,java]
+----
+include::{sourcesdir}/security/roles_1.java[]
+----
+
+注解可以指定多次。例如，下面的角色赋予所有实体和属性的读取权限、允许修改 customer 的 `grade` 和 `comments` 属性、允许创建/更新 order 实体及其所有属性：
+
+[source,java]
+----
+include::{sourcesdir}/security/roles_2.java[]
+----
+
+[WARNING]
+====
+只有 <<cuba.security.rolesPolicyVersion,cuba.security.rolesPolicyVersion>> 设置为 2 时，才能在设计时创建角色，该配置是使用 CUBA 7.2+ 创建新项目的默认配置。如果是从之前版本迁移至新版，请参阅 <<legacy_roles>>。
+====
+--
+
+[[roles_run_time]]
+运行时定义角色::
++
+--
+框架带有在已经运行应用程序中定义角色的 UI 界面：*Administration - 管理 > Roles - 角色*。运行时定义的角色可以修改或删除。设计时定义的角色为只读。
+
+在角色编辑界面的顶部，可以定义通用角色参数。界面的底部有定义权限的标签页。
+
+* *Screens - 界面权限* 标签页配置界面权限。树状结构展示应用程序主菜单的结构。如需设置主菜单访问不到的界面权限（比如，实体编辑界面），可以在最后一个树节点 *Other screens - 其它界面* 内找到。
++
+*Allow all screens - 允许所有界面* 复选框能一次性允许所有界面访问。与 `@ScreenAccess(screenIds = "*")` 功能一样。
+
+* *Entities - 实体权限* 标签页配置实体操作权限。*Assigned only - 显示已分配* 复选框默认选中，此时表格中只显示该角色已配置权限的实体。因此，如果是新角色，表格中无数据。如要添加权限，反选 *Assigned only* 并点击 *Apply - 应用*。如要过滤实体列表，可在 *Entity - 实体* 字段输入实体名称的一部分并点击 *Apply*。*System level - 系统级别* 复选框选中可以查看并选择系统实体，系统实体使用 `@SystemLevel` 注解标记，默认不显示。
++
+使用 *Allow all entities - 允许所有实体* 面板启用对所有实体的操作，与 `@EntityAccess(entityName = "*", ...)` 功能一样。
+
+* *Attributes - 属性权限* 标签页配置实体属性权限。实体表格的 *Permissions - 权限* 列展示已配置权限的实体属性列表。实体列表与 *Entities* 标签页的实体列表使用一样的管理方式。
++
+使用 *Allow all attributes - 允许所有属性* 面板启用对所有实体所有属性的查看或编辑。如果您需要对某一实体启用全部属性，为该实体在 *Permissions* 面板底部选择 "++*++" 复选框。代码中，可以在 `@EntityAttributeAccess` 注解中使用 "*" 通配符作为 `entityName` 和 `view/modify` 属性的值。
+
+* *Specific - 特定权限* 标签页配置特殊功能权限。由 <<permissions.xml,permissions.xml>> 文件定义项目中用到的特殊权限名称。
++
+*Allow all specific permissions - 允许所有特定权限* 复选框功能与 `@SpecificAccess(permissions = "*")` 一样。
+
+* *UI - 界面元素权限* 标签页配置 UI 界面组件权限。如需创建一个许可，在 *Screen - 界面* 下拉框选择需要配置的界面，然后在 *Component - 组件* 字段配置组件路径，并点击 *Add - 添加*。根据 <<permissions>> 章节描述的规则配置客体组件。可以使用 *Components tree - 组件树* 按钮查看界面组件结构：在树状结构中选择一个组件然后点击右键菜单的 *Copy id to path - 复制id*。
+--
+
+[[security_scope]]
+安全范围::
++
+--
+_Security scopes - 安全范围_ 可以依据使用的不同客户端技术为用户配置不同的角色组（因此有不同的权限）。安全范围使用 `@Role` 注解的 `securityScope` 属性设置，如果此角色是运行时定义的，则可以使用角色编辑界面的 *Security scope - 安全范围* 字段设置。
+
+核心框架只有单一客户端 - <<gui_framework,通用用户界面>>，因此所有角色默认具有 `GENERIC_UI` 权限范围。所有登录通用 UI 的用户将获得有该标签的一组角色。
+
+{rest_man_url}[REST API 插件] 定义其自有的 `REST` 权限范围，因此如果项目中添加了该插件，需要为使用 REST API 登录系统的用户配置另一组角色。如果不这样做，用户将不能通过 REST 登录，因为这些用户不会有任何权限，也包括 `cuba.restApi.enabled` 的特定权限。
+--
+
+[[system_roles]]
+系统角色::
++
+--
+框架为 `GENERIC_UI` 范围提供两个预定义的角色：
+
+* `system-minimal` 角色包含最小的一组权限，允许用户使用通用 UI。通过 `MinimalRoleDefinition` 类定义。该角色赋予用户 `cuba.gui.loginToClient` 特定权限，以及访问某些系统级实体和界面的权限。`system-minimal` 角色设置了 `default` 属性，因此会自动为新用户分配该角色。
+
+* `system-full-access` 角色具有全部的许可，可以用来创建系统管理员。系统自带的 `admin` 用户就默认分配该角色。
+--

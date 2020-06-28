@@ -1,0 +1,662 @@
+:sourcesdir: ../../../../../../source
+
+[[entity_attr_annotations]]
+====== 属性注解
+
+应该为相应的字段设置属性注解，此情况除外：如果需要声明只读且非持久属性 `foo`，则只创建 `getFoo()` 方法并使用 `@MetaProperty` 注解就可以了。
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/annotation/CaseConversion.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[caseconversion_annotation]]
+@CaseConversion::
++
+--
+表明使用此注解的实体属性绑定的文本输入框控件会自动转换大小写。
+
+参数:
+
+* `type` - 转换类型：`UPPER`（默认值）、`LOWER`。
+
+示例：
+
+[source, java]
+----
+@CaseConversion(type = ConversionType.UPPER)
+@Column(name = "COUNTRY_CODE")
+protected String countryCode;
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/Column.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[column_annotation]]
+@Column::
++
+--
+定义用于存储属性值的 DB 列。
+
+参数:
+
+* `name` – 列名。
+
+* `length` – （可选参数，默认为 `255` ） - 列字段的长度。还用于生成<<metadata_framework,元数据>>，可以限制绑定到此属性的可视化组件中输入文本的最大长度。添加 `@Lob` 注解可以移除对属性长度的限制。
+
+* `nullable` – （可选参数，默认为 `true` ） - 确定属性是否可以包含 `null` 值。当 `nullable = false` 时，JPA 会确保该字段在保存时有值。此外，带有该属性的可视化组件会要求用户必须输入值。
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/chile/core/annotations/Composition.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[composition_annotation]]
+@Composition::
++
+--
+表示一种组合的关系，是比关联更紧密的一种关系。本质上，这意味着相关实体仅作为已有实体的一部分存在，也就是与已有实体一起创建和删除。
+
+例如，订单中的条目列表（ `Order` 类包含 `Item` 实例的集合，`Item` 实例不能独立存在）：
+
+[source, java]
+----
+@OneToMany(mappedBy = "order")
+@Composition
+protected List<Item> items;
+----
+
+另一个例子是一对一的关系：
+
+[source, java]
+----
+@Composition
+@OneToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "DETAILS_ID")
+protected CustomerDetails details;
+----
+
+选择 `@Composition` 注解类型的关系可以在<<screen_edit,编辑界面>>中使用数据源的特殊提交模式。在此模式下，仅在提交主实体时保存对关联实例的更改。详细信息，请参阅<<composition_recipe>>。
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/Embedded.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[embedded_annotation]]
+@Embedded::
++
+--
+定义可嵌入类型的引用属性。被引用实体应该具有 `@Embeddable` 注解。
+
+例如:
+
+[source, java]
+----
+@Embedded
+protected Address address;
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/annotation/EmbeddedParameters.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[embeddedParameters_annotation]]
+@EmbeddedParameters::
++
+--
+默认情况下，如果嵌入实体的所有属性在数据库中为空，则 <<orm,ORM>> 不会创建嵌入实体的实例。当实例始终为非空时，可以使用 `@EmbeddedParameters` 注解指定不同的行为，例如：
+
+[source, java]
+----
+@Embedded
+@EmbeddedParameters(nullAllowed = false)
+protected Address address;
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/Id.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[id_annotation]]
+@Id::
++
+--
+表示该属性是实体主键。通常，此注解在基类的字段上设置，例如 <<base_entity_classes,BaseUuidEntity>>。仅在继承 `BaseStringIdEntity` 基类（即用于创建主键是字符串类型的实体）的情况下，才需要对特定实体类使用此注解。
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/annotation/IgnoreUserTimeZone.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[ignoreUserTimeZone]]
+@IgnoreUserTimeZone::
++
+--
+使框架忽略时间戳类型属性的用户<<timeZone,时区>>（如果当前会话设置了时区），时间戳属性使用 `@javax.persistence.Temporal.TIMESTAMP` 注解。
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/JoinColumn.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[joinColumn_annotation]]
+@JoinColumn::
++
+--
+定义确定实体之间关系的 DB 列。存在此注解则表示该关联关系的拥有方（owning side）。
+
+参数:
+
+* `name` – 列名
+
+例如:
+
+[source, java]
+----
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "CUSTOMER_ID")
+protected Customer customer;
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/JoinTable.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[joinTable_annotation]]
+@JoinTable::
++
+--
+定义 `@ManyToMany` 关系拥有方的关联表。
+
+参数:
+
+* `name` – 关联表表名
+
+* `joinColumns` – 关联表中的 `@JoinColumn` 元素对应于关联关系拥有方的主键（包含 `@JoinTable` 注解的那个）
+
+* `inverseJoinColumns` – 关联表中的 `@JoinColumn` 元素对应于关系非拥有方（non-owning side）的主键。
+
+关系拥有方的 `Group` 类的 `customers` 属性示例：
+
+[source, java]
+----
+@ManyToMany
+@JoinTable(name = "SALES_CUSTOMER_GROUP_LINK",
+ joinColumns = @JoinColumn(name = "GROUP_ID"),
+ inverseJoinColumns = @JoinColumn(name = "CUSTOMER_ID"))
+protected Set<Customer> customers;
+----
+
+同一关系非拥有方的 `Customer` 类的 `groups` 属性的示例：
+
+[source, java]
+----
+@ManyToMany(mappedBy = "customers")
+protected Set<Group> groups;
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/Lob.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[lob_annotation]]
+@Lob::
++
+--
+表示该属性没有任何长度限制。此注解与 `@Column` 注解一起使用。如果设置了 `@Lob`，则忽略 `@Column` 中的默认或明确定义的长度。
+
+示例：
+
+[source, java]
+----
+@Column(name = "DESCRIPTION")
+@Lob
+private String description;
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/annotation/LocalizedValue.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[localizedValue_annotation]]
+@LocalizedValue::
++
+--
+确定获取属性的本地化值的方法，实现是使用 <<messageTools,MessageTools>>.`getLocValue()` 方法获取本地化值。
+
+参数:
+
+* `messagePack` – 显式定义从哪个包中获取本地化消息的包名，例如，`com.haulmont.cuba.core.entity`。
+
+* `messagePackExpr` – 定义包名路径的表达式，包含本地化消息的包名称（例如，`proc.messagesPack`）。路径从当前实体的属性开始。
+
+下面示例中的注解表明 `state` 属性值的本地化消息应该从 `proc` 实体的 `messagesPack` 属性中定义的包中获取。
+
+[source, java]
+----
+@Column(name = "STATE")
+@LocalizedValue(messagePackExpr = "proc.messagesPack")
+protected String state;
+
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "PROC_ID")
+protected Proc proc;
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/annotation/Lookup.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[lookup_annotation]]
+@Lookup::
++
+--
+定义引用属性的查找类型设置。
+
+参数:
+
+* `type` - 默认值为 `SCREEN`，表示从<<screen_lookup,查找界面>>中选择引用。 `DROPDOWN` 表示从下拉列表中选择引用。如果查找类型设置为 `DROPDOWN`，则在创建编辑界面时，Studio 将生成<<gui_collection_container,集合数据容器>>。因此，应在生成实体编辑界面之前设置查找类型参数。此外，<<gui_Filter,Filter>> 组件将允许用户从下拉列表中而不是查找界面中选择此类型的参数。
+
+* `actions` - 定义默认情况下要在 FieldGroup 内的 PickerField 组件中使用的操作。可能的值：`lookup` 、 `clear` 、 `open`。
+
+[source, java]
+----
+@Lookup(type = LookupType.DROPDOWN, actions = {"open"})
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "CUSTOMER_ID")
+protected Customer customer;
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/ManyToMany.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[manyToMany_annotation]]
+@ManyToMany::
++
+--
+定义具有多对多关系类型的集合属性。
+
+多对多关系可以有一个拥有方和一个反向的非拥有方。拥有方应使用 `@JoinTable` 注解，非拥有方则使用 `mappedBy` 参数。
+
+参数:
+
+* `mappedBy` – 关系拥有方引用实体的字段。只能在关系的非拥有方进行设置。
+
+* `targetEntity` – 引用实体的类型。如果使用 Java 泛型声明集合，则此参数是可选的。
+
+* `fetch` – （可选参数，默认为 `LAZY` ） - 定义 JPA 是否会以<<eager_fetching,贪婪>>的方式加载引用实体的集合。此参数应始终保持为 `LAZY`，因为 CUBA 应用程序中是通过<<views,视图>>机制确定如何加载引用实体。
+
+[WARNING]
+====
+不推荐使用 `cascade` 注解属性。使用此注解会隐式的对实体进行持久化和合并，这将绕过某些系统机制。特别是，<<entityStates,EntityStates>> bean 将不能正确地检测托管状态，并且根本不会调用<<entity_listeners, 实体监听器>>。
+====
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/ManyToOne.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[manyToOne_annotation]]
+@ManyToOne::
++
+--
+定义具有多对一关系类型的引用属性。
+
+参数:
+
+* `fetch` – （默认情况下为 `EAGER` ）参数，用于确定 JPA 是否以 <<eager_fetching,贪婪>>的方式加载引用的实体。此参数应始终设置为 `LAZY`，因为 CUBA 应用程序中是通过<<views,视图>>机制确定如何加载引用实体。
+
+* `optional` – （可选参数，默认情况下为 `true`）– 表明属性是否可以包含 `null` 值。如果 `optional = false`，JPA 会确保在保存实体时引用存在。此外，使用此属性的可视化组件会要求用户输入值。
+
+例如，几个 `Order` 实例引用相同的 `Customer` 实例。在这种情况下，`Order.customer` 属性应该具有以下注解：
+
+[source, java]
+----
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "CUSTOMER_ID")
+protected Customer customer;
+----
+
+[WARNING]
+====
+不推荐使用 `cascade` 注解属性。使用此注解会隐式的对实体进行持久化和合并，这将绕过某些系统机制。特别是，<<entityStates,EntityStates>> bean 将不能正确地检测托管状态，并且根本不会调用 <<entity_listeners, 实体监听器>>。
+====
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/chile/core/annotations/MetaProperty.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[metaProperty_annotation]]
+@MetaProperty::
++
+--
+表明<<metadata_framework,元数据>>应包含带有此注解的属性。可以为字段设置此注解，但是如果没有字段，也可以为 getter 方法设置此注解。
+
+已经带有 `javax.persistence` 包中的以下注解的字段不需要这个注解：`@Column`、`@OneToOne`、`@OneToMany`、`@ManyToOne`、`@ManyToMany`、`@Embedded`。这些字段自动包含在元数据中。因此，`@MetaProperty` 主要用于定义实体的非持久化属性。
+
+参数（可选）:
+
+* `mandatory` - 确定属性是否可以包含 `null` 值。如果 `mandatory = true`，使用此属性的可视化组件会要求用户输入值。
+
+* `datatype` - 显式定义<<datatype,数据类型>>，将会覆盖根据属性的 Java 类型推断的数据类型。
+
+* `related` - 当此属性包含在<<views,视图>>中时，定义从数据库中提取的与该属性相关联的其他持久化属性的数组。还有，如果此注解用在 getter 方法上，比如该属性为只读属性，那么关联属性的改动会为该只读属性产生 `PropertyChangeEvent` 事件。此功能可以帮助展示该只读属性的 UI 组件更新页面。
+
+字段示例:
+
+[source, java]
+----
+@Transient
+@MetaProperty
+protected String token;
+----
+
+方法示例:
+
+[source, java]
+----
+@MetaProperty(related = "firstName,lastName")
+public String getFullName() {
+    return firstName + " " + lastName;
+}
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/chile/core/annotations/NumberFormat.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[numberFormat_annotation]]
+@NumberFormat::
++
+--
+指定 `Number` 类型（`BigDecimal` 、 `Integer` 、 `Long` 或 `Double`）属性的格式。在所有的 UI 展示中，将按照注解参数提供的格式对属性值进行格式化和解析：
+
+* `pattern` -  https://docs.oracle.com/javase/8/docs/api/java/text/DecimalFormat.html[DecimalFormat] 所描述的格式模板.
+
+* `decimalSeparator` - 用作小数位分隔符的字符（可选）。
+
+* `groupingSeparator` - 用作千位分隔符的字符（可选）。
+
+如果未指定 `decimalSeparator` 或 `groupingSeparator`，框架会使用当前用户的本地化格式字符串或服务器操作系统的本地化格式字符串。
+
+例如:
+
+[source, java]
+----
+@Column(name = "PRECISE_NUMBER", precision = 19, scale = 4)
+@NumberFormat(pattern = "0.0000")
+protected BigDecimal preciseNumber;
+
+@Column(name = "WEIRD_NUMBER", precision = 19, scale = 4)
+@NumberFormat(pattern = "#,##0.0000", decimalSeparator = "_", groupingSeparator = "`")
+protected BigDecimal weirdNumber;
+
+@Column(name = "SIMPLE_NUMBER")
+@NumberFormat(pattern = "#")
+protected Integer simpleNumber;
+
+@Column(name = "PERCENT_NUMBER", precision = 19, scale = 4)
+@NumberFormat(pattern = "#%")
+protected BigDecimal percentNumber;
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/annotation/OnDelete.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[onDelete_annotation]]
+@OnDelete::
++
+--
+在实体软删除的情况下，确定关联实体的处理策略。参阅<<soft_deletion>>。
+
+例如:
+
+[source, java]
+----
+@OneToMany(mappedBy = "group")
+@OnDelete(DeletePolicy.CASCADE)
+private Set<Constraint> constraints;
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/annotation/OnDeleteInverse.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[onDeleteInverse_annotation]]
+@OnDeleteInverse::
++
+--
+从关系的反向软删除实体的情况下，确定属性关联实体的处理策略。参阅 <<soft_deletion>>。
+
+例如:
+
+[source, java]
+----
+@ManyToOne
+@JoinColumn(name = "DRIVER_ID")
+@OnDeleteInverse(DeletePolicy.DENY)
+private Driver driver;
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/OneToMany.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[oneToMany_annotation]]
+@OneToMany::
++
+--
+定义一对多关系类型的集合属性。
+
+参数:
+
+* `mappedBy` – 引用实体的字段，通过此字段建立关联。
+
+* `targetEntity` – 引用实体的类型。如果使用 Java 泛型声明的集合，则此参数是可选的。
+
+* `fetch` – （可选参数，默认为 `LAZY`） - 确定 JPA 是否以<<eager_fetching,贪婪>>的方式加载引用实体的集合。此参数应始终保持为 `LAZY`，因为 CUBA 应用程序中是通过<<views,视图>>机制确定如何加载引用实体。
+
+例如，几个 `Item` 实例使用 `@ManyToOne`  注解的字段 `Item.order` 引用相同的 `Order` 实例。在这种情况下，`Order` 类可以包含 `Item` 实例的集合：
+
+[source, java]
+----
+@OneToMany(mappedBy = "order")
+protected Set<Item> items;
+----
+
+[WARNING]
+====
+不推荐使用 JPA `cascade` 和 `orphanRemoval` 注解属性。使用此注解会隐式的对实体进行持久化和合并，这将绕过某些系统机制。特别是，<<entityStates,EntityStates>> bean 将不能正确地检测托管状态，并且根本不会调用 <<entity_listeners,实体监听器>>。`orphanRemoval` 注解属性不遵循 <<soft_deletion,软删除>>机制。
+====
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/OneToOne.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[oneToOne_annotation]]
+@OneToOne::
++
+--
+使用一对一关系类型定义引用属性。
+
+参数:
+
+* `fetch` –（默认情况下为 `EAGER`）确定 JPA 是否会 <<eager_fetching, 贪婪>>的方式加载引用的实体。此参数应设置为 `LAZY`，因为 CUBA 应用程序中是通过<<views,视图>>机制确定如何加载引用实体。
+
+* `mappedBy` – 引用实体的字段，使用这个字段建立关联。只能设置在关系的非拥有方。
+
+* `optional` – （可选参数，默认为 `true` ）- 指示属性是否可以包含 `null` 值。如果 `optional = false`，JPA 确保在保存实体时存在引用。此外，使用此属性的可视化组件会要求用户输入值。
+
+`Driver` 类中关系的拥有方示例：
+
+[source, java]
+----
+@OneToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "CALLSIGN_ID")
+protected DriverCallsign callsign;
+----
+
+`DriverCallsign` 类中关系的非拥有方示例：
+[source, java]
+----
+@OneToOne(fetch = FetchType.LAZY, mappedBy = "callsign")
+protected Driver driver;
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/OrderBy.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[orderBy_annotation]]
+@OrderBy::
++
+--
+定义从数据库检索关联时集合属性中元素的顺序。需要对有序的 Java 集合（例如 `List` 或 `LinkedHashSet` ）指定此注解，这样获得可预测的元素序列。
+
+参数:
+
+* `value` – 确定排序的字符串格式：
+
+[source, plain]
+----
+orderby_list::= orderby_item [,orderby_item]*
+orderby_item::= property_or_field_name [ASC | DESC]
+----
+
+例如:
+
+[source, java]
+----
+@OneToMany(mappedBy = "user")
+@OrderBy("createTs")
+protected List<UserRole> userRoles;
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/Temporal.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[temporal_annotation]]
+@Temporal::
++
+--
+指定 `java.util.Date` 类型属性的存储值类型：日期、时间或日期加时间。
+
+参数:
+
+* `value` – 存储值的类型：`DATE` 、 `TIME` 、 `TIMESTAMP`
+
+例如:
+
+[source, java]
+----
+@Column(name = "START_DATE")
+@Temporal(TemporalType.DATE)
+protected Date startDate;
+----
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/Transient.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[transient_annotation]]
+@Transient::
++
+--
+表示该字段不存储在数据库中，即属性是非持久化的。
+
+字段的类型如果是 JPA 支持的（请参阅 link:$$http://docs.oracle.com/javaee/7/api/javax/persistence/Basic.html$$[Basic 注解类型]），那么在默认情况下是持久化的，这就是为什么对于这些类型的非持久化属性必须要加上 `@Transient` 注解。
+
+如果元数据中需要包含 `@Transient` 属性，应该给属性加上 <<metaProperty_annotation,@MetaProperty>> 注解。
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/Version.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[version_annotation]]
+@Version::
++
+--
+表明注解的字段是用于支持<<optimistic_locking,乐观锁>>的版本字段。
+
+当实体类实现 `Versioned` 接口时，需要这样的字段，`StandardEntity` 基类已经包含这样的字段。
+
+例如:
+
+[source, java]
+----
+@Version
+@Column(name = "VERSION")
+private Integer version;
+----
+--
+

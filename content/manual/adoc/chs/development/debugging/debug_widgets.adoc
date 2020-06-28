@@ -1,0 +1,25 @@
+:sourcesdir: ../../../../source
+
+[[debug_widgets]]
+==== 调试 web Widgets
+
+可以在浏览器使用 *GWT Super Dev Mode - GWT 超级开发模式* 来调试 web widgets。
+
+. 在 `build.gradle` 里设置 <<build.gradle_debugWidgetSet,debugWidgetSet>> 任务。
+
+. 部署应用程序并启动 Tomcat。
+
+. 执行 `debugWidgetSet` 任务：
++
+`gradlew debugWidgetSet`
++
+运行中的 GWT 代码服务会在修改代码的时候自动重编译。
+
+. 在 Chrome 浏览器打开 `++http://localhost:8080/app?debug&superdevmode++` 然后等待 widgetset 第一次构建。
+
+. 在 Chrome 打开调试控制器窗口：
++
+image::debugWidgetSet_chrome_console.png[align="center"]
+
+. 在 `web-toolkit` 模块修改了 Java 代码之后，刷新浏览器页面。Widgetset 会重新增量构建，大概需要 8-10 秒时间。
+

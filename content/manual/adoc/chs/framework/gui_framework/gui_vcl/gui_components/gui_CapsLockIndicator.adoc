@@ -1,0 +1,56 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_CapsLockIndicator]]
+====== 大小写锁定提示器
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=capslock-indicator" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+这个组件在用户使用 <<gui_PasswordField,PasswordField>> 输入密码的时候提示用户是否开启了大小写锁定。
+
+该组件对应的 XML 名称: `capsLockIndicator`
+
+image::gui_capsLockIndicator.png[align="center"]
+
+可以用 `capsLockOnMessage` 和 `capsLockOffMessage` 属性来定义大小写锁定开启和关闭时的提示信息。
+
+示例:
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/capsLockIndicator.xml[]
+----
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/capsLockIndicator.java[]
+----
+
+`CapsLockIndicator` 组件被设计为配合 <<gui_PasswordField,PasswordField>> 一起使用，当 `PasswordField` 获得焦点的时候该组件处理大小写锁定状态，当 `PasswordField` 失去焦点时，大小写锁定的状态就变成 inactive 了。因为此时没法监控关联的密码控件输入情况了。
+
+可以用 <<gui_attr_visible,visible>> 属性来动态改变 `CapsLockIndicator` 的可见性。但是如果此时界面已经打开了，控制可见性就不一定能按预想工作。
+
+`CapsLockIndicator` 的展示可以使用带 `$cuba-capslockindicator-*` 前缀的 SCSS 变量进行自定义。可以在创建一个 <<web_theme_extension,主题扩展>> 或者一个 <<web_theme_creation,自定义主题>> 之后在可视化编辑器里修改这些变量的值。
+
+'''
+
+capsLockIndicator 的属性::
+
+<<gui_attr_align,align>> -
+<<gui_CapsLockIndicator,capsLockOffMessage>> -
+<<gui_CapsLockIndicator,capsLockOnMessage>> -
+<<gui_attr_colspan,colspan>> -
+<<gui_attr_css,css>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_id,id>> -
+<<gui_attr_rowspan,rowspan>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+'''
+

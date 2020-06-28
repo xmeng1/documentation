@@ -1,0 +1,77 @@
+:sourcesdir: ../../../../source
+
+[[app_components_usage]]
+==== 使用公共扩展组件
+
+可以通过以下方式将发布在市场上的扩展组件添加到项目中。第一种和第二种方法假设你使用的是一个<<access_to_repo,标准 CUBA 仓库>>。最后一种方法适用于开源扩展组件，不涉及任何远程仓库。
+
+[[app_components_usage_by_studio]]
+通过 Studio::
++
+--
+如果你使用 CUBA Studio 11+ 以上版本，需要使用 **CUBA Add-Ons** 窗口管理扩展，参考 {studio_man_url}/#add_ons[Studio 文档] 。
+
+如果使用的之前版本的 CUBA Studio，按照下面的步骤：
+
+. 编辑 *Project properties* 并在 *App components* 面板上单击 *Custom components* 旁边的加号按钮。
+
+. 从 Marketplace 页面或扩展组件的文档中复制扩展组件的 Maven 坐标，并将其粘贴到坐标输入框中，例如：
++
+[source, plain]
+----
+com.haulmont.addon.cubajm:cuba-jm-global:0.3.1
+----
+
+. 单击对话框中的 *OK*。Studio 将尝试在当前项目选择的仓库中查找扩展组件的二进制文件。如果找到，对话框将关闭，扩展组件将显示在自定义组件列表中。
+
+. 单击 *OK* 保存项目属性。
+--
+
+[[app_components_usage_manual_edit]]
+通过手动编辑::
++
+--
+. 编辑 `build.gradle` 并在根 `dependencies` 元素中指定扩展组件的坐标：
++
+[source, groovy]
+----
+dependencies {
+    appComponent("com.haulmont.cuba:cuba-global:$cubaVersion")
+    // your add-ons go here
+    appComponent("com.haulmont.addon.cubajm:cuba-jm-global:0.3.1")
+}
+----
+
+. 在命令行中执行 `gradlew idea` 以在项目的开发环境中包含扩展组件。
+
+. 编辑 `core` 和 `web` 模块的 `web.xml` 文件，并将扩展组件的标识符（等同于 Maven groupId）添加到 `appComponents` 上下文参数中以空格分隔的应用程序组件列表：
++
+[source, xml]
+----
+<context-param>
+    <param-name>appComponents</param-name>
+    <param-value>com.haulmont.cuba com.haulmont.addon.cubajm</param-value>
+</context-param>
+----
+--
+
+[[app_components_usage_from_sources]]
+通过源码构建::
++
+--
+. 将扩展组件的仓库克隆到本地目录，然后将项目导入 Studio。
+
+. 执行 *CUBA > Advanced > Install app component* 主菜单命令将扩展组件安装到本地 Maven 仓库（默认为 `~/.m2` 目录）。
+
+. 在 Studio 中打开项目，然后在 *Project > Properties* 中选上 *Use local Maven repository*。
+
+. 使用 Studio 中的 *CUBA Add-ons* 界面将扩展安装至项目中。参考 *Studio 用户手册* 的 {studio_man_url}/#add_ons[管理扩展] 章节的 *使用坐标安装扩展* 部分内容了解更多细节。
+
+. 单击对话框中的 *OK* 并保存项目属性。
+--
+
+[TIP]
+====
+如果一个项目使用了多个包含 **web-toolkit** 模块的扩展组件，那么项目本身也必须要有 **web-toolkit** 模块。如果没有的话，只会为应用程序从一个扩展中加载一个 widgetset。所以如果要集成所有的 widgetset，必须要有 **web-toolkit** 模块。
+====
+

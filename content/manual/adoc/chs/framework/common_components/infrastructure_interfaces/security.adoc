@@ -1,0 +1,18 @@
+:sourcesdir: ../../../../../source
+
+[[security]]
+===== Security
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/global/Security.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+此接口用于检查用户对系统中不同对象的访问权限。大多数接口方法委托给当前 <<userSession,UserSession>> 对象的相应方法，但在此之前，会搜索实体的原始 meta-class，这对于具有<<extension,扩展>>的项目很重要。
+除了复制 `UserSession` 功能的方法之外，该接口还包含 `isEntityAttrReadPermitted()` 和 `isEntityAttrUpdatePermitted()` 方法，这两个方法用于检查指定属性路径的可用性，在检查的过程中会检查包含在这个路径中的所有实体和属性的可用性。
+
+建议应用程序代码中使用 `Security` 接口，而不是直接调用 `UserSession.isXYXPermitted()` 方法。
+
+在<<authentication>>中查看更多信息。
+

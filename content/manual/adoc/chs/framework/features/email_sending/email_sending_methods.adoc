@@ -1,0 +1,19 @@
+:sourcesdir: ../../../../../source
+
+[[email_sending_methods]]
+===== 发送方法
+
+
+要发送电子邮件，在中间件上应使用 `EmailerAPI` bean，在客户端层使用 `EmailService` 服务。
+
+这些组件的基本方法如下所述：
+
+* `sendEmail()` – 同步发送消息。调用代码在消息发送到 SMTP 服务器前一直等待。
++
+消息内容由一组参数（逗号分隔的收件人列表，主题，内容，附件数组）组成，并以 `EmailInfo` 对象的形式传输，该对象封装了所有这些信息并允许显式设置发件人的地址并使用 *FreeMarker* 模板构造邮件正文。
++
+同步发送时可能会抛出 `EmailException`，其中包含投递失败的收件人地址的信息，以及相应的错误消息。
++
+执行该方法期间，在数据库中为每个收件人创建一个 `SendingMessage` 实例。发送状态初始值为 `SendingStatus.SENDING`，成功发送后状态变为 `SendingStatus.SENT`。如果消息发送错误，消息状态将更改为 `SendingStatus.NOTSENT`。
+
+* `sendEmailAsync()` - 异步发送消息。此方法返回在数据库中创建的 `SendingStatus.QUEUE` 状态的 `SendingMessage` 实例的列表（列表数量按收件人数）。实际发送是通过随后调用 `EmailerAPI.processQueuedEmails()` 方法执行的，需要为 <<scheduled_tasks, 计划任务>>设置符合期望的发送邮件频率来调用此方法。

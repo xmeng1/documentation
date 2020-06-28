@@ -1,0 +1,67 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_Link]]
+====== 链接组件
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-link" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/Link.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`Link` 链接组件为一个超链接，可以打开外部 web 资源。
+
+该组件的 XML 名称为： `link`
+
+以下为一个 `link` 的 XML 描述示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/link_1.xml[]
+---- 
+
+`link` 组件的属性:
+
+[[gui_Link_url]]
+* `url` – 对应 web 资源的 url 地址。
+
+[[gui_Link_target]]
+* `target` – 为 Web 客户端设置 web 页面的打开模式，与 `<a>` HTML 元素的 `target` 属性相同。
+
+[[gui_Link_rel]]
+* `rel` - 可选属性，指定当前文档与链接文档的关系。与 `<a>` HTML 元素中的 `rel` 属性相同。
++
+默认值为 `"noopener noreferrer"`。
++
+** `noopener` - 通过些链接打开的浏览器上下文中不能使用 opener，即 `window.opener` 为 `null`。
++
+** `noreferrer` - 不为后续链接提供 HTTP referer header。
+
+'''
+
+Link 组件的属性列表::
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_css,css>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_Link_rel,rel>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_Link_url,url>> -
+<<gui_Link_target,target>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+'''
+

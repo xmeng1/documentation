@@ -1,0 +1,16 @@
+:sourcesdir: ../../../../../source
+
+[[entity_snapshots_save]]
+===== 保存快照
+
+为了保存给定实体关系图的快照，需要调用 `EntitySnapshotService.createSnapshot()` 方法，并至少传递两个参数 - 实体和<<views,视图>>，实体是对象关系图入口点实体，视图用于描述关系图。将会使用已加载的实体创建快照，不做任何对数据库的调用。因此，如果加载实体的视图中不包含某些字段，快照也不会包含这些字段。
+
+Java 的对象图被转换为 XML 并与主实体的链接一起保存在 *SYS_ENTITY_SNAPSHOT* 表(对应 `EntitySnapshot` 实体)中。
+
+通常，在<<screen_edit,编辑界面>>提交后需要保存快照。可以通过重写界面控制器的 `postCommit()` 方法来实现这种需求。例如:
+
+[source, java]
+----
+include::{sourcesdir}/features/entity_snapshots_save.java[]
+----
+

@@ -1,0 +1,162 @@
+:sourcesdir: ../../../../source
+
+[[web_login]]
+==== Web 登录
+
+本节介绍 Web 客户端身份验证的工作原理以及如何在项目中进行扩展。有关中间层身份验证的信息，请参阅<<login>>。
+
+Web 客户端 block 的登录过程的实现机制如下：
+
+- `ConnectionImpl` 实现了 `Connection`。
+- `LoginProvider` 实现。
+- `HttpRequestFilter` 实现。
+
+.Web 客户端的登录机制
+image::WebLoginStructure.png[align="center"]
+
+Web 登录子系统的主要接口是 `Connection`，它包含以下关键方法：
+
+- *login()* - 验证用户、启动会话并更改连接状态。
+- *logout()* - 退出系统。
+- *substituteUser()* - 用另一个用户替换当前会话中的用户。此方法会创建一个新的 *UserSession* 实例，但会话 ID 不变。
+- *getSession()* - 获取当前用户会话。
+
+成功登录后，*Connection* 将 *UserSession* 对象存储到 `VaadinSession` 的属性中并设置 `SecurityContext`。*Connection* 对象被绑定到 `VaadinSession`，因此无法从非 UI 线程使用它，如果在非 UI 线程调用 `login/logout` ，则会抛出 *IllegalConcurrentAccessException*。
+
+通常，登录是通过 `LoginScreen` 界面执行的，该界面支持使用用户名/密码和 “记住我” 凭据登录。
+
+`Connection` 的默认实现是 `ConnectionImpl`，它将登录委托给 `LoginProvider` 实例链。`LoginProvider` 是一个可以处理特定 `Credentials` 实现的登录模块，它还有一个特殊的 `supports()` 方法，允许调用者查询它是否支持给定的 `Credentials` 类型。
+
+.标准用户登录过程
+image::WebLoginProcedure.png[align="center"]
+
+标准用户登录过程：
+
+* 用户输入用户名和密码。
+
+* Web 客户端 block 创建一个 `LoginPasswordCredentials` 对象，将用户名和密码传递给其构造函数，并使用此凭据调用 `Connection.login()` 方法。
+
+* `Connection` 查找对象 `LoginProvider` 对象链。 这种情况下使用的是 `LoginPasswordLoginProvider` ，它支持 `LoginPasswordCredentials` 凭据。`LoginPasswordLoginProvider` 使用 `PasswordEncryption` bean 的 `getPlainHash()` 方法散列密码，并调用 `AuthenticationService.login(Credentials)`。
+根据 <<cuba.checkPasswordOnClient,cuba.checkPasswordOnClient>>属性设置，它要使用户名和密码调用 `AuthenticationService.login(Credentials)` 方法；或者通过用户名加载 `User` 实体、根据加载的密码哈希验证密码，验证通过后使用 `TrustedClientCredentials` 和 <<cuba.trustedClientPassword,cuba.trustedClientPassword>>作为可信客户端登录。
+
+* 如果验证成功，则创建的具有活动<<userSession,UserSession>>的 `AuthenticationDetails` 实例将被回传给 `Connection`。
+
+* `Connection` 创建一个 `ClientUserSession` 包装器并将其设置到 `VaadinSession` 的属性中。
+
+* `Connection` 创建一个 `SecurityContext` 实例并将其设置为 `AppContext`。
+
+* `Connection` 触发 `StateChangeEvent`，此事件会触发 UI 更新和 `MainScreen` 初始化。
+
+所有 `LoginProvider` 实现必须：
+
+* 使用 `Credentials` 对象验证用户。
+* 使用 `AuthenticationService` 启动新用户会话或返回另一个活动会话（例如，匿名的）。
+* 返回身份验证详细信息，如果无法使用此 `Credentials` 对象登录用户，则返回空，例如，如果登录提供程序已被禁用或未正确配置。
+* 如果出现错误的 `Credentials`，则抛出 `LoginException` 或将 `LoginException` 从中间件传递给调用者。
+
+[[web_http_filter]]
+`HttpRequestFilter` - bean 的标记接口，这种 bean 将作为 HTTP 过滤器自动被添加到应用程序过滤器链： https://docs.oracle.com/javaee/6/api/javax/servlet/Filter.html 。可以使用它来实现其它形式的身份验证、对 HTTP 请求和响应进行预处理或后处理。
+
+
+要添加额外的 `Filter` ， 可以创建 Spring Framework 组件并实现 `HttpRequestFilter` 接口：
+[source, java]
+----
+include::{sourcesdir}/gui/web_customHttpFilter.java[]
+----
+
+请注意，最简单的实现必须将执行委托给 `FilterChain`，否则应用程序将无法工作。默认情况下，作为 `HttpRequestFilter` bean 被添加的过滤器将不会收到对 `VAADIN` 目录和 `cuba.web.cubaHttpFilterBypassUrls` app 属性中指定的其它路径的请求。
+
+[[built_in_login_providers]]
+内置登录提供程序::
++
+--
+平台包含以下 `LoginProvider` 接口的实现：
+
+- `AnonymousLoginProvider` - 为不需登录的用户提供匿名登录。
+- `LoginPasswordLoginProvider` -将登录委托给使用 `LoginPasswordCredentials` 的 `AuthenticationService`。
+- `RememberMeLoginProvider`- 将登录委托给使用 `RememberMeCredentials` 的 `AuthenticationService`。
+- `LdapLoginProvider` - 授受 `LoginPasswordCredentials` 参数，使用 LDAP 执行身份验证并将登录委托给使用 `TrustedClientCredentials` 的 `AuthenticationService` 服务。
+- `ExternalUserLoginProvider` - 授受 `ExternalUserCredentials` 参数，将登录委托给使用 `TrustedClientCredentials` 的 `AuthenticationService` 服务。可使用提供的用户名执行登录。
+
+
+所有实现都使用 `AuthenticationService.login()` 创建一个活动的用户会话。
+
+可以使用 Spring Framework 的机制覆盖它们中的任何一个。
+--
+
+[[web_login_events]]
+事件::
++
+--
+`Connection` 的标准实现 - `ConnectionImpl` 在登录过程中触发以下应用程序<<events, 事件>>：
+
+- `BeforeLoginEvent` / `AfterLoginEvent`
+- `LoginFailureEvent`
+- `UserConnectedEvent` / `UserDisconnectedEvent`
+- `UserSessionStartedEvent` / `UserSessionFinishedEvent`
+- `UserSessionSubstitutedEvent`
+
+`BeforeLoginEvent` 和 `LoginFailureEvent` 的事件处理程序可能抛出 `LoginException` 来取消登录过程或覆盖初始登录失败异常。
+
+例如，可以使用 `BeforeLoginEvent` 实现只允许登录名中包含有公司域名的用户登录 Web 客户端。
+
+[source, java]
+----
+include::{sourcesdir}/gui/web_beforeLoginEventListener.java[]
+----
+
+此外，标准应用程序类 - `DefaultApp` 会触发以下事件：
+
+- `AppInitializedEvent` - 在 `App` 初始化后触发，每个 HTTP 会话执行一次。
+- `AppStartedEvent` - 在以匿名用户身份登录进行第一次请求处理时触发。事件处理器可以使用绑定到 `App` 的 `Connection` 对象来完成用户登录。
+- `AppLoggedInEvent` - 用户登录成功时的 `App` UI 初始化后触发。
+- `AppLoggedOutEvent` - 用户注销时的 `App` UI 初始化后触发。
+- `SessionHeartbeatEvent` - 收到来自客户端 Web 浏览器的心跳请求时触发。
+
+`AppStartedEvent` 可用于使用第三方认证系统实现 SSO 登录，例如 Jasig CAS。通常，它与自定义 `HttpRequestFilter` bean 一起使用，该 bean 应收集并提供其它身份验证数据。
+
+
+我们假设：如果用户有一个特殊的 cookie 值 - `PROMO_USER`，应用程序将自动登录。
+
+[source, java]
+----
+include::{sourcesdir}/gui/web_appStartedEventListener.java[]
+----
+
+因此，如果用户拥有“PROMO_USER”cookie 并打开应用程序，它们将自动以 `promoUserLogin` 身份登录。
+
+如果要在登录和 UI 初始化后执行其它操作，可以使用 `AppLoggedInEvent`。 需要注意的是，在事件处理程序中必须检查用户是否进行了身份验证，因为所有事件也会对 `anonymous` 用户触发。
+--
+
+[[web_session_events]]
+Web 会话生命周期事件::
++
+--
+框架会发送与 HTTP 会话生命周期相关的两个事件：
+
+- `WebSessionInitializedEvent` - 当 HTTP 会话初始化时。
+- `WebSessionDestroyedEvent` - 当 HTTP 会话销毁时。
+
+可以用这些事件做一些系统级别的动作。注意，在线程中没有可用的 `SecurityContext`。
+--
+
+[[web_login_extension_points]]
+扩展点::
++
+--
+可以使用以下类型的扩展点扩展登录机制：
+
+- `Connection` - 替换现有的 `ConnectionImpl`。
+- `HttpRequestFilter` - 实现额外的 `HttpRequestFilter`。
+- `LoginProvider` 实现 - 实现额外的或替换现有的 `LoginProvider`。
+- 事件 - 为一个可用的<<web_login_events,事件>>实现事件处理器。
+
+可以使用 Spring Framework 机制替换现有 bean，例如通过在 *web* 模块的 Spring XML 配置中注册新 bean。
+
+[source, xml]
+----
+<bean id="cuba_LoginPasswordLoginProvider"
+      class="com.company.demo.web.CustomLoginProvider"/>
+----
+
+--

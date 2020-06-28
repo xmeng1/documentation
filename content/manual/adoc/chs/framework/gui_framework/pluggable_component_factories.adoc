@@ -1,0 +1,45 @@
+:sourcesdir: ../../../../source
+
+[[pluggable_component_factories]]
+==== 插件工厂
+
+插件工厂机制扩展了标准组件的创建过程，允许在<<gui_Form,Form>>、<<gui_Table,Table>>和<<gui_DataGrid,DataGrid>> 中创建不同的编辑字段。这意味着应用程序组件或应用程序项目本身可以提供自定义策略，以创建非标准的组件或支持自定义数据类型。
+
+该机制的入口点是 `UiComponentsGenerator.generate(ComponentGenerationContext)` 方法。其工作原理如下：
+
+* 尝试查找 `ComponentGenerationStrategy` 实现。如果找到至少一种策略，那么：
+** 根据 `org.springframework.core.Ordered` 接口遍历策略。
+** 返回第一个创建的非 `null` 组件。
+
+`ComponentGenerationStrategy` 实现用于创建 UI 组件。项目可以包含任意数量的此类策略。
+
+`ComponentGenerationContext` 是一个类，该类存储创建组件时可以使用的以下信息：
+
+* `metaClass` - 定义为其创建组件的实体。
+* `property` - 定义为其创建组件的实体属性。
+* `datasource` - 数据源。
+* `optionsDatasource` - 可用于显示选项列表的数据源。
+* `valueSource` - 可用于创建组件的值来源。
+* `options` - 可用于显示选项的选项对象。
+* `xmlDescriptor` - 在组件以声明的方式在 XML 描述中定义时，包含附加信息的 XML 描述。
+* `componentClass` - 要创建的组件的类型。例如，`Form`、`Table`、`DataGrid`。
+
+有两种内置组件策略：
+
+* `DefaultComponentGenerationStrategy` - 用于根据给定的 `ComponentGenerationContext` 对象创建组件。顺序值为 `ComponentGenerationStrategy.LOWEST_PLATFORM_PRECEDENCE` （1000）。
+* `DataGridEditorComponentGenerationStrategy` - 用于根据给定的 `ComponentGenerationContext` 对象为数据网格编辑器创建组件。顺序值为 `ComponentGenerationStrategy.HIGHEST_PLATFORM_PRECEDENCE + 30` （130）。
+
+以下示例展示如何替换为特定实体的某个属性 `Form` 组件的默认生成过程。
+
+[source, java]
+----
+include::{sourcesdir}/gui/pluggable_field_factories1.java[]
+----
+
+以下示例展示如何为特定的 <<datatype,datatype>> 定义 `ComponentGenerationStrategy`。
+
+[source, java]
+----
+include::{sourcesdir}/gui/pluggable_field_factories2.java[]
+----
+

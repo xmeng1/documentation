@@ -1,0 +1,158 @@
+:sourcesdir: ../../../source
+
+[[menu.xml]]
+=== menu.xml
+
+这个类型的文件在 Web 客户端使用，定义应用程序的主菜单结构。
+
+XML schema： {xsd_url}/menu.xsd
+
+这个文件的路径由 <<cuba.menuConfig,cuba.menuConfig>> 应用程序属性指定。当在 Studio 里面创建新项目的时候，会在 *web* 模块包的根目录创建 `web-menu.xml` 文件，比如 `modules/web/src/com/company/sample/web-menu.xml`。
+
+`menu-config` – XML 根节点元素。`menu-config` 的元素组成了一个树状结构，这里 `menu` 元素是树枝，`item` 和 `separator` 元素是树叶。
+
+`menu` 元素的属性：
+
+** `id` – 元素的标识符。
+
+** `caption` - 菜单元素的名称。如果未设置，名称会按照<<menu.xml_localized,下文>>介绍的规则确定。
+
+** `description` - 光标悬浮提示窗的内容。可以使用主语言包里面的本地化语言。
+
+** `icon` - 菜单元素的图标。参考 <<gui_attr_icon,icon>> 了解细节。
+
+** `insertBefore` 、 `insertAfter` – 设置此菜单项应当放在特定的元素或者特定的名称的菜单项之前或之后。这个属性用来在<<app_components,应用程序组件>>菜单文件定义的菜单中找一个合适的位置插入此菜单项。`insertBefore` 和 `insertAfter` 不能同时使用。
+
+** `stylename` - 为菜单项定义一个样式名称。参考 <<gui_themes>> 了解细节。
+
+`item` 元素的属性：
+
+** `id` – 元素的唯一标识符。如果没有定义任何 `screen`，`bean`，`class` 属性，此 id 用来指向具有相同 id 值的界面。当用户点击菜单项时，会在程序主窗口打开对应的界面。
++
+[source, xml]
+----
+<item id="sample_Foo.browse"/>
+----
+
+** `caption` - 菜单元素的名称。如果未设置，名称会按照<<menu.xml_localized,下文>>介绍的规则确定。
++
+[source, xml]
+----
+<item id="sample_Foo.browse" caption="mainMsg://fooBrowseCaption"/>
+----
+
+** `screen` - 界面标识符。可以用这个标识符在菜单中多次包含同一界面。当用户点击菜单项时，会在程序主窗口打开对应的界面。
++
+[source, xml]
+----
+<item id="foo1" screen="sample_Foo.browse"/>
+<item id="foo2" screen="sample_Foo.browse"/>
+----
+
+** `bean` - bean 名称。必须跟 `beanMethod` 一起使用。当用户点击菜单项时，会调用 bean 的此方法。
++
+[source, xml]
+----
+<item bean="sample_FooProcessor" beanMethod="processFoo"/>
+----
+
+** `class` - 实现了 `Runnable` 的类全名。当用户点击菜单项时，会创建指定类的一个对象，并调用其 `run()` 方法。
++
+[source, xml]
+----
+<item class="com.company.sample.web.FooProcessor"/>
+----
+
+** `description` - 光标悬浮提示窗显示的文字。可以从主语言包中使用本地化语言。
++
+[source, xml]
+----
+<item id="sample_Foo.browse" description="mainMsg://fooBrowseDescription"/>
+----
+
+** `shortcut` – 此菜单项的快捷键。可以用 `ALT`, `CTRL`, `SHIFT` 功能键，用 `-` 分隔，比如：
++
+[source, properties]
+----
+shortcut="ALT-C"
+shortcut="ALT-CTRL-C"
+shortcut="ALT-CTRL-SHIFT-C"
+----
++
+快捷键也可以通过<<app_properties,应用程序属性>>来配置，然后在 `menu.xml` 文件中通过下列方式来使用：
++
+[source, properties]
+----
+shortcut="${sales.menu.customer}"
+----
+
+** `openType` – 界面打开模式。对应于 `OpenMode` 枚举：`NEW_TAB`，`THIS_TAB`，`DIALOG`。默认值是 `NEW_TAB`。
+
+** `icon` - 菜单元素的图标。参考 <<gui_attr_icon,icon>> 了解细节。
+
+** `insertBefore`, `insertAfter` – 设定此项应当在一个特定元素或者标识符指定的特定菜单项之前或者之后。
+
+** `resizable` – 只跟 `DIALOG` 界面打开模式有关。控制界面是否能改变大小。可选值：`true`，`false`。默认情况下主菜单不会影响弹出窗口的改变大小的功能。
+
+** `stylename` - 为菜单项定义一个样式名称。参考 <<gui_themes>> 了解细节。
+
+* `item` 的子元素：
+
+[[menu.xml_screen_properties]]
+** `properties` – 定义一组参数用来传递至界面的公共 setter 方法。每个参数在 `property` 元素内定义，使用 `name` 属性与 setter 方法对应，比如，`foo` 字符串对应于 `void setFoo(String value)` 方法。框架会在触发 <<screen_AfterInitEvent,AfterInitEvent>> 和 <<screen_BeforeShowEvent,BeforeShowEvent>> 事件的间隙调用这些 setters。
+
++
+`property` 的属性：
+
+*** `name` – 参数名称
+
+*** `value` – 非实体属性的参数值。
+
+*** `entityClass` – 实体属性的类。
+
+*** `entityId` – 实体属性的 id。
+
+*** `entityView` – 可选；用来加载实体属性的视图。
+
+** `permissions` – 设置一组权限，用户只有满足这些权限才能使用此菜单项。这个机制应当在菜单项需要绑定到特定的权限或者绑定到多个权限时使用。大多数情况下，安全子系统的标准功能应该足以满足根据界面标识符控制菜单可用性的要求。
++
+这个元素应当包含一组 `permission` 子元素，每个元素描述一条需要的权限。菜单项只有在所有权限都满足的情况下才可用。
++
+`permission` 属性：
+
+*** `type` – 权限类型。可用这些 `PermissionType`: `SCREEN`, `++ENTITY_OP++`, `++ENTITY_ATTR++`, `SPECIFIC`, `UI`。
+
+*** `target` – 用来检查权限的对象（object）。根据权限类型会不同：
+
+**** `SCREEN` – 界面标识符，比如 `sales_Customer.lookup`。
+
+**** `++ENTITY_OP++` – 使用 `++{entity_name}:{op}++` 格式的字符串，这里 `{op}` 可以是：`read`, `create`, `update`, `delete`。比如 `sales_Customer:create`。
+
+**** `++ENTITY_ATTR++` – 使用 `++{entity_name}:{attribute}++` 格式的字符串，比如 `sales_Customer:name`。
+
+**** `SPECIFIC` – 特定的权限标识符，比如 `sales.runInvoicing`。
+
+**** `UI` – 界面可视化组件的路径。
+
+菜单文件的示例：
+
+[source, xml]
+----
+include::{sourcesdir}/config_files/menu_1.xml[]
+----
+<1> - 以弹出框的方式打开界面。
+<2> - 调用 `setStringParam()` 方法，传递 `some string`。
+<3> - 调用 `setCustomerParam()` 方法，传递使用给定 id 加载的实体实例。
+<4> - 调用 `StandardEditor` 的 `setEntityToEdit()` 方法，传递使用给定 id 和视图加载的实体实例。
+
+[[menu.xml_localized]]
+如果 `caption` 属性未指定，菜单项的本地化语言名称可以通过这种方式来定义：`menu-config` 前缀加上一个点放到元素标识符前面；这个拼出来的字符串作为<<main_message_pack,主语言包>>的一个键值。示例：
+
+[source, properties]
+----
+menu-config.sales=Sales
+menu-config.sales_Customer.lookup=Customers
+----
+
+如果没设置 `id`，菜单元素的名称会通过类名（如果设置了 `class` 属性）或者 bean 名称和 bean 方法名称（如果设置了 `bean` 属性）生成，因此，推荐设置 `id` 属性。
+

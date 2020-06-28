@@ -1,0 +1,158 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_SplitPanel]]
+====== 分隔面板
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-split" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/SplitPanel.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`SplitPanel` − 由可移动的分隔条分隔成两个区域的容器。
+
+image::gui_splitPanel.png[align="center"]
+
+该组件的 XML 名称：`split`
+
+下面是一个分隔面板的 XML 描述示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/splitpanel_1.xml[]
+---- 
+
+`split` 容器必须包含两个嵌套的容器或组件。它们将显示在分隔条的两侧。
+
+`split` 的属性:
+
+[[gui_SplitPanel_dockable]]
+* `dockable` - 启用或禁用 `SplitPanel` 停靠按钮，默认值为 `false`。
++
+image::gui_SplitPanel_dockable.png[align="center"]
++
+[WARNING]
+====
+停靠功能仅适用于水平方向的 `SplitPanel`。
+====
+
+[[gui_SplitPanel_dockMode]]
+* `dockMode` - 定义停靠方向。可以使用 `LEFT` 或 `RIGHT` 作为值。
++
+[source, xml]
+----
+<split orientation="horizontal"
+       dockable="true"
+       dockMode="RIGHT">
+    ...
+</split>
+----
+
+[[gui_SplitPanel_minmax]]
+* `minSplitPosition` 、 `maxSplitPosition` - 可以通过像素或百分比来定义分割条的可用位置范围。
++
+如下所示，可以限制分隔条从组件左侧移动 100 到 300 像素：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/splitpanel_2.xml[]
+----
++
+如果想以编程方式来设置范围，请使用 `Component.UNITS_PIXELS` 或 `Component.UNITS_PERCENTAGE` 来指定值的单位：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/splitpanel_3.java[]
+----
+
+[[gui_SplitPanel_orientation]]
+* `orientation` – 定义组件方向。`horizontal`- 嵌套的组件水平放置，`vertical`- 嵌套的组件垂直放置。
+
+[[gui_SplitPanel_pos]]
+* `pos` – 整数，定义第一个组件区域与第二个组件区域的百分比。例如，`pos="30"` 表示区域比例为 30/70。默认情况下，区域比例为 50/50。
+
+[[gui_SplitPanel_reversePosition]]
+* `reversePosition` - 定义从组件的另一侧指定分隔条的 `pos` 属性。
+
+[[gui_SplitPanel_locked]]
+* 如果 `locked` 属性设置为 `true`，则用户无法更改分隔条位置。
+
+[[gui_SplitPanel_stylename]]
+* 带有 `large` 值的 `stylename` 属性会使分隔条变地宽一点。
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/splitpanel_4.java[]
+----
+
+`SplitPanel` 的方法:
+
+[[gui_SplitPanel_getPosition]]
+* 可以使用 `getSplitPosition()` 方法来获取分隔条的位置。
+
+[[gui_SplitPanel_PositionUpdateListener]]
+* 可以使用 `PositionUpdateListener()` 方法来获取分隔条移动事件。可以使用 <<gui_api_UserOriginated,isUserOriginated()>> 方法来跟踪 `SplitPositionChangeEvent`  的来源。
+
+* 如果需要获取分隔条位置的单位，请使用 `getSplitPositionUnit()` 方法。返回值为 `Component.UNITS_PIXELS` 或 `Component.UNITS_PERCENTAGE`。
+
+* 如果从组件的另一侧设置位置，那么 `isSplitPositionReversed()` 方法会返回 `true`。
+
+[[gui_SplitPanel_getMinMaxSplitPosition]]
+* `getMinSplitPosition()` 和 `getMaxSplitPosition()` 方法分别返回当前分隔条位置的<<gui_SplitPanel_minmax,最小>>或<<gui_SplitPanel_minmax,最大>>值。
+
+[[gui_SplitPanel_getMinMaxSplitPositionSizeUnit]]
+* `getMinSplitPositionSizeUnit()` 和 `getMaxSplitPositionSizeUnit()` 方法分别返回分隔条位置的<<gui_SplitPanel_minmax,最小>>或<<gui_SplitPanel_minmax,最大>>值的单位。可能单位是：`Component.UNITS_PIXELS` 和 `Component.UNITS_PERCENTAGE`。
+
+`SplitPanel` 的展示可以使用带 `$cuba-splitpanel-*` 前缀的 SCSS 变量进行自定义。可以在创建一个 <<web_theme_extension,主题扩展>> 或者一个 <<web_theme_creation,自定义主题>> 之后在可视化编辑器里修改这些变量的值。
+
+'''
+
+split 的属性::
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_SplitPanel_dockable,dockable>> -
+<<gui_SplitPanel_dockMode,dockMode>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_id,id>> -
+<<gui_SplitPanel_locked,locked>> -
+<<gui_SplitPanel_minmax,minSplitPosition>> -
+<<gui_SplitPanel_minmax,maxSplitPosition>> -
+<<gui_SplitPanel_orientation,orientation>> -
+<<gui_SplitPanel_pos,pos>> -
+<<gui_SplitPanel_reversePosition,reversePosition>> -
+<<gui_attr_settingsEnabled,settingsEnabled>> -
+<<gui_SplitPanel_stylename,stylename>> -
+<<gui_attr_width,width>>
+
+API::
+<<gui_api_add,add>> -
+<<gui_SplitPanel_PositionUpdateListener,addPositionUpdateListener>> -
+<<gui_api_settings,applySettings>> -
+<<gui_api_getComponent,getComponent>> -
+<<gui_api_getComponentNN,getComponentNN>> -
+<<gui_api_getComponents,getComponents>> -
+<<gui_SplitPanel_getMinMaxSplitPosition,getMaxSplitPosition>> -
+<<gui_SplitPanel_getMinMaxSplitPositionSizeUnit,getMaxSplitPositionSizeUnit>> -
+<<gui_SplitPanel_getMinMaxSplitPosition,getMinSplitPosition>> -
+<<gui_SplitPanel_getMinMaxSplitPositionSizeUnit,getMinSplitPositionSizeUnit>> -
+<<gui_api_getOwnComponent,getOwnComponent>> -
+<<gui_api_getOwnComponents,getOwnComponents>> -
+<<gui_api_remove,remove>> -
+<<gui_api_removeAll,removeAll>> -
+<<gui_api_settings,saveSettings>>
+
+'''
+

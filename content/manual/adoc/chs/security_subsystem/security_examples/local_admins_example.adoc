@@ -1,0 +1,77 @@
+:sourcesdir: ../../../../source
+
+[[local_admins_example]]
+==== 创建本地管理员
+
+在<<groups,访问组>>的树形层级结构加上<<constraints,约束>>能够支持创建 _本地管理员（部门管理员）_，可以用来在组织部门内代理做一些创建、配置用户和权限管理的工作。
+
+本地管理员可以访问安全子系统的界面，但是他们只能看到自己访问组或以下的用户和访问组。本地管理员还可以创建子访问组、用户以及能<<roles,分配>>系统上的角色。其创建的新用户也至少有跟创建他们的本地管理员一样的权限限制。
+
+访问组根节点下面的全局管理员需要创建能被本地管理员看到的角色，然后本地管理员才能分配给用户。本地管理员不能创建或修改角色。
+
+下面是一个访问组结构的例子：
+
+image::local_admins_groups.png[align="center"]
+
+问题有：
+
+* `*Departments*` 下面的用户应该只能看到该组下面的用户，或低于该组层级的组里的用户。
+
+* `*Dept 1*`, `*Dept 2*`, 这些子组都应该有自己的管理员可以创建用户，分配角色。
+
+方案是：
+
+* 在 `*Departments*` 里添加以下约束：
+
+** 对于 `sec$Group` 实体：
++
+[source, plain]
+----
+{E}.id in (
+  select h.group.id from sec$GroupHierarchy h
+  where h.group.id = :session$userGroupId or h.parent.id = :session$userGroupId
+)
+----
++
+这样，用户就不会看到比自己所在组层级高的组。
+
+** 对于 `sec$User` 实体：
++
+[source, plain]
+----
+{E}.group.id in (
+  select h.group.id from sec$GroupHierarchy h
+  where h.group.id = :session$userGroupId or h.parent.id = :session$userGroupId
+)
+----
++
+这样，用户不会看到比自己所在组层级高的组里的用户。
+
+** 对于 `sec$Role` 实体（一个在内存中检查的 Groovy 约束）：
++
+[source, plain]
+----
+!['system-full-access', 'Some Role to Hide 1', 'Some Role to Hide 2'].contains({E}.name)
+----
++
+有了这个约束，用户将无法查看和分配不想要的角色。
+
+* 为本地管理员创建一个 `Department Administrator` 角色：
++
+--
+** 在 *Screens - 界面权限* 标签页，允许如下界面：
++
+`Administration`、 `Users`、 `Access Groups`、 `Roles`、 `sec$Group.edit`、 `sec$Group.lookup`、 `sec$Role.lookup`、 `sec$User.changePassword`、 `sec$User.copySettings`、 `sec$User.edit`、 `sec$User.lookup`、 `sec$User.newPasswords`、 `sec$User.resetPasswords`、 `sec$UserSubstitution.edit`。
+
+** 在 *Entities - 实体权限* 标签页，允许对下列实体的所有操作：`sec$Group`、`sec$User`、`sec$UserRole` 实体，允许 *Read* 操作实体 `sec$Role`（需要选中 *System level* 才能为 `sec$UserRole` 添加权限）。
+
+** 在 *Attributes - 属性权限* 标签页，为这些实体选择 "*"：`sec$Group`、`sec$User`、`sec$Role`。
+--
+
+* 按照上面的截屏在他们的部门内创建本地管理员并为其分配 `Department Administrator` 角色。
+
+当本地管理员登录系统之后，他们只能看到自己的部门分组以及子分组：
+
+image::local_admins_res.png[align="center"]
+
+本地管理员可以创建新用户并且为其分配已有的角色，当然，除了那些约束中列举的角色。

@@ -1,0 +1,94 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_TwinColumn]]
+====== 双列
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-twincolumn" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/TwinColumn.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`twinColumn` 是用于选择多个值的两个列表组件。左边的列表包含可选的未选择值列表，右边的列表是已经选择的值列表。用户通过在左右两个列表移动值来进行选择或取消选择值，移动操作可通过双击或点击按钮完成。每个值都可以定义自己的展示样式和图标。
+
+image::TwinColumn.png[align="center"]
+
+组件的 XML 名称: `twinColumn`
+
+下面是一个使用 `twinColumn` 组件选择实体实例的示例:
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/twincolumn_1.xml[]
+---- 
+
+在这个例子中，`twinColumn` 组件将显示 `allProductsDc` <<gui_data_containers,数据容器>>中的 `Product` 实体的<<namePattern_annotation,实例名称>>，它的 `getValue()` 方法返回选中实例的集合。
+
+[[gui_TwinColumn_addAllBtnEnabled]]
+`addAllBtnEnabled` 属性用于配置组件是否显示在两列之间移动所有值的按钮。
+
+[[gui_TwinColumn_columns_rows]]
+`columns` 属性设置一行中可显示的字符数，`rows` 属性– 配置每个列表中的行数。
+
+[[gui_TwinColumn_reorderable]]
+`reorderable` 属性设置在进行选择之后，这些条目是否需要重新排序。默认开启重新排序。此时，条目会在选择之后重新排序以符合数据源中元素的顺序。如果该属性是 `false`，条目会按照选择的顺序进行添加。
+
+[[gui_TwinColumn_captions]]
+`leftColumnCaption` 和 `rightColumnCaption` 属性 – 分别配置左列和右列的名称。
+
+列表中每个条目的外观可通过实现 `TwinColumn.StyleProvider` 接口来定义，可以为列表中每个实体实例返回样式名和图标路径。
+
+可以使用 <<gui_CheckBoxGroup,CheckBoxGroup>> 组件中描述的 `setOptionsList()` 、 `setOptionsMap()` 和 `setOptionsEnum()` 方法任意指定组件的选项列表。
+
+
+'''
+
+twinColumn 组件的属性::
+<<gui_attr_align,align>> -
+<<gui_TwinColumn_addAllBtnEnabled,addAllBtnEnabled>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_captionProperty,captionProperty>> -
+<<gui_TwinColumn_columns_rows,columns>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_TwinColumn_captions,leftColumnCaption>> -
+<<gui_attr_optionsContainer,optionsContainer>> -
+<<gui_attr_optionsDatasource,optionsDatasource>> -
+<<gui_attr_property,property>> -
+<<gui_TwinColumn_reorderable,reorderable>> -
+<<gui_attr_required,required>> -
+<<gui_attr_requiredMessage,requiredMessage>> -
+<<gui_TwinColumn_captions,rightColumnCaption>> -
+<<gui_TwinColumn_columns_rows,rows>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+TwinColumn 组件的元素::
+<<gui_validator,validator>>
+API::
+<<gui_api_addValueChangeListener,addValueChangeListener>> -
+<<gui_api_contextHelp,setContextHelpIconClickHandler>> -
+<<gui_LookupField_setOptionCaptionProvider,setOptionCaptionProvider>>
+
+'''
+

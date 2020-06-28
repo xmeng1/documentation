@@ -1,0 +1,170 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_RadioButtonGroup]]
+====== 单选按钮组
+
+++++
+<div class="manual-since-container">
+    <a href="http://files.cuba-platform.com/cuba/release-notes/7.0/" class="since-btn" target="_blank">
+        <span class="since-btn-caption">最低版本</span><span class="since-btn-version">7.0</span>
+    </a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=radiobuttongroup-simple" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/RadioButtonGroup.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+这是一个允许用户使用单选按钮从选项列表中选择单个值的组件。
+
+image::gui_RadioButtonGroup.png[align="center"]
+
+该组件对应的 XML 名称： `radioButtonGroup`
+
+可以使用 `setOptions()`、`setOptionsList()`、 `setOptionsMap()` 和 `setOptionsEnum()` 方法，或使用 `optionsDatasource` 或 `optionsContainer` 属性指定组件选项列表。
+
+[[gui_RadioButtonGroup_optionsEnum]]
+* 使用 `RadioButtonGroup` 的最简单的场景是为实体属性选择枚举值。例如，`Role` 实体具有 `RoleType` 类型的 `type` 属性，它是一个枚举。那么可以使用 `RadioButtonGroup` 显示这个属性， 如下所示：
++
+--
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/gui_RadioButtonGroup.xml[]
+----
+
+[[gui_RadioButtonGroup_setOptionsEnum]]
+`setOptionsEnum()` 将一个枚举类作为参数。选项列表将包含枚举值的本地化名称，组件的值将是一个枚举值。
+
+[source, java]
+----
+radioButtonGroup.setOptionsEnum(RoleType.class);
+----
+
+[[gui_RadioButtonGroup_setOptions]]
+使用 `setOptions()` 方法可以得到相同的结果，该方法允许使用任何类型的选项：
+
+[source, java]
+----
+radioButtonGroup.setOptions(new EnumOptions<>(RoleType.class));
+----
+--
+
+[[gui_RadioButtonGroup_setOptionsList]]
+* `setOptionsList()` 能够以编程方式指定组件选项列表。为此在 XML 描述中声明一个组件：
++
+--
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/gui_RadioButtonGroup_2.xml[]
+----
+
+然后将组件注入控制器并为其指定选项列表：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gui_RadioButtonGroup_3.java[]
+----
+
+该组件将如下所示：
+
+image::gui_RadioButtonGroup_2.png[align="center"]
+
+根据所选的选项，组件的 `getValue()` 方法将返回 `Integer` 类型的值：2 、4 、5 、7。
+--
+
+[[gui_RadioButtonGroup_setOptionsMap]]
+* `setOptionsMap()` 能够分别指定选项的显示名称和选项值。例如，我们可以为控制器中注入的 `radioButtonGroup` 组件设置以下选项 map：
++
+--
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gui_RadioButtonGroup_4.java[]
+----
+
+该组件将如下所示：
+
+image::gui_RadioButtonGroup_3.png[align="center"]
+
+根据所选的选项，组件的 `getValue()` 方法将返回 `Integer` 类型的值：2 、4 、5 、 7，而不是界面上显示的字符串。
+--
+
+[[gui_RadioButtonGroup_optionsContainer]]
+* 该组件可以从数据容器中获取选项列表。要做到这点，需要使用 `optionsContainer` 属性。例如：
++
+--
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/gui_RadioButtonGroup_5.xml[]
+----
+
+在这种情况下，`radioButtonGroup` 组件将显示位于 `employeesCt` 数据容器中的 `Employee` 实体的<<namePattern_annotation,实例名>>，其 `getValue()` 方法将返回所选实体实例。
+
+image::gui_RadioButtonGroup_4.png[align="center"]
+
+使用<<gui_attr_captionProperty,captionProperty>>属性，可以指定一个实体属性作为选项的显示名称，而不是使用实例名称作为选项的显示名称。
+
+可以使用 `RadioButtonGroup` 接口的 `setOptions()` 方法以编程方式定义选项容器：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gui_RadioButtonGroup_6.java[]
+----
+--
+
+[[gui_RadioButtonGroup_orientation]]
+`orientation` 属性定义了分组元素的排列方向。默认情况下，元素垂直排列。设置值为 `horizontal` 将水平排列。
+
+'''
+
+RadioButtonGroup 的属性::
+<<gui_attr_align,align>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_captionProperty,captionProperty>> -
+<<gui_attr_colspan,colspan>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_height,height>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_RadioButtonGroup_optionsContainer,optionsContainer>> -
+<<gui_attr_optionsDatasource,optionsDatasource>> -
+<<gui_RadioButtonGroup,optionsEnum>> -
+<<gui_RadioButtonGroup_orientation,orientation>> -
+<<gui_attr_property,property>> -
+<<gui_attr_required,required>> -
+<<gui_attr_requiredMessage,requiredMessage>> -
+<<gui_attr_responsive,responsive>> -
+<<gui_attr_rowspan,rowspan>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+API::
+<<gui_api_addValueChangeListener,addValueChangeListener>> -
+<<gui_api_contextHelp,setContextHelpIconClickHandler>> -
+<<gui_RadioButtonGroup_setOptions,setOptions>> -
+<<gui_LookupField_setOptionCaptionProvider,setOptionCaptionProvider>> -
+<<gui_RadioButtonGroup_setOptionsEnum,setOptionsEnum>> -
+<<gui_RadioButtonGroup_setOptionsList,setOptionsList>> -
+<<gui_RadioButtonGroup_setOptionsMap,setOptionsMap>>
+
+'''
+

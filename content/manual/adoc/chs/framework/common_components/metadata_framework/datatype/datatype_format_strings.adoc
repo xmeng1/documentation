@@ -1,0 +1,34 @@
+:sourcesdir: ../../../../../../source
+
+[[datatype_format_strings]]
+====== 数据类型格式化字符串
+
+依赖 locale 的解析格式通过应用程序或者<<app_components,应用程序组件>>的<<main_message_pack,主语言消息包>>来提供，使用下面这些键值：
+
+* `numberDecimalSeparator` – 数值类型的小数分隔符。
+
+* `numberGroupingSeparator` – 数值类型的千分位符。
+
+* `integerFormat` – `Integer` 和 `Long` 类型的格式。
+
+* `doubleFormat` – `Double` 类型的格式。
+
+* `decimalFormat` – `BigDecimal` 类型的格式。
+
+* `dateTimeFormat` – `java.util.Date` 类型的格式。
+
+* `dateFormat` – `java.sql.Date` 类型的格式。
+
+* `timeFormat` – `java.sql.Time` 类型的格式。
+
+* `trueString` – `Boolean.TRUE` 类型对应的显示字符串。
+
+* `falseString` – `Boolean.FALSE` 类型对应的显示字符串。
+
+[TIP]
+====
+通过 Studio 可以设置针对应用程序使用的语言的格式化字符串。编辑 *Project Properties*，点击 *Available locales* 字段的编辑按钮，然后勾选 *Show data format strings*。
+====
+
+locale 相应的格式化字符串可以通过 `FormatStringsRegistry` bean 获得。
+

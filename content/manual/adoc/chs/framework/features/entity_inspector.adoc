@@ -1,0 +1,40 @@
+:sourcesdir: ../../../../source
+
+[[entity_inspector]]
+==== 实体探查器
+
+实体探查器可以在任何应用程序对象上使用，而无需创建专用界面。探查器动态生成界面来浏览和编辑所选的实体实例。
+
+这使系统管理员有机会查看和编辑由于设计原因而无法从标准界面访问的数据，并能在原型设计阶段创建数据模型以及创建仅链接到实体探查器的主菜单部分。
+
+探查器的入口是 `com/haulmont/cuba/gui/app/core/entityinspector/entity-inspector-browse.xml` 界面。
+
+如果使用名为 `entity` 的 `String` 类型参数将实体名称作为参数传递给实体探查器，则探查器将显示具有过滤、选择和编辑功能的实体列表。在<<screens.xml,screens.xml>>中配置界面时可以指定参数，例如：
+
+`screens.xml`
+
+[source, xml]
+----
+<screen id="sales_Product.lookup"
+      template="/com/haulmont/cuba/gui/app/core/entityinspector/entity-inspector-browse.xml">
+  <param name="entity"
+         value="sales_Product"/>
+</screen>
+----
+
+`menu.xml`
+
+[source, xml]
+----
+<item id="sales_Product.lookup"/>
+----
+
+界面标识符定义为 `++{entity_name}.lookup++` 时将允许<<gui_PickerField,PickerField>>和<<gui_LookupPickerField,LookupPickerField>>组件在 `PickerField.LookupAction` 标准操作中使用此界面。
+
+通常可以在没有任何参数的情况下调用界面。在这种情况下，界面顶部将包含一个实体选择字段。在 *cuba* 应用程序组件中，探查器界面使用 `entityInspector.browse` 标识符进行注册，因此在菜单项中可以很容易引用：
+
+[source, xml]
+----
+<item id="entityInspector.browse"/>
+----
+

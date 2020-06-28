@@ -1,0 +1,35 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_data_comp_decl]]
+====== 声明式创建数据组件
+
+为界面创建数据组件的最简单方法就是在界面的 XML 描述中的 `<data>` 元素中进行声明式的定义。
+
+考虑包含 `Customer` 、 `Order` 和 `OrderLine` 实体的数据模型。`Order` 实体的编辑界面可以用下面的 XML 定义：
+
+[source, xml]
+----
+include::{sourcesdir}/gui/data_comp/data_comp_1.xml[]
+----
+
+这个例子中，会创建下列数据组件：
+
+<1> - `DataContext` 实例。
+<2> - `Order` 实体的 `InstanceContainer`。
+<3> - 容器内实体实例的内联 <<views,view>>。内联视图也可以继承共享视图（定义在 `views.xml`）。
+<4> - 加载 `Order` 实例的 `InstanceLoader`。
+<5> - 加载内嵌实体 `OrderLines` 的 `CollectionPropertyContainer` ，是绑定到 `Order.lines` 属性的实体。
+<6> - 加载 `Customer` 实体的 `CollectionContainer` 。`view` 属性可以绑定某个共享视图。
+<7> - `CollectionLoader` 使用指定的查询加载 `Customer` 实体。
+
+数据容器可以在可视化组件中这样使用：
+
+[source, xml]
+----
+include::{sourcesdir}/gui/data_comp/data_comp_2.xml[]
+----
+
+<1> 单独的控件具有 `dataContainer` 和 `property` 属性。
+<2> `form` 会将 `dataContainer` 传递给 form 的字段，所以字段只需要 `property` 属性。
+<3> 查找字段有 `optionsContainer` 属性。
+<4> 表格只有 `dataContainer` 属性。

@@ -1,0 +1,38 @@
+:sourcesdir: ../../../../source
+
+[[orm]]
+==== ORM 层
+
+对象关系映射（ORM）是一种将关系型数据库表映射到编程语言对象的技术。CUBA 使用基于 *EclipseLink* 框架的 ORM 实现。
+
+ORM 提供一些明显的优点：
+
+* 通过操控 Java 对象来操控关系型 DBMS。
+
+* 通过消除枯燥的 SQL 查询语句的编写来简化编程。
+
+* 通过一个命令来加载和保存整个对象图来简化编程。
+
+* 允许将应用程序轻松地移植到不同的 DBMS。
+
+* 允许使用简洁的对象查询语言 – <<jpql, JPQL>>。
+
+同时，ORM 也存在一些缺点。首先，直接使用 ORM 的开发者需要对它有很深的了解，知道它是如何工作的。此外，由于使用了 ORM，使得 SQL 的直接优化和使用 DBMS 的特性变得困难。
+
+[TIP]
+====
+如果对数据库访问出现任何性能问题，首先应检查的是实际执行的 SQL 语句。可以使用 `eclipselink.sql` <<logging_useful_loggers,logger>> 将 ORM 生成的所有 SQL 语句输出到日志文件。
+====
+
+include::orm/entityManager.adoc[]
+
+include::orm/entity_states.adoc[]
+
+include::orm/lazy_loading.adoc[]
+
+include::orm/query.adoc[]
+
+include::orm/nativeQuery.adoc[]
+
+include::orm/entity_listeners.adoc[]
+

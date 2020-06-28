@@ -1,0 +1,43 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_data_comp_dep]]
+====== 数据组件之间的依赖
+
+有时候需要加载和展示依赖同一界面上其它数据的数据。比如，在下面的截屏中，左边的表格展示 orders 的列表，右边的表格展示选中 order 的 lines。右边的列表会在左边列表每次选择改动时刷新。
+
+.表格相互依赖
+image::gui_data/dep_data_comp.png[align="center"]
+
+这个例子中，`Order` 实体包含了 `orderLines` 属性，这个是一对多的集合。所以实现这个界面的最简单的方法就是使用带有 `orderLines` 属性的视图加载 orders 列表，并且使用<<gui_property_containers,属性容器>>来装载依赖的 lines 列表。然后绑定左边的表格到主容器，绑定右边的表格到属性容器。
+
+但是这个方案有一个隐藏的性能问题：会加载左边表格所有 orders 的所有 lines，尽管每次只是给单一的 order 展示 lines。orders 列表越长，会加载越多不需要的数据，因为用户只有很小的可能会查看每个 order 关联的 lines。这就是为什么推荐只在加载单一主实体的时候使用属性容器以及范围广的视图，比如在 order 编辑界面。
+
+还有，主实体也许跟依赖的实体没有直接的属性关联关系。这种情况下，上面使用属性容器的方案根本就行不通。
+
+组织界面内数据关系的通常方法是使用带参数的查询。依赖的加载器包含一个带参数的查询语句，这个参数关联到主实体的数据，当主容器的当前实体更改时，需要手动设置参数并且触发依赖的加载器。
+
+下面这个例子的界面包含两对依赖的容器/加载器以及绑定的表格。
+
+[source, xml]
+----
+include::{sourcesdir}/gui/data_comp/data_comp_dep_1.xml[]
+----
+
+<1> 主容器和主加载器
+<2> 依赖容器和加载器
+<3> 主表格
+<4> 从表格
+
+[source, java]
+----
+include::{sourcesdir}/gui/data_comp/data_comp_dep_1.java[]
+----
+
+<1> 界面控制器类没有 `@LoadDataBeforeShow` 注解，所以加载器不会自动触发。
+<2> 主加载器在 `BeforeShowEvent` 处理器中触发。
+<3> 在主容器的 `ItemChangeEvent` 处理器中，给依赖加载器设置了参数并且触发依赖加载。
+
+[TIP]
+====
+使用 <<gui_DataLoadCoordinator,DataLoadCoordinator>> facet 可以将数据组件通过声明式的方式连接，不需要写 Java 代码。
+====

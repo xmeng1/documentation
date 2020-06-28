@@ -1,0 +1,23 @@
+:sourcesdir: ../../../../../source
+
+[[file_download]]
+===== 下载文件
+
+可以使用 `ExportDisplay` 接口将文件从文件存储下载到用户的计算机。可以通过调用 `AppConfig.createExportDisplay()` 静态方法或通过在控制器类中使用<<screen_controller_injection,注入>>来获取 `ExportDisplay` 实例 。例如：
+
+[source, java]
+----
+AppConfig.createExportDisplay(this).show(fileDescriptor);
+----
+
+`show()` 方法接收一个可选的 `ExportFormat` 类型的参数，该参数定义内容的类型和文件扩展名。如果没有提供格式，则从 `FileDescriptor` 中检索扩展名，并将内容类型设置为 `application/octet-stream`。
+
+文件扩展名定义文件是通过浏览器标准打开/保存对话框（`Content-Disposition = attachment`）下载，还是在浏览器窗口中直接显示（`Content-Disposition = inline`）。需要在浏览器窗口中直接显示的文件的扩展名列表由 <<cuba.web.viewFileExtensions,cuba.web.viewFileExtensions>> 应用程序属性定义。
+
+如果使用 `ByteArrayDataProvider` 作为 `show()` 方法的参数，`ExportDisplay` 也可以下载任意数据。例如：
+
+[source, java]
+----
+include::{sourcesdir}/features/exportDisplay_1.java[]
+----
+

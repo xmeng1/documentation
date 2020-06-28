@@ -1,0 +1,47 @@
+:sourcesdir: ../../../source
+
+[[qs_create_project]]
+=== 创建项目
+
+. 启动 {studio_man_url}[CUBA Studio] 。
+
+. 点击 *Create New Project* 创建新项目。
++
+image::quick_start/start_studio.png[align="center"]
+
+. 确保安装了 Java SE Development Kit (JDK) 8，并且选择这个版本为项目默认的 JDK。
++
+仓库（Repository）的列表已经包含了<<artifact_repository,仓库>> URL 以及认证需要的参数。
++
+image::quick_start/create_project.png[align="center"]
+
+. 在 *New project* 窗口的 *Project name* 字段指定新项目名称 - 比如 `sales`。名称只能包含拉丁字母，数字以及下划线。这里需要仔细考虑项目名称，因为之后想要修改的话，会需要比较麻烦的手动操作。
++
+--
+. 下面这些字段会自动填充：
+
+* *Project location* – 项目目录的路径。您可以通过点击右边的 *...* 按钮来进行手动选择。点击之后会出现 *Select folder* 的窗口，这里会给出你硬盘上的目录列表。您可以选择一个或者创建一个新目录。
+
+* *Project namespace* – 会被加在实体名字和数据库表名之前作为前缀的一个命名空间的名字。命名空间只能包含拉丁字母，而且应当越短越好。比如，项目的名字是 `++sales_2++`，命名空间可以用 `sales` 或者 `sal`。
+
+* *Root package* −  Java 类的根包名。这个可以之后再调整，但是那些在项目创建时就生成的类将来是不会自动修改的。
+
+* *Platform version* – 项目中需要采用的 CUBA 框架的版本。在项目编译的时候相应的平台的依赖包会从仓库自动下载。
+
+image::quick_start/new_project.png[align="center"]
+--
+
+. 点击 *Finish*。会在指定的 `sales` 目录创建新的空项目，Studio 的主工作界面也会打开。
++
+如果您是首次使用 Studio，Studio 启动时会下载以及连接 Gradle 后台程序。还有，在首次使用 CUBA 框架构建的时候，Studio 会自动下载平台的源码和相应的依赖库。因此，打开项目以及组装项目可能会费一些时间。在开始项目工作之前，需要等待 Studio 的同步和创建索引工作完成。
++
+image::quick_start/studio_workspace.png[align="center"]
+
+. 在本地 *HyperSQL* 上创建数据库：选择菜单项 *CUBA* > *Create database*。数据库的名字默认就是项目的命名空间。
+
+. 选择 *CUBA* > *Start application server*。或者也可以通过工具栏的 *Run Configuration* 下拉列表来启动应用程序。在 CUBA 项目树的 *Runs at...* 部分的项目链接可以用来直接从 Studio 打开浏览器展示项目。
++
+默认的用户名密码是 `admin` / `admin`。
++
+应用运行起来会自带两个主菜单项（*Administration* 和 *Help*），以及 CUBA 框架提供的<<security_subsystem,安全子>>系统功能、管理子系统功能。
+

@@ -1,0 +1,84 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_OptionsList]] 
+====== 选项列表
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-optionslist" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/OptionsList.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`OptionsList` 是 <<gui_OptionsGroup,OptionsGroup>> 组件的变体，它将选项列表展示为可垂直滚动的列表。如果启用了多选，则可以通过单击时按住 Ctrl 键来选择多个选项，或按住 Shift 键来选择一个范围内的选项。
+
+image::gui_optionsList.png[align="center"]
+
+该组件对应的 XML 名称： `optionsList`
+
+[[gui_OptionsGroup_nullOptionVisible]]
+默认情况下，`OptionsList` 组件在建议弹窗中显示第一个空元素，可以通过将 `nullOptionVisible` 属性设置为 `false` 来禁止此行为。
+
+[[gui_OptionsList_doubleClickEvent]]
+使用 `addDoubleClickListener()` 可以监听 `DoubleClickEvent`，用来拦截组件选项上的双击事件。
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gui_optionsList_addDoubleClick.java[]
+----
+同样，也可以在界面控制器中订阅组件的双击事件，示例：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gui_optionsList_doubleClick.java[]
+----
+
+`OptionsList` 和 <<gui_OptionsGroup,OptionsGroup>> API 之间的唯一区别是 `OptionsList` 没有 `orientation` 属性。
+
+'''
+
+optionsList 的属性::
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_captionProperty,captionProperty>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_OptionsGroup_multiselect,multiselect>> -
+<<gui_OptionsGroup_nullOptionVisible,nullOptionVisible>> -
+<<gui_attr_optionsDatasource,optionsDatasource>> -
+<<gui_attr_optionsEnum,optionsEnum>> -
+<<gui_attr_property,property>> -
+<<gui_attr_required,required>> -
+<<gui_attr_requiredMessage,requiredMessage>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+optionsList 的元素::
+<<gui_validator,validator>>
+
+API::
+<<gui_OptionsList_doubleClickEvent,addDoubleClickListener>> -
+<<gui_api_addValueChangeListener,addValueChangeListener>> -
+<<gui_api_contextHelp,setContextHelpIconClickHandler>> -
+<<gui_LookupField_setOptionCaptionProvider,setOptionCaptionProvider>>
+
+'''
+

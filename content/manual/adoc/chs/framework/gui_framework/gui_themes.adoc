@@ -1,0 +1,22 @@
+:sourcesdir: ../../../../source
+
+[[gui_themes]]
+==== 主题
+
+主题用于管理应用程序的视觉展现。
+
+一个 Web 主题由 link:http://sass-lang.com[SCSS] 文件和其它的资源比如图像组成。
+
+框架提供几个可以在项目中<<web_theme_usage,开箱即用>>的主题。通过<<web_theme_extension,主题扩展>>可以在项目级别修改使用的主题。除了标准的主题外，也可以创建<<web_theme_creation,自定义主题>>。
+
+如果希望在多个项目中使用同一个主题，可以<<web_theme_inheritance,在应用程序组件中包含此主题>>或者创建一个可重用的<<web_theme_reusable,主题 JAR>>。
+
+include::gui_themes/web_theme_usage.adoc[]
+
+include::gui_themes/web_theme_extension.adoc[]
+
+include::gui_themes/web_theme_creation.adoc[]
+
+include::gui_themes/web_theme_inheritance.adoc[]
+
+include::gui_themes/web_theme_reusable.adoc[]

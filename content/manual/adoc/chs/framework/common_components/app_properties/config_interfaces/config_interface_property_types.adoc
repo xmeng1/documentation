@@ -1,0 +1,67 @@
+:sourcesdir: ../../../../../../source
+
+[[config_interface_property_types]]
+====== 属性类型
+
+平台支持以下开箱即用的属性类型：
+
+* `String`, 原始类型及其封装类型（`boolean`、`Boolean`、`int`、`Integer` 等）
+
+* `enum`，属性值作为枚举的值名称存储在文件或数据库中。
++
+
+如果枚举实现了 `EnumClass` 接口并且具有用于通过标识符获取值的静态方法 `fromId()`，则可以使用 `@EnumStore` 注解指定存储枚举标识符而不是具体值。例如：
++
+[source, java]
+----
+include::{sourcesdir}/common/configinterface_8.java[]
+----
+
+* 持久化<<data_model,实体>>类。访问实体类型的属性时，将从数据库加载由属性值定义的实例。
+
+要支持任意类型，请使用 `TypeStringify` 和 `TypeFactory` 类将值转换为字符串或从字符串转换值，并使用 `@Stringify` 和 `@Factory` 注解为属性指定这些类。
+
+我们以 `UUID` 类型为例来了解这个过程。
+
+* 创建类 `com.haulmont.cuba.core.config.type.UuidTypeFactory` 继承于 `com.haulmont.cuba.core.config.type.TypeFactory` 类
+并实现下面的方法：
++
+[source, java]
+----
+include::{sourcesdir}/common/configinterface_4.java[]
+----
+
+* 在这种情况下没有必要创建 `TypeStringify`，因为有 `toString()` 方法。
+
+* 在配置接口中注解属性：
++
+[source, java]
+----
+include::{sourcesdir}/common/configinterface_5.java[]
+----
+
+平台为以下类型提供了 `TypeFactory` 实现：
+
+* `UUID` – `UuidTypeFactory`, 如上所述。
+
+* `java.util.Date` – `DateFactory`。日期值必须以 `yyyy-MM-dd HH:mm:ss.SSS` 格式指定，例如：
++
+[source, properties]
+----
+cuba.test.dateProp = 2013-12-12 00:00:00.000
+----
+
+* `List<Integer>` (整数列表) – `IntegerListTypeFactory`。必须以数字的形式指定属性值，用空格分隔，例如：
++
+[source, properties]
+----
+cuba.test.integerListProp = 1 2 3
+----
+
+* `List<String>` (字符串列表) – `StringListTypeFactory`。必须将属性值指定为由"|"分隔的字符串列表，例如：
++
+[source, properties]
+----
+cuba.test.stringListProp = aaa|bbb|ccc
+----
+

@@ -1,0 +1,47 @@
+:sourcesdir: ../../../../source
+
+[[gui_data]]
+==== 数据组件
+
+++++
+<div class="manual-since-container">
+    <a href="http://files.cuba-platform.com/cuba/release-notes/7.0/" class="since-btn" target="_blank">
+        <span class="since-btn-caption">最低版本</span><span class="since-btn-version">7.0</span>
+    </a>
+</div>
+++++
+
+数据组件是界面的不可见元素，用来从中间层加载数据，然后绑定数据到可视化组件，也可将数据改动保存回中间层。有以下数据组件：
+
+* <<gui_data_containers,数据容器>>作为实体和具有数据感知能力的可视化组件之间薄薄的一层，不同类型的容器包含单一实体实例或者实体的集合。
+
+* <<gui_data_loaders,数据加载器>>将数据从中间层加载至数据容器。
+
+* <<gui_DataContext,数据上下文>>跟踪实体的改动并且按照要求将改动的实例发送回中间层。
+
+通常，数据组件在界面 XML 描述的 `<data>` 元素定义。可以跟可视化组件以相同的方式注入到控制器中：
+
+[source, java]
+----
+include::{sourcesdir}/gui/data_comp/data_comp_4.java[]
+----
+
+特定界面的数据组件注册在 `ScreenData` 对象中，这个对象跟控制器关联，可以通过控制器的 `getScreenData()` 方法获取。这个对象在需要加载界面所有的数据的时候很有用，示例：
+
+[source, java]
+----
+include::{sourcesdir}/gui/data_comp/data_comp_5.java[]
+----
+
+[TIP]
+====
+需要注意的是，如果控制器带有 `@LoadDataBeforeShow` 注解，数据会自动加载。所以只有在没有此注解或注解的值是 `false` 的时候需要通过编程的方式加载数据。通常在需要设置一些加载参数的时候使用编程的方法，如上面例子所示。
+====
+
+include::gui_data/gui_data_containers.adoc[]
+
+include::gui_data/gui_data_loaders.adoc[]
+
+include::gui_data/gui_DataContext.adoc[]
+
+include::gui_data/gui_using_data_comp.adoc[]

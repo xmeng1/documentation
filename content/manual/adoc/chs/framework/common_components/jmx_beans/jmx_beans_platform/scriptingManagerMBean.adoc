@@ -1,0 +1,37 @@
+:sourcesdir: ../../../../../../source
+
+[[scriptingManagerMBean]]
+====== ScriptingManagerMBean
+
+http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/jmx/ScriptingManagerMBean.html[ScriptingManagerMBean] 是 <<scripting,Scripting>> 基础接口的 JMX 外观设计模式实现。
+
+JMX 对象名: `app-core.cuba:type=ScriptingManager`
+
+JMX 属性:
+
+* `RootPath` – 中间层<<app_tiers,block>> <<conf_dir,配置文件目录>>的绝对路径，是这个 Bean 的起始目录。
+
+JMX 操作：
+
+* `runGroovyScript()` – 在中间层上下文中执行 Groovy 脚本并返回结果。会将以下变量传递给脚本：
+
+** `persistence` - <<persistence,Persistence>> 类型的参数。
+
+** `metadata` - <<metadata,Metadata>> 类型的参数。
+
+** `configuration` - <<configuration,Configuration>> 类型的参数。
+
+** `dataManager` - <<dataManager,DataManager>> 类型的参数。
++
+--
+
+结果类型应该是可显示 JMX 界面上的字符串类型。除此之外，此方法与 <<scripting.runGroovyScript,Scripting.runGroovyScript()>> 完全一样。
+
+用于创建一组测试用户的示例脚本，如下所示：
+
+[source, groovy]
+----
+include::{sourcesdir}/common/scriptingjmx_1.java[]
+----
+--
+

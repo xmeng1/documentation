@@ -1,0 +1,81 @@
+:sourcesdir: ../../../../../source
+
+[[build.gradle_createDb]]
+===== 创建数据库
+
+`createDb` – `CubaDbCreation` 类型的任务，通过执行相应的<<db_scripts,数据库脚本>>来创建应用程序数据库。定义在 `core` 模块。
+
+如果<<db_connection_app,使用应用程序属性>>配置数据源，下面这些参数会自动从应用程序属性中获取，所以任务定义可以为空：
+
+[source, groovy]
+----
+task createDb(dependsOn: assemble, description: 'Creates local database', type: CubaDbCreation) {
+}
+----
+
+当然也可以显式的设置这些参数：
+
+* `storeName` - 附加数据存储的名称。如果未设置，任务会在主数据存储上运行。
+
+* `dbms` – <<dbms_types, 数据库类型>>，`hsql`，`postgres`，`mssql` 或者 `oracle`。
+
+* `dbName` – 数据库名称
+
+* `dbUser` – 数据库用户名
+
+* `dbPassword` – 用户的密码
+
+* `host` – 数据库服务的地址和端口（可选），使用 `host[:port]` 格式。如果没设置，则会使用 `localhost`。
+
+* `connectionParams` - 可选的连接参数，添加到连接 URL 最后面。
+
+* `masterUrl` – 数据库连接串 URL。如果没设置，默认会根据 `dbms` 和 `host` 生成。
+
+* `dropDbSql` –  删除数据库的 SQL 命令。如果没设置，默认会根据 `dbms` 生成。
+
+* `createDbSql` – 创建数据库的 SQL 命令。如果没设置，默认会根据 `dbms` 生成。
+
+* `driverClasspath` – 包含 JDBC 驱动的 JAR 包文件列表。在 Linux 系统使用 ":" 分隔列表里的文件，在 Windows 系统使用 ";" 分隔。如果没设置，系统会用当前模块的 `jdbc` 配置所需要的依赖。使用 Oracle 的时候需要显式的定义 `driverClasspath`，因为 Oracle 的 JDBC 驱动没有能自动下载的可用依赖，需要手动配置。
+
+* `oracleSystemPassword` – Oracle 的 SYSTEM 用户密码。
+
+PostgreSQL 示例:
+
+[source, groovy]
+----
+task createDb(dependsOn: assemble, description: 'Creates local database', type: CubaDbCreation) {
+    dbms = 'postgres'
+    dbName = 'sales'
+    dbUser = 'cuba'
+    dbPassword = 'cuba'
+}
+----
+
+微软 SQL Server 示例:
+
+[source, groovy]
+----
+task createDb(dependsOn: assemble, description: 'Creates local database', type: CubaDbCreation) {
+    dbms = 'mssql'
+    dbName = 'sales'
+    dbUser = 'sa'
+    dbPassword = 'saPass1'
+    connectionParams = ';instance=myinstance'
+}
+----
+
+Oracle 示例:
+
+[source, groovy]
+----
+task createDb(dependsOn: assemble, description: 'Creates database', type: CubaDbCreation) {
+    dbms = 'oracle'
+    host = '192.168.1.10'
+    dbName = 'orcl'
+    dbUser = 'sales'
+    dbPassword = 'sales'
+    oracleSystemPassword = 'manager'
+    driverClasspath = "$tomcatDir/lib/ojdbc6.jar"
+}
+----
+

@@ -1,0 +1,27 @@
+:sourcesdir: ../../../../source
+
+[[qs_create_menu]]
+==== 应用程序菜单
+
+在创建界面的同时，这些界面会被自动添加到默认的应用程序菜单的 *application* 菜单项中。现在重命名这个菜单，在 Studio 的 CUBA 项目树中切换到 *Generic UI* 部分，双击 *Web Menu*，这时会打开 `web-menu.xml` 描述文件。
+
+将菜单标识符从 `application-sales` 改为 `shop`，可以从代码直接改，也可以通过 *Structure* 标签页的可视化编辑器修改，效果一样。
+
+[source, xml]
+----
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<menu-config xmlns="http://schemas.haulmont.com/cuba/menu.xsd">
+    <menu id="shop" insertBefore="administration">
+        <item screen="sales_Customer.browse"/>
+        <item screen="sales_Order.browse"/>
+    </menu>
+</menu-config>
+----
+
+然后，在 *Main Message Pack* 部分打开 `messages.properties` 文件，修改菜单项的标题：
+
+[source, plain]
+----
+menu-config.shop = Shop
+----
+

@@ -1,0 +1,161 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_PickerField]]
+====== 选择器控件
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-pickerfield" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/PickerField.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`PickerField` 在文本字段中显示实体实例，并在用户单击右侧的按钮时执行操作。
+
+image::PickerField.png[align="center"]
+
+该组件的 XML 名称： `pickerField`
+
+* `PickerField` 有一个使用规则，就是它只用于引用类型的实体属性。使用时为组件指定 <<gui_attr_dataContainer,dataContainer>> 和 <<gui_attr_property,property>> 属性就可以了：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/pickerfield_1.xml[]
+---- 
++
+在上面的例子中，界面为具有 `color` 属性的 `Car` 实体定义了 id 为 `carDc` 的<<gui_data_containers,数据容器>>。在 `pickerField` 元素中，通过 `dataContainer` 属性连接到此数据容器，并给 `property` 属性设置了实体属性的名称。实体属性应该引用另一个实体，在上面的示例中就是 `Color` 实体。
+
+
+[[gui_PickerField_actions]]
+* 对于 `PickerField`，可以定义任意数量的<<gui_Action,操作>>，这些操作在组件右侧显示为按钮。
++
+操作的定义可以使用 `actions` 嵌套元素在 XML 描述中完成，也可以使用 `addAction()` 方法在控制器中以编程方式完成。
+
+** 平台提供一组标准的 <<standard_actions,PickerField 操作>> ：`picker_lookup` 、`picker_clear` 、`picker_open`。它们分别执行关联实体的选择、清空组件以及打开所选关联实体的编辑界面。在 XML 中声明标准操作时，应当定义操作的标识符并使用 `type` 属性定义操作类型。
++
+如果在声明组件时未定义 `actions` 元素中的动作，则 XML 加载器将默认为其定义 `lookup` 和 `clear` 操作。要添加一个默认操作，比如 `open`，就需要定义 `actions` 元素，如下所示：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/pickerfield_2.xml[]
+---- 
++
+`action` 元素能不能扩展，但可以按操作标识符来覆盖一组标准操作。所以必须明确定义所有需要的操作的标识符。该组件如下所示：
++
+image::gui_pickerFieldActionsSt.png[align="center"]
++
+[[gui_PickerField_addAction]]
+使用 `addAction()` 以编程方式设置标准操作。如果在组件的 XML 描述中没有 `actions` 嵌套元素，就可以使用这个方法添加缺少的操作：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/pickerfield_3.java[]
+---- 
++
+如果组件是在控制器中创建的，则它将不会包含默认操作，需要显式添加所有需要的操作：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/pickerfield_4.java[]
+---- 
++
+可以通过订阅 `ActionPerformedEvent` 事件来自定义标准操作的行为并提供自定义的实现。比如，可以通过如下方式使用特定的查找界面：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/pickerfield_5.java[]
+---- 
++
+更多信息，请参阅 <<opening_screens,>> 部分。
+
+** 可以在 XML 描述中的 `actions` 嵌套元素中定义任何操作，这些操作的逻辑可以在操作的事件中实现，例如：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/pickerfield_6.xml[]
+----
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/pickerfield_7.java[]
+----
++
+操作的声明式创建和编程式创建在<<gui_Action>>部分有描述。
+
+[[gui_PickerField_metaclass]]
+* 可以在不绑定实体的情况下使用 `PickerField`，即不设置 <<gui_attr_dataContainer,dataContainer>>/<<gui_attr_datasource,datasource>> 和 <<gui_attr_property,property>>属性。在这种情况下，`metaClass` 属性应该用于指定 `PickerField` 的实体类型。例如：
+
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/pickerfield_8.xml[]
+---- 
++
+可以通过将组件注入控制器并调用其 `getValue()` 方法来获取所选实体的实例。
++
+[WARNING]
+====
+要正确使用 `PickerField` 组件，需要设置 `metaClass` 属性，或者同时设置 <<gui_attr_dataContainer,dataContainer>>/<<gui_attr_datasource,datasource >> 和<<gui_attr_property,property >> 属性。
+====
+可以在 `PickerField` 中使用键盘快捷键，有关详细信息，请参阅<<shortcuts,快捷键>>。
+
+[[gui_PickerField_iconProvider]]
+* `PickerField` 组件可以在左边有一个图标。下面的例子在界面控制器中使用 `setOptionIconProvider()` 提供的方法。`"cancel"` 图标会在字段值是 `null` 的时候显示，而 `"chain"` 图标会在其它情况显示。
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/pickerfield_9.java[]
+----
++
+image::gui_pickerField_icons.png[align="center"]
+
+'''
+
+pickerField 的属性::
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_captionProperty,captionProperty>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_PickerField_metaclass,metaClass>> -
+<<gui_attr_property,property>> -
+<<gui_attr_required,required>> -
+<<gui_attr_requiredMessage,requiredMessage>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+pickerField 的元素::
+<<gui_PickerField_actions,actions>> -
+<<gui_validator,validator>>
+
+API::
+<<gui_PickerField_addAction,addAction>> -
+<<gui_api_addValueChangeListener,addValueChangeListener>> -
+<<gui_api_commit,commit>> -
+<<gui_api_discard,discard>> -
+<<gui_api_isModified,isModified>> -
+<<gui_api_contextHelp,setContextHelpIconClickHandler>> -
+<<gui_LookupField_setOptionCaptionProvider,setOptionCaptionProvider>> -
+<<gui_PickerField_iconProvider, setOptionIconProvider>>
+
+'''
+

@@ -1,0 +1,35 @@
+:sourcesdir: ../../../../../source
+
+[[config_interfaces]]
+===== 配置接口
+
+配置接口机制允许使用 Java 接口方法处理应用程序属性，从而带来以下好处：
+
+* 类型化访问 - 在应用程序代码中可以使用实际数据类型（String 、 Boolean 、 Integer 等）。
+* 应用程序代码使用接口方法而不是字符串类型的属性标识符，这些接口方法可由编译器检查，并且在集成开发环境中使用代码自动完成。
+
+读取中间件 block 中的事务超时属性值的示例：
+
+[source, java]
+----
+include::{sourcesdir}/common/configinterface_1.java[]
+----
+
+如果无法注入，可以通过<<configuration,Configuration>>基础接口获取配置接口引用：
+
+[source, java]
+----
+include::{sourcesdir}/common/configinterface_2.java[]
+----
+
+[WARNING]
+====
+配置接口不是常规的 Spring bean。它们只能通过显式接口注入或通过 `Configuration.getConfig()` 获取，但不能通过 `AppBeans.get()` 获取。
+====
+
+include::config_interfaces/config_interface_usage.adoc[]
+
+include::config_interfaces/config_interface_property_types.adoc[]
+
+include::config_interfaces/config_interface_default_values.adoc[]
+

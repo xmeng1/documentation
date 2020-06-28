@@ -1,0 +1,143 @@
+:sourcesdir: ../../../../../source
+
+[[declarative_actions]]
+===== 声明式操作
+
+可以在 XML 界面描述中为任何实现了 `Component.ActionsHolder` 接口的组件指定一组<<gui_Action,操作>>，包括整个窗口或 frame。 操作的定义使用 `actions` 元素完成，它包含嵌套的 `action` 元素。
+
+`action` 元素有以下属性：
+
+* `id` − 标识符，在 `ActionsHolder` 组件中应该是唯一的。
+
+* `type` - 定义指定的操作类型。如果设置了该属性，框架会搜索带有 `@ActionType` 注解以及指定类型的类，并用该类实例化此操作。如果未指定类型，框架会创建一个<<baseAction,BaseAction>>类的实例。参阅 <<standard_actions>> 了解如何使用框架提供的操作类型，以及 <<custom_action_types>> 了解如何创建自己的操作类型。
+
+* `caption` – 操作名称。
+
+* `description` – 操作描述。
+
+* `enable` – 可用性标识(`true` / `false`)。
+
+* `icon` – 操作图标。
+
+[[actions_primary]]
+* `primary` - 属性，表明是否应使用特殊视觉样式（`true` / `false`）突出显示表示此操作的按钮。
++
+--
+突出显示在 `hover` 主题中默认可用; 要在 `halo` 主题中启用此功能，请将 `$cuba-highlight-primary-action` <<web_theme_extension_common,样式变量>>设置为 `true`。
+
+默认情况下，`create` 标准列表操作和查找界面中的 `lookupSelectAction` 是突出显示的。
+
+image::actions_primary.png[align="center"]
+--
+
+* `shortcut` - 快捷键。
++
+--
+
+可以在 XML 描述中对快捷键值进行硬编码。可选的修饰键：`ALT`、`CTRL`、`SHIFT` ，由“ - ”字符分隔。例如：
+
+[source, xml]
+----
+<action id="create" shortcut="ALT-N"/>
+----
+
+要避免使用硬编码值，可以使用下面列表中的预定义快捷键别名，例如：
+
+[source, xml]
+----
+<action id="edit" shortcut="${TABLE_EDIT_SHORTCUT}"/>
+----
+
+** `TABLE_EDIT_SHORTCUT`
+
+** `COMMIT_SHORTCUT`
+
+** `CLOSE_SHORTCUT`
+
+** `FILTER_APPLY_SHORTCUT`
+
+** `FILTER_SELECT_SHORTCUT`
+
+** `NEXT_TAB_SHORTCUT`
+
+** `PREVIOUS_TAB_SHORTCUT`
+
+** `PICKER_LOOKUP_SHORTCUT`
+
+** `PICKER_OPEN_SHORTCUT`
+
+** `PICKER_CLEAR_SHORTCUT`
+
+另一种选择是使用 `Config` 接口和方法的完全限定名称，这个方法返回快捷键定义：
+
+[source, xml]
+----
+<action id="remove" shortcut="${com.haulmont.cuba.client.ClientConfig#getTableRemoveShortcut}"/>
+----
+--
+
+* `visible` – 可见性标识 (`true` / `false`).
+
+下面是操作声明和处理的示例。
+
+* 为整个界面声明操作：
++
+[source, xml]
+----
+include::{sourcesdir}/gui/actions_1.xml[]
+----
++
+[source, java]
+----
+include::{sourcesdir}/gui/actions_2.java[]
+----
++
+在上面的示例中，声明了一个操作，它的标识符是 `sayHello`，标题来自界面的<<message_packs,消息包>>。此操作被绑定到一个按钮，按钮的标题将被设置为操作的名称。界面控制器订阅操作的 `ActionPerformedEvent`，这样当用户单击按钮或按下 ALT-T 快捷键时，将调用 `onSayHelloActionPerformed()` 方法。
+
+* 为<<gui_PopupButton,PopupButton>>声明操作:
++
+[source, xml]
+----
+include::{sourcesdir}/gui/actions_3.xml[]
+---- 
++
+[source, java]
+----
+include::{sourcesdir}/gui/actions_3_1.java[]
+----
+
+* 为<<gui_Table,Table>>声明操作:
++
+[source, xml]
+----
+include::{sourcesdir}/gui/actions_4.xml[]
+----
++
+[source, java]
+----
+include::{sourcesdir}/gui/actions_4_1.java[]
+----
++
+在这个例子中，除了表格的 `create` 、`edit` 和 `remove` 标准动作之外，还声明了 `copy` 操作。`trackSelection="true"` 属性表示如果表格中没有行被选中，则操作和相应按钮将被禁用。如果要对当前选定的表格行执行操作， 这个属性就很有用。
+
+* 声明<<gui_PickerField,PickerField>>操作:
++
+[source, xml]
+----
+include::{sourcesdir}/gui/actions_5.xml[]
+----
++
+[source, java]
+----
+include::{sourcesdir}/gui/actions_5_1.java[]
+----
++
+在上面的例子中，为 `PickerField` 组件声明了标准的 `picker_lookup` 操作和一个额外的 `show` 操作。由于显示操作的 `PickerField` 按钮使用图标而不是标题，因此未设置标题属性。`description` 属性允许将光标悬停在操作按钮上时显示提示信息。
+
+在界面控制器中可以通过直接注入或从实现 `Component.ActionsHolder` 接口的组件中获取中任何已声明操作的引用。这对于以编程方式设置操作属性非常有用。例如：
+
+[source, java]
+----
+include::{sourcesdir}/gui/actions_6.java[]
+---- 
+

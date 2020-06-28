@@ -1,0 +1,4 @@
+[[using_entity_listeners_recipe]]
+=== 使用实体监听器
+
+示例请参阅 <<entity_listeners>> 部分。

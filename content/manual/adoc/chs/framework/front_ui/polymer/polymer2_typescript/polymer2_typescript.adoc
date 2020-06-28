@@ -1,0 +1,60 @@
+:sourcesdir: ../../../../../source
+
+[[polymer2_typescript]]
+===== TypeScript 支持
+
+从 CUBA Release 6.9 开始，可以通过 Studio 搭建基于 TypeScript 的 Polymer 客户端脚手架代码。当创建 Polymer 客户端模块的时候，可以选择客户端的 `polymer2-typescript` preset。跟基本 JavaScript 版本的主要不同是：
+
+组件类（Component classes）放在分开单独的 `*.ts` 文件::
+
+[source,typescript]
+.myapp-component.ts
+----
+namespace myapp {
+
+  const {customElement} = Polymer.decorators;
+
+  @customElement('myapp-component')
+  class MyappComponent extends Polymer.Element {
+  }
+}
+----
+
+[source,html]
+.myapp-component.html
+----
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<link rel="import" href="./shared-styles.html">
+
+<dom-module id="myapp-component">
+  <template>
+     <!-- some html markup -->
+  </template>
+  <script src="myapp-component.js"></script>
+</dom-module>
+----
+
+构建过程额外增加了一个阶段 - TypeScript 编译::
+
+参考 `package.json` 的 `scripts` 部分：
+
+[source,json]
+----
+{
+  "scripts": {
+    "build": "npm run compile && polymer build",
+    "compile": "tsc",
+    "watch": "tsc -w"
+  }
+}
+----
+
+现在，在 `polymer build` 命令之前，需要先运行 `npm run compile` 命令，这个命令会有效的执行 TypeScript 编译（`tsc`）。
+
+[WARNING]
+====
+如果修改了组件类的代码，并且希望通过 Studio 的热部署使改动生效，需要先手动在 `modules/front` 目录运行 `npm run watch` 命令。
+====
+
+include::polymer2_typescript_components.adoc[]

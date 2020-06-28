@@ -1,0 +1,117 @@
+:sourcesdir: ../../../../../../source
+
+[[datasource_query_params]]
+====== 查询参数
+
+[WARNING]
+====
+这是旧版本的 API。对于从 7.0 开始的新 API，请参阅 <<gui_data>>。
+====
+
+数据源中的 JPQL 查询语句可能包含几种不同类型的参数。参数类型是通过参数名称的前缀决定的，参数名称中 $ 符号之前的部分就是名称前缀，下面针对不同的前缀分别介绍一下 $ 符号之后部分的理解。
+
+[[datasource_query_params_ds]]
+* `ds` 前缀
++
+这个参数的值是在同一个 `DsContext` 注册的其它数据源的数据。示例：
++
+[source, xml]
+----
+include::{sourcesdir}/gui/datasources_6.xml[]
+---- 
++
+上面这个例子中，`ordersDs` 数据源的查询参数是 `customersDs` 数据源当前加载的实体实例。
++
+如果使用了 `ds` 开头的参数，会自动创建数据源之间的依赖关系。因此能在参数变化了的情况下数据源自动更新。比如在上面的例子中，如果选择的 Customer 改变了，Order 的列表会自动更新。
++
+需要注意的是，在上面这个带参数的查询中，等号左边的部分是 `o.customer.id` 标识符的值，右边部分则是 `customersDs` 数据源中的 `Customer` 实例。这个等式能成立是因为在 *Middleware* 运行这个查询的时候，<<query,Query>> 接口的实现类会在给查询参数赋值的时候自动将实体的实例替换成实体的 ID。
++
+也可以在 $ 符号后面的数据源中使用实体关系图（entity graph）中的路径来指定一个深层的属性（直接用这个属性的值），示例：
++
+[source, xml]
+----
+include::{sourcesdir}/gui/datasources_7.xml[]
+---- 
++
+或者 
++
+[source, xml]
+----
+include::{sourcesdir}/gui/datasources_8.xml[]
+---- 
+
+[[datasource_query_params_custom]]
+* `custom` 前缀
++
+参数值会从传给数据源 `refresh()` 方法的 `Map<String, Object>` 对象中获取。示例：
++
+[source, xml]
+----
+include::{sourcesdir}/gui/datasources_9.xml[]
+----
++
+[source, java]
+----
+include::{sourcesdir}/gui/datasources_10.java[]
+---- 
++
+如果需要的话，这里也会将实体实例转成标识符，这个机制跟 `ds` 前缀里面描述的类似。但是这里不支持实体关系图路径。
+
+[[datasource_query_params_param]]
+* `param` 前缀
++
+参数值从传递给<<screen_controller,界面控制器>> `init()` 方法的 `Map<String, Object>` 对象中获取。示例：
++
+[source, xml]
+----
+include::{sourcesdir}/gui/datasources_15.xml[]
+----
++
+[source, java]
+----
+include::{sourcesdir}/gui/datasources_18.java[]
+----
++
+如果需要的话，这里也会将实体实例转成标识符，这个机制跟 `ds` 前缀里面描述的类似。这里也支持使用实体关系图路径的参数名称。
+
+[[datasource_query_params_component]]
+* `component` 前缀
++
+使用一个可视化组件当前的值作为参数值，通过参数名称来定义组件路径。示例：
++
+[source, xml]
+----
+include::{sourcesdir}/gui/datasources_11.xml[]
+---- 
++
+组件的路径需要包含所有嵌套的<<frame,界面子框架>>。
++
+如果需要的话，这里也会将实体实例转成标识符，这个机制跟 `ds` 前缀里面描述的类似。这里也支持使用实体关系图路径的参数名称，但是实体属性的路径要继续添加在组件路径之后。
++
+[TIP]
+====
+数据源不会因为组件的值改变而自动刷新。
+====
+
+[[datasource_query_params_session]]
+* `session` 前缀
++
+--
+从<<userSession,用户会话>>的属性中获取跟参数名称相同的属性值作为参数值。
+
+通过 `UserSession.getAttribute()` 方法获取这个值，所以会话中预定义的名称都支持。
+
+** `userId` – 当前注册用户或者被替代用户的 ID；
+
+** `userLogin` – 当前注册用户或者被替代用户的用户名（英文小写）。
+
+示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui/datasources_12.xml[]
+---- 
+
+如果需要的话，这里也会将实体实例转成标识符，这个机制跟 `ds` 前缀里面描述的类似。但是这里不支持实体关系图路径。
+--
+

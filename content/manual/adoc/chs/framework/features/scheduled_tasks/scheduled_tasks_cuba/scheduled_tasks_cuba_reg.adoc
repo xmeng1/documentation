@@ -1,0 +1,96 @@
+:sourcesdir: ../../../../../../source
+
+[[scheduled_tasks_cuba_reg]]
+====== 任务注册
+
+任务在数据库表 `++SYS_SCHEDULED_TASK++` 中注册，该表对应于 `ScheduledTask` 实体。平台提供了用于管理任务的浏览和编辑界面： *Administration* -> *Scheduled Tasks* 。
+
+下面是关于任务属性的描述：
+
+* *Defined by* – 描述哪个软件对象实现该任务。可能的值是：
+
+** *Bean* – 该任务由 Spring<<managed_beans,bean>>的方法实现。额外属性：
+
+*** *Bean name* – Spring bean 的名称。
++
+[WARNING]
+====
+只有在 *core* 模块中定义并且具有接口（该接口包含适合任务调用的方法）时，才会列出该 bean 并且可供选择。不支持没有接口的 bean。
+====
+
+*** *Method name* – 执行的 bean 接口方法。该方法要么没有参数，要么所有参数必须是 `String` 类型。方法的返回值类型可以是 `void` 或 `String`。后一种情况的返回值将存储在执行表中（参阅下面的 *Log finish* ）。
+
+*** *Method parameters* – 所选方法的参数。仅支持 `String` 类型的参数。
+
+** *Class* – 该任务是一个实现 `java.util.concurrent.Callable` 接口的类。该类必须具有 public 修饰符的无参构造函数。附加属性：
+
+*** *Class name* – 类名。
+
+** *Script* – 该任务是一个 Groovy 脚本。该脚本由<<scripting.runGroovyScript,Scripting.runGroovyScript()>>执行。附加属性：
+
+*** *Script name* – 脚本名。
+
+* *User name* – 一个用户名，以其身份执行任务。如果未指定，则以<<cuba.jmxUserLogin,cuba.jmxUserLogin>>应用程序属性中指定的用户的身份来执行该任务。
+
+* *Singleton* – 表示该任务是单例，即应该只在一个应用程序服务上运行。
+
+* *Scheduling type* – 任务调度的方式:
+
+** *Cron* – Cron 表达式是由六个字段组成的序列，用空格分隔：秒、分钟、小时、日、月、星期。月份和星期可以用英文名称的前三个字母表示。例如：
+
+*** 0 0 * * * * – 每天每小时的开始时刻
+
+*** */10 * * * * * – 每 10 秒钟
+
+*** 0 0 8-10 * * * – 每天 8 点、9 点和 10 点
+
+*** 0 0/30 8-10 * * * – 每天 8:00、 8:30、 9:00、 9:30 和 10 点
+
+*** 0 0 9-17 * * MON-FRI – 工作日每天 9 点到 17 点的整点时刻
+
+*** 0 0 0 25 DEC ? – 每个圣诞节的午夜 12 点
+
+** *Period* – 以秒为单位周期性执行
+
+** *Fixed Delay* – 完成前一次执行后，将延迟在 *Period* 中指定的时间之后再次执行任务。
+
+* *Period* – 如果 *Scheduling type* 是 *Period* 或 *Fixed Delay*，任务将以秒为单位周期性重复执行或延迟固定时间后执行。
+
+* *Start date* – 首次执行的日期或时间。如果未指定，则在服务启动时立即执行该任务。如果指定，则在 `++startDate + period * N++` 启动执行任务，其中 N 是整数。对于周期任务来说，N 可以是大于 1 的数，对延迟任务来说 N 是 1。
++
+只为偶发任务指定 `Start date` 是合理的，即每小时运行一次、每天运行一次等。
+
+* *Timeout* – 以秒为单位的时间，到期时无论是否存在关于任务完成的信息，都认为任务已执行完成。如果未明确设置超时时间，则假定为 3 小时。
++
+[TIP]
+====
+推荐在使用<<cluster_mw,集群>>部署时，将超时时限（timeout）设置为一个切实可行的值。如果使用标准值，当一个正在执行计划任务的集群节点宕机之后，其他节点要等候 3 小时才开始执行新的任务。
+====
+
+* *Time frame* – 如果指定了 `Start date` ,`Time frame` 定义了以秒为单位的时间窗口，任务将在 `++startDate + period * N++` 时间到期后的 `Time frame` 秒内启动。如果没有明确指定 `Time frame`，则它等于 `period / 2`。
++
+如果未指定 `Start date`，则忽略 `Time frame`，即任务将在上一次任务到期执行后的 `Period` 之后的任何时间启动。
+
+* *Start delay* - 服务启动并激活调度后，延迟执行的秒数。如果任务会拖慢服务启动的速度，可考虑为任务设置此参数。
+
+* *Permitted servers* – 以逗号分隔的具有运行此任务权限的<<serverId,服务器标识符>>列表，如果未指定列表，则可以在任何服务器上执行该任务。
++
+对于单例任务，列表中服务器的顺序决定了执行优先级：第一个服务器的优先级高于最后一个。具有较高优先级的服务器将拦截单例的执行，如下所示：如果具有较高优先级的服务器检测到该任务先前已由具有较低优先级的服务器执行，则无论 `Period` 是否过期，它都会启动该任务。
++
+[WARNING]
+====
+服务器优先级仅在 *Scheduling type* 为 `Period` 并且未指定 *Start date* 属性时有效。否则，服务会同时开始，也就没有机会进行拦截了。
+====
+
+* *Log start* – 标记任务启动是否应该在 `++SYS_SCHEDULED_EXECUTION++` 表中记录，该表对应于 `ScheduledExecution` 实体。
++ 
+在目前的实现中，如果任务是单例，无论此标志是什么都会记录启动状态。
+
+* *Log finish* – 标记任务完成是否应该在 `++SYS_SCHEDULED_EXECUTION++` 表中记录，该表对应于 `ScheduledExecution` 实体。
++
+在目前的实现中，如果任务是单例，则无论此标志是什么都会记录完成状态。
+
+* *Description* – 任务的文本描述。
+
+任务也具有激活标志，可以在任务列表界面中设置。非激活任务会被忽略。
+

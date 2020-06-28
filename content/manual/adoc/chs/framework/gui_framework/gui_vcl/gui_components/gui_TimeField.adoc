@@ -1,0 +1,97 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_TimeField]]
+====== 时间组件
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-timefield" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/TimeField.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`TimeField` 是用来显示和输入时间的组件。
+
+image::gui_timeField.png[align="center"]
+
+组件的 XML 名称: `timeField`
+
+* 要创建关联数据的时间组件，应该使用<<gui_attr_dataContainer,数据容器>>和 <<gui_attr_property,property>> 属性:
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/timefield_1.xml[]
+---- 
++
+如同上面的示例，在界面描述中为实体 `Order` 定义了<<gui_data_containers,数据容器>> `orderDc` ，实体具有 `deliveryTime` 属性。时间输入组件的 `dataContainer` 属性包含到数据容器的连接， `property` 属性 – 设置要显示在时间字段中的实体属性名称。
++
+关联的实体属性类型应该是 `java.util.Date` 或 `java.sql.Time` 类型。
+
+[[gui_TimeField_datatype]]
+* 如果该控件不与实体属性相关联（比如没有设置数据容器和属性名称），可以使用 `datatype` 属性设置数据类型。 `TimeField` 使用如下数据类型：
+** `localTime`
+** `offsetTime`
+** `time`
+
+[[gui_TimeField_timeFormat]]
+* 时间格式通过 `time` <<datatype,数据类型>>定义，并且在<<main_message_pack,主本地化消息包>>中通过 `timeFormat` 键指定。
+
+* 时间格式也可以通过 `timeFormat` 属性指定，属性值可以是一个格式化字符串，或者是消息包中的键名(前缀：`msg://` )。
+
+[[gui_TimeField_showSeconds]]
+* 无论上面提到的属性如何设置，都可以通过 `showSeconds` 属性控制是否显示秒。默认情况下，如果时间格式中包含 `ss`，则显示秒。
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/timefield_2.xml[]
+----
++
+image::gui_timeFieldSec.png[align="center"]
+
+'''
+
+timeField 的属性::
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_TimeField_datatype,datatype>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_attr_property,property>> -
+<<gui_attr_required,required>> -
+<<gui_attr_requiredMessage,requiredMessage>> -
+<<gui_TimeField_showSeconds,showSeconds>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_TimeField_timeFormat,timeFormat>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+timeField 的元素::
+<<gui_validator,validator>>
+
+API::
+<<gui_api_addValueChangeListener,addValueChangeListener>> -
+<<gui_api_commit,commit>> -
+<<gui_api_discard,discard>> -
+<<gui_api_isModified,isModified>> -
+<<gui_api_contextHelp,setContextHelpIconClickHandler>>
+
+'''
+

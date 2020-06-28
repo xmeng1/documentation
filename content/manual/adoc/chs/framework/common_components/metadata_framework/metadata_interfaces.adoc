@@ -1,0 +1,158 @@
+:sourcesdir: ../../../../../source
+
+[[metadata_interfaces]]
+===== 元数据接口
+
+以下是基本的元数据接口：
+
+.元数据框架接口
+image::MetadataFramework.png[align="center"]
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/chile/core/model/Session.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+Session::
+元数据框架的入口点。允许按名称或相应的 Java 类获取 `MetaClass` 实例。注意方法的不同：`getClass()` 方法可以返回 `null` 而 `getClassNN()`（NotNull）方法不能。
++
+可以使用<<metadata,元数据>>基础接口获得 `Session` 对象。
++
+示例:
+[source, java]
+----
+@Inject
+protected Metadata metadata;
+...
+Session session = metadata.getSession();
+MetaClass metaClass1 = session.getClassNN("sec$User");
+MetaClass metaClass2 = session.getClassNN(User.class);
+assert metaClass1 == metaClass2;
+----
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/chile/core/model/MetaModel.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+MetaModel::
++
+很少使用的接口，用于对元类进行分组。
++
+元类按照 <<metadata.xml,metadata.xml>> 文件中指定的 Java 项目包的根名称进行分组。
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/chile/core/model/MetaClass.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[metaClass]]
+MetaClass::
++
+--
+实体类元数据接口。`MetaClass` 始终与它所代表的 Java 类相关联。
+
+基本方法：
+
+* `getName()` – 实体名称，根据惯例，在 `_` 符号之前名称的第一部分是项目命名空间代码，例如 `sales_Customer`。
+
+* `getProperties()` – 元属性列表（`MetaProperty`）。
+
+* `getProperty()`、`getPropertyNN()` – 按名称返回元属性。如果没有与提供的名称对应的属性，则第一个方法返回 `null`，第二个方法抛出异常。
++
+示例：
++
+[source, java]
+----
+MetaClass userClass = session.getClassNN(User.class);
+MetaProperty groupProperty = userClass.getPropertyNN("group");
+----
+
+[[MetaPropertyPath]]
+* `getPropertyPath()` – 允许通过引用进行属性遍历。此方法接收属性路径参数 - 以点分隔的属性名字符串。方法返回 `MetaPropertyPath` 对象，可通过调用此对象的 `getMetaProperty()` 方法访问所需的（路径中的最后一个）属性。
++
+示例：
++
+[source, java]
+----
+MetaClass userClass = session.getClassNN(User.class);
+MetaProperty groupNameProp = userClass.getPropertyPath("group.name").getMetaProperty();
+assert groupNameProp.getDomain().getName().equals("sec$Group");
+----
+
+* `getJavaClass()` – 对应于这个 `MetaClass` 的实体类。
+
+* `getAnnotations()` – <<meta_annotations,元注解>>集合。
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/chile/core/model/MetaProperty.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+[[metaProperty]]
+MetaProperty::
++
+实体属性元数据接口。
++
+基本方法：
+
+* `getName()` – 属性名，对应于实体属性名。
+
+* `getDomain()` – 拥有这个属性的元类。
+
+[[metaProperty.getType]]
+* `getType()`- 属性类型：
+
+** 简单类型： `DATATYPE`
+
+** 枚举： `ENUM`
+
+** 两种引用类型：
+
+*** `ASSOCIATION - 关联` − 简单引用另一个实体。例如，订单 - 客户的关系就是一种关联关系。
+
+*** `COMPOSITION - 组合` − 引用一个实体，这个实体在脱离拥有它的实体时会失去实际意义。`COMPOSITION` 被认为是一种比 `ASSOCIATION` 更紧密的关系。例如，Order 和它的 Items 之间的关系是一个 `COMPOSITION`，因为如果没有 Item 所属的 Order，Item 就不能存在。
++
+引用属性的 `ASSOCIATION` 或 `COMPOSITION` 类型影响实体编辑模式：在第一种情况下，相关实体独立地持久化到数据库，在第二种情况下，相关实体仅与父实体一起持久化。有关详细信息，请参阅<<composition_recipe>>。
+
+* `getRange()` – `Range` 接口提供属性类型的详细描述。
+
+* `isMandatory()` – 表示必须属性。例如，可视化组件以此来提示用户必须输入值。
+
+* `isReadOnly()` – 表示只读属性。
+
+* `getInverse()` – 对于引用类型的属性，返回关联另一侧的元属性（如果存在）。
+
+* `getAnnotatedElement()` – 对应于实体属性的字段（`java.lang.reflect.Field`）或方法（`java.lang.reflect.Method`）。
+
+* `getJavaType()` – 实体属性的 Java 类。可以是相应字段的类型，也可以是相应方法的返回值的类型。
+
+* `getDeclaringClass()` – 包含这个属性的 Java 类。
+
+[[range]]
+Range::
++
+详细描述实体属性类型的接口。
++
+基本方法：
+
+* `isDatatype()` – 如果是简单<<metaProperty.getType,类型>>属性则返回 `true`。
+
+* `asDatatype()` – 对于简单类型属性返回对应的<<datatype,Datatype>>实例。
+
+* `isEnum()` –  如果是枚举类型返回 `true`。
+
+* `asEnumeration()` – 对于枚举类型属性返回<<datatype,Enumeration>>实例。
+
+* `isClass()` – 如果是 `ASSOCIATION` 或 `COMPOSITION` 类型属性，则返回 `true`。
+
+* `asClass()` – 对于引用属性返回关联实体的<<metaClass,元类>>。
+
+* `isOrdered()` – 如果属性由有序集合（例如 `List`）表示，则返回 `true`。
+
+* `getCardinality()` – 引用属性的关系类型: `++ONE_TO_ONE++` 、 `++MANY_TO_ONE++` 、`++ONE_TO_MANY++`、 `++MANY_TO_MANY++`。
+

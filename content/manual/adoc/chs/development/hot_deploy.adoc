@@ -1,0 +1,47 @@
+:sourcesdir: ../../../source
+
+[[hot_deploy]]
+=== 热部署
+
+CUBA 框架支持热部署技术，可以在项目运行时进行项目改动的部署，改动即时生效而且不需要重启应用服务。本质上，热部署是将项目的资源改动和 Java 源文件改动拷贝到应用的<<conf_dir,配置目录>>，然后运行中的应用程序会编译源文件并且加载新的类和资源。
+
+工作原理::
++
+--
+当项目中的源代码改动时，Studio 会拷贝改动过的文件到 web 应用程序的配置目录 (`tomcat/conf/app` 或者 `tomcat/conf/app-core`)。由于 Tomcat 配置目录中资源的优先级比应用程序 JAR 包里面的高，所以程序会在下次需要这些资源的时候从配置目录加载。如果需要加载的是 Java 源码，则会先编译再加载编译过后的类。
+
+Studio 也会给应用程序发信号，通知它清理掉缓存以便加载改动过的资源，这些缓存包含信息（messages）缓存、view 的配置、注册的界面还有菜单。
+
+当应用程序服务重启的时候，所有在配置目录的文件都会被删除，因为新的 JAR 包会包含代码的最新改动。
+--
+
+能做热部署的部分::
++
+--
+* *web* 和 *gui* <<app_modules,模块>>中的<<screen_descriptors,界面 XML 描述>>和<<screen_controllers,界面控制器>> (包含静态方法)。
+* *core* 模块中的中间件 <<services,service>> 的实现类。
+* <<portal,Portal>> 模板。
+
+其它 UI 和中间件类或者 bean（包含它们的静态方法），只有在需要它们的某些界面文件或者中间件服务的实现也发生了改动的时候才会做热部署。
+
+原因是，类加载是靠信号驱动的：对于界面控制器来说，这个信号是用户重新打开了界面；对于服务来说 - Studio 生成了一个特殊的触发器文件（trigger file），这个文件可以被应用服务识别，并且使用这个文件来加载里面提到的特定的类和相关的依赖。
+--
+
+不能热部署的部分::
++
+--
+* *global* 模块的任何类，包括中间件服务的接口类、<<base_entity_classes,实体类>>、<<entity_listeners,实体监听器类>>等等。
+--
+
+在 Studio 里面使用热部署::
++
+--
+热部署的设置可以在 Studio 中进行配置：主菜单点击 *CUBA > Settings*，然后选择 *CUBA > Project settings* 元素。
+
+* 点击 *Hot Deploy Settings* 链接可以配置源代码路径和 Tomcat 路径的映射关系。
+
+* *Instant hot deploy* 复选框可以设置关闭当前项目的热部署
+
+当热部署禁用之后，可以通过在主菜单点击 *CUBA > Build Tasks > Hot Deploy To Configuration Directory* 手动触发。
+--
+

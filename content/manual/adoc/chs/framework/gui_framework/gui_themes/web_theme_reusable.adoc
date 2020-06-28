@@ -1,0 +1,99 @@
+:sourcesdir: ../../../../../source
+
+[[web_theme_reusable]]
+===== 创建可复用主题
+
+任何主题都可以在没有<<web_theme_inheritance,应用程序组件>>的情况下打包和重用。要创建主题包，需要从头开始创建 Java 项目并将其打包在单个 JAR 文件中。按照以下步骤创建前面示例中 `facebook` 主题的发布。
+
+. 在 IDE 中使用以下结构创建新项目。它是一个简单的 Java 项目，由 SCSS 文件和主题属性组成：
++
+--
+[source, plain]
+----
+include::{sourcesdir}/gui/themes/themes_31.scss[]
+----
+
+此示例主题项目可以从 https://github.com/cuba-labs/halo-facebook[GitHub] 下载。
+
+* `build.gradle` 脚本：
++
+[source, groovy]
+----
+include::{sourcesdir}/gui/themes/themes_32.groovy[]
+----
+
+* `settings.gradle` 文件：
++
+[source, groovy]
+----
+include::{sourcesdir}/gui/themes/themes_33.groovy[]
+----
+
+* `app-component.scss` 文件：
++
+[source, scss]
+----
+include::{sourcesdir}/gui/themes/themes_34.scss[]
+----
+
+* `halo-facebook.scss` 文件：
++
+[source, scss]
+----
+include::{sourcesdir}/gui/themes/themes_35.scss[]
+----
+
+* `halo-facebook-defaults.scss` 文件：
++
+[source, css]
+----
+include::{sourcesdir}/gui/themes/themes_36.css[]
+----
+
+* `halo-facebook-theme.properties` 文件：
++
+[source, scss]
+----
+include::{sourcesdir}/gui/themes/themes_37.scss[]
+----
+--
+
+. 使用 Gradle 任务构建和安装项目：
++
+[source, plain]
+----
+gradle assemble install
+----
+
+. 通过修改 `build.gradle` 文件，将主题作为 Maven 依赖项添加到基于 CUBA 的项目中，有两种配置方式（gradle configurations）：themes 和 compile：
++
+[source, groovy]
+----
+include::{sourcesdir}/gui/themes/themes_38.groovy[]
+----
++
+如果在本地安装主题，不要忘记将 `mavenLocal()` 添加到仓库列表中：在 Studio 中打 *Project Properties* 界面，选中 “User local maven repository” 复选框。
+
+. 要在项目中继承此主题并修改它，必须扩展此主题。扩展 `halo` 主题并将 `themes/halo` 文件夹重命名为 `themes/halo-facebook`：
++
+[source, plain]
+----
+include::{sourcesdir}/gui/themes/themes_39.scss[]
+----
+
+. 修改 `styles.scss` 文件：
++
+[source, scss]
+----
+include::{sourcesdir}/gui/themes/themes_40.scss[]
+----
+
+. 最后一步是在 `web-app.properties` 文件中定义 `halo-facebook-theme.properties` 文件：
++
+[source, plain]
+----
+include::{sourcesdir}/gui/themes/themes_41.scss[]
+----
+
+现在，可以从 *Help* > *Settings* 菜单中选择 `halo-facebook` 主题，或使用 `cuba.web.theme` 应用程序属性设置默认主题。
+

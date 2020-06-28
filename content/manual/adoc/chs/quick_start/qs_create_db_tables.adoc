@@ -1,0 +1,18 @@
+:sourcesdir: ../../../source
+
+[[qs_create_db_tables]]
+=== 创建数据库表
+
+通过主菜单的 *CUBA > Generate Database Scripts* 来 {studio_man_url}/#database_migration[创建数据库表]。之后，会弹出 *Database Scripts* 页。
+
+包含针对当前数据库状态的增量 DB 更新脚本会展示在 *Updates* 标签页：
+
+image::quick_start/db_scripts.png[align="center"]
+
+生成的数据库初始化脚本在 *Init Tables*, *Init Constraints*, 和 *Init Data* 标签页。
+
+image::quick_start/db_scripts_init.png[align="center"]
+
+点击 *Save and close* 按钮保存生成的脚本。
+
+如果要执行更新脚本，点击 *CUBA > Update database* 即可。也许需要先停止应用程序服务才能进行该操作。

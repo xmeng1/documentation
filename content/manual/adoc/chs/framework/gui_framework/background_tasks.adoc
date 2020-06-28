@@ -1,0 +1,84 @@
+:sourcesdir: ../../../../source
+
+[[background_tasks]]
+==== 后台任务
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=standard-progressbar" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+后台任务机制用于在客户端层异步执行任务，不阻塞用户界面。
+
+要使用后台任务，请执行以下操作：
+
+. 定义一个继承自 `BackgroundTask` 抽象类的任务。将界面控制器的引用传递给任务的构造器，该控制器将与任务和任务超时关联起来。
++
+关闭界面将中断与其相关的任务。此外，任务将在指定的超时后自动中断。
++
+任务执行的实际操作在<<background_tasks_run,run()>>方法中实现。
+
+. 通过将任务实例传递给 `BackgroundWorker` bean 的 `handle()` 方法，创建一个控制任务的 `BackgroundTaskHandler` 类。可以通过在<<screen_controller,界面控制器>>中注入或通过 `AppBeans` 类来获得对 `BackgroundWorker` 的引用。
+
+. 通过调用 `BackgroundTaskHandler` 的 `execute()` 方法来运行任务。
+
+[WARNING]
+====
+UI 组件的状态和数据容器不能在 `BackgroundTask` `run()` 方法中读取/更新：使用 `done()` 、 `progress()` 和 `canceled()` 回调方法代替。如果尝试从后台线程设置 UI 组件的值，则会抛出 `IllegalConcurrentAccessException`。
+====
+
+示例:
+
+[source, java]
+----
+include::{sourcesdir}/gui/backgroundtasks_1.java[]
+----
+
+JavaDocs 中提供了 `BackgroundTask`、`TaskLifeCycle`、`BackgroundTaskHandler` 类的有关方法的详细信息。
+
+请注意以下事项：
+
+* `BackgroundTask<T, V>` 是一个参数化类：
+
+** `T` − 显示任务进度的对象类型。在工作线程中调用 `TaskLifeCycle.publish()` 期间，将此类型对象传递给任务的 `progress()` 方法。
+
+** `V` − 任务结果类型被传递给 `done()` 方法。它也可以通过调用 `BackgroundTaskHandler.getResult()` 方法获得，该方法将等待任务完成。
+
+* `canceled()` 方法只在受控的任务取消时被调用，即在 `TaskHandler` 中调用 `cancel()` 时。
+
+* `handleTimeoutException()` 方法在任务超时时被调用。如果正在运行任务的窗口关闭，则任务将在没有通知的情况下停止。
+
+[[background_tasks_run]]
+* 任务的 `run()` 方法应该支持外部中断。要确保这一点，建议在长时间运行的处理中定期检查 `TaskLifeCycle.isInterrupted()` 标识，并在需要时停止执行。另外，不应该静默地忽略掉 `InterruptedException`（或任何其它异常） - 而应该正确退出方法或根本不处理异常（将异常暴露给调用方）。
++
+** `isCancelled()` 如果通过调用 `cancel()` 方法中断任务，则此方法返回 `true`。
++
+[source, java]
+----
+include::{sourcesdir}/gui/backgroundtasks_2.java[]
+----
+
+* `BackgroundTask` 对象是无状态的。如果在实现任务类时没有为临时数据创建字段，则可以使用单个任务实例启动多个并行进程。
+
+* `BackgroundHandler` 对象（它的 `execute()` 方法）只能被启动一次。如果需要经常重启任务，请使用 `BackgroundTaskWrapper` 类。
+
+* 使用带有一组静态方法的 `BackgroundWorkWindow` 类或 `BackgroundWorkProgressWindow` 类来显示带进度指示器和 *Cancel* 按钮的模式窗口。可以定义进度指示类型，并允许或禁止取消窗口的后台任务。
+
+* 如果需要在任务线程中使用可视化组件的某个值，应该通过 `getParams()` 方法来获取，该方法在任务启动时在 UI 线程中运行一次。在 run()方法中，可以通过 `TaskLifeCycle` 对象的 `getParams()` 方法访问这些参数。
+
+* 如果发生任何异常，框架将在 UI 线程中调用 `BackgroundTask.handleException()` 方法，该方法可用于显示错误。
+
+* 后台任务受<<cuba.backgroundWorker.maxActiveTasksCount,cuba.backgroundWorker.maxActiveTasksCount>>和<<cuba.backgroundWorker.timeoutCheckInterval,cuba.backgroundWorker.timeoutCheckInterval>>应用程序属性的影响。
+
+[WARNING]
+====
+在 Web 客户端中，后台任务是使用 Vaadin 框架提供的 HTTP 推送实现的。有关如何为此技术设置 Web 服务器的信息，请参阅 https://vaadin.com/wiki/-/wiki/Main/Working+around+push+issues 。
+====
+
+[TIP]
+====
+如果不使用后台任务，但想要从非 UI 线程更新 UI 状态，请使用 `UIAccessor` 接口的方法。应该在 UI 线程中使用 `BackgroundWorker.getUIAccessor()` 方法获取对 `UIAccessor` 的引用，之后可以从后台线程中调用它的 `access()` 和 `accessSynchronously()` 方法来安全地读取或修改 UI 组件的状态。
+====
+
+include::background_tasks/background_task_examples.adoc[]

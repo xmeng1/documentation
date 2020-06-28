@@ -1,0 +1,78 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_AppMenu]]
+====== 应用程序菜单
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/mainwindow/AppMenu.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`AppMenu` 应用程序菜单组件提供了在<<gui_MainScreen,主几面>>中自定义主菜单的方式，通过它可以动态管理菜单项。
+
+image::gui_AppMenu.png[align="center"]
+
+CUBA Studio 基于标准的 `MainScreen` 主窗口界面提供了一些界面模板。下面的例子中，这个模板扩展了 `MainScreen` 类，通过它可以直接访问 `AppMenu` 实例：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/appmenu.java[]
+----
+
+`AppMenu` - 应用程序菜单接口的方法有：
+
+[[gui_AppMenu_addMenuItem]]
+* `addMenuItem()` - 往根菜单列表末尾指定位置添加菜单项目。
+
+[[gui_AppMenu_createMenuItem]]
+* `createMenuItem()` - 是一个创建新菜单项目的工厂方法。并不会把菜单项目添加到菜单里。`id` 必须在菜单中唯一。
+
+[[gui_AppMenu_createSeparator]]
+* `createSeparator()` - 创建菜单分隔线。
+
+* `getMenuItem()/getMenuItemNN()` - 根据菜单树中的 `id` 返回菜单项目。
+
+* `getMenuItems()` - 返回菜单根菜单项列表。
+
+* `hasMenuItems()` - 如果该菜单包含菜单项则返回 `true`。
+
+`MenuItem` - 菜单项接口的方法有:
+
+* `addChildItem() / removeChildItem()` - 在子菜单项列表末尾或者指定位置添加/删除菜单项。
+
+* `getCaption()` - 返回菜单项标题。
+
+* `getChildren()` - 返回子菜单项列表。
+
+[[gui_AppMenu_setCommand]]
+* `setCommand()` - 设置菜单项命令或点击菜单项目需要执行的动作。
+
+* `setDescription()` - 设置菜单项的描述，会在弹出提示中显示。
+
+* `setIconFromSet()` - 设置菜单项的图标。
+
+* `getId()` - 返回菜单项的 id。
+
+* `getMenu()` - 返回菜单项所属菜单。
+
+* `setStylename()` - 设置一个或多个自定义的样式，会替换已有的所有自定义样式。多个样式之间用空格分开。样式名称必须是有效的 CSS 类名称。
+
+* `hasChildren()` - 该菜单项有子菜单项时返回 `true`。
+
+* `isSeparator()` - 如果该菜单项是分隔线的话返回 `true`。
+
+* `setVisible()` - 设置菜单项是否可见。
+
+`AppMenu` 的展示可以使用带 `$cuba-menubar-++*++` 和 `$cuba-app-menubar-++*++` 前缀的 SCSS 变量进行自定义。可以在创建一个 <<web_theme_extension,主题扩展>> 或者一个 <<web_theme_creation,自定义主题>> 之后在可视化编辑器里修改这些变量的值。
+
+'''
+
+API::
+<<gui_AppMenu_addMenuItem,addMenuItem>> -
+<<gui_AppMenu_createMenuItem,createMenuItem>> -
+<<gui_AppMenu_createSeparator,createSeparator>> -
+<<gui_AppMenu_setCommand,setCommand>>
+
+'''
+

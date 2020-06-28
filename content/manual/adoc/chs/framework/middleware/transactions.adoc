@@ -1,0 +1,17 @@
+:sourcesdir: ../../../../source
+
+[[transactions]]
+==== 事务管理
+
+本节介绍在 CUBA 应用程序中事务管理的各个方面。
+
+include::transactions/transactions_prog.adoc[]
+
+include::transactions/transactions_decl.adoc[]
+
+include::transactions/transactions_interaction.adoc[]
+
+include::transactions/transaction_params.adoc[]
+
+include::transactions/transaction_listeners.adoc[]
+

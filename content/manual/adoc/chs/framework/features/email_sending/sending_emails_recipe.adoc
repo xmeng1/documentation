@@ -1,0 +1,93 @@
+:sourcesdir: ../../../../../source
+
+[[sending_emails_recipe]]
+===== 发送电子邮件
+
+本节包含使用 CUBA 邮件发送机制发送电子邮件的实用指南。
+
+我们看看以下任务：
+
+--
+* 有 `NewsItem` 实体和 `NewsItemEdit` 界面。
+
+* `NewsItem` 实体包含以下属性： `date` 、  `caption` 、 `content`。
+
+* 我们希望每次通过 `NewsItemEdit` 界面创建新的 `NewsItem` 实例时向某些地址发送电子邮件。电子邮件应包含 `NewsItem.caption` 作为主题，并且应该从包含 `NewsItem.content` 的模板创建邮件消息正文。
+--
+
+. 将以下代码添加到 `NewsItemEdit.java`：
++
+--
+[source, java]
+----
+include::{sourcesdir}/features/email/sending_emails_1.java[]
+----
+<1> - 指示在当前编辑器中是否有新 item。
+<2> - 当新 item 初始化时调用此方法。
+<3> - data context 提交之后调用此方法。
+<4> - 如果新实体保存到数据库，询问用户是否发送邮件。
+<5> - 添加邮件至队列，异步发送。
+<6> - 收件人
+<7> - 标题
+<8> - 从 <<cuba.email.fromAddress,cuba.email.fromAddress>> 应用程序属性获取 `from - 发送` 地址 
+<9> - 邮件体模板路径
+<10> - 模板参数
+
+在上面的代码中，在 `sendByEmail()` 方法中调用 `EmailService` 并传递描述邮件消息的 `EmailInfo` 实例给 `sendEmailAsync` 方法。邮件消息的主体将基于 `news_item.txt` 模板创建。
+--
+
+. 在 *core* 模块的 `com.company.demo.templates` 包中创建邮件消息主体模板文件 `news_item.txt`。
++
+--
+[source, plain]
+----
+include::{sourcesdir}/features/email/sending_emails_2.txt[]
+----
+
+这是一个 link:http://freemarker.incubator.apache.org[Freemarker] 模板，其使用 `EmailInfo` 实例中传递的参数（在本例中为 `newsItem` ）。
+--
+
+. 运行应用程序，打开 `NewsItem` 实体浏览界面并点击 *Create*。编辑界面将被打开。填写字段并点击 *OK*。将显示一个确认对话框，询问是否发送邮件。点击 *Yes*。
+
+. 切换到应用程序的 *Administration > Email History* 界面。将看到两个处于 `Queue` 状态的记录（按收件人数量）。这表示电子邮件在队列中但尚未发送。
+
+. 要处理队列，请设置<<scheduled_tasks_cuba,计划任务>>。切换到应用程序的 *Administration > Scheduled Tasks* 界面。创建一个新任务并设置以下参数：
++
+--
+
+* *Bean Name* - `cuba_Emailer`
+
+* *Method Name* - `processQueuedEmails()`
+
+* *Singleton* - yes（这对于中间层服务集群很重要）
+
+* *Period, sec* - 10
+--
++
+保存任务并点击 *Activate*。
++
+如果之前没有为此项目设置定时任务的执行，则此阶段不会发生任何事情 - 在启动整个定时机制之前，任务不会执行。
+
+. 打开 `modules/core/src/app.properties` 文件并添加以下 <<cuba.schedulingActive,属性>>：
++
+[source, properties]
+----
+cuba.schedulingActive = true
+----
++
+重启应用服务。定时机制现在处于激活状态并调用电子邮件队列处理程序。
+
+. 转到 *Administration > Email History* 界面。如果发送成功，电子邮件的状态将为 `Sent`。否则最有可能为 `Sending` 或 `Queue`。在后一种情况下，可以在 `build/tomcat/logs/app.log` 中打开应用程序日志并找出原因。电子邮件发送机制将尝试多次（默认为 10 次）发送邮件消息，如果失败，设置状态为 `Not sent`。
+
+. 无法发送电子邮件的最常见原因是没有设置 SMTP 服务器<<email_sending_properties,参数>>。可以通过 `app-core.cuba:type=Emailer` JMX bean 或中间件中的应用程序属性文件中设置参数。我们看看后者。打开 `modules/core/src/app.properties` 文件并添加所需的<<email_sending_properties,参数>>。
++
+[source, properties]
+----
+include::{sourcesdir}/features/email/sending_emails_3.properties[]
+----
++
+
+重启应用程序服务。转到 *Administration > JMX Console*，找到 `Emailer` JMX bean 并尝试使用 `sendTestEmail()` 操作向自己发送测试邮件。
+
+. 现在发送机制已经正确设置，但它不会发送在 `Not sent` 状态中的邮件消息。所以必须在编辑界面中创建另一个 `NewsItem`。执行此操作然后观察在 *Email History* 界面中新邮件消息的状态如何更改为 `Sent`。
+

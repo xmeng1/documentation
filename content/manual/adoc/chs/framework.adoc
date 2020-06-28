@@ -1,0 +1,25 @@
+[[framework]]
+== 框架详细介绍
+
+本章节包含关于平台架构、通用组件以及工作机制的详细介绍。
+
+include::framework/architecture.adoc[]
+
+include::framework/common_components.adoc[]
+
+include::framework/dbms.adoc[]
+
+include::framework/middleware.adoc[]
+
+include::framework/gui_framework.adoc[]
+
+include::framework/gui_legacy.adoc[]
+
+include::framework/front_ui.adoc[]
+
+include::framework/portal.adoc[]
+
+include::framework/features.adoc[]
+
+include::framework/extension.adoc[]
+

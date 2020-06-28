@@ -1,0 +1,15 @@
+:sourcesdir: ../../../../../../source
+
+[[uiComponents]]
+====== UiComponents
+
+`UiComponents` 是个工厂类，可以使用该类按名称、类或者类型标识创建 UI 组件。
+
+如果创建关联数据的组件，使用类型标识执行特定值类型来对组件进行参数化。比如对于 `Label`，`TextField` 或者 `DateField` 组件，使用类型标识 `TextField.TYPE_INTEGER`。当创建关联到实体的组件，比如 `PickerField`，`LookupField` 或者 `Table`，使用静态的 `of()` 方法来获取合适的类型标识。对于其它组件和容器，使用组件类作为参数。
+
+示例：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/uiComponents_1.java[]
+----

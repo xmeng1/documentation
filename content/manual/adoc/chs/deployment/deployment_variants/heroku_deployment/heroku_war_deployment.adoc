@@ -1,0 +1,190 @@
+:sourcesdir: ../../../../../source
+
+[[heroku_war_deployment]]
+===== 部署 WAR 至 Heroku
+
+Heroku 账号::
++
+--
+首先，使用浏览器在 Heroku 创建一个账号，免费账号类型 `hobby-dev` 已经足够使用。然后登录账号，并且点击界面顶部的 *New* 按钮创建新项目。
+
+选择一个唯一的名称（或者这个字段空着等着自动分配）并且选择一个服务器地址。然后 Heroku 会创建一个应用，比如 `morning-beach-4895`。
+
+第一次使用的时候，Heroku 会切换到 *Deploy* 标签页，选择使用 Heroku 的 Git 部署方式。
+--
+
+Heroku CLI::
++
+--
+* 在电脑安装 https://devcenter.heroku.com/articles/heroku-command-line[Heroku CLI]。
+
+* 切换到 CUBA 项目目录。接下来这个目录会用 `$PROJECT_FOLDER` 来代称。
+
+* 在 `$PROJECT_FOLDER` 目录打开命令行窗口并输入：
++
+[source,plain]
+----
+heroku login
+----
+
+* 按提示输入用户名密码。下面的步骤应该不需要再给这个项目输入用户名密码了。
+
+* 安装 Heroku CLI 插件：
++
+[source,plain]
+----
+heroku plugins:install heroku-cli-deploy
+----
+--
+
+PostgreSQL 数据库::
++
+--
+使用浏览器访问 Heroku 数据 https://data.heroku.com/[网页]
+
+可以选择已有的 Postgres 数据库或者创建一个新的。以下步骤描述怎么创建一个新数据库。
+
+* 找到 *Heroku Postgres* 区域点击 *Create one*
+* 然后新界面点击 *Install Heroku Postgr...*
+* 下拉列表选择 Heroku 应用程序并连接数据库
+* 选择账号付费计划（比如 `hobby-dev`）
+
+或者也可以通过 Heroku CLI 来安装 PostgreSQL：
+
+[source,plain]
+----
+heroku addons:create heroku-postgresql:hobby-dev --app morning-beach-4895
+----
+
+这里的 `morning-beach-4895` 是 Heroku 应用的名称。
+
+然后可以在 *Resources* 标签页看到新建的数据库。数据库已经连接 Heroku 应用程序。通过这个方式可以看到数据库的用户名密码：切换到 Heroku 数据库的 *Datasource* 界面，下翻到 *Administration* 区域然后点击 *View credentials* 按钮。
+
+[source,plain]
+----
+Host compute.amazonaws.com
+Database d2tk
+User nmmd
+Port 5432
+Password 9c05
+URI postgres://nmmd:9c05@compute.amazonaws.com:5432/d2tk
+----
+--
+
+项目部署设置::
++
+--
+* 假设 CUBA 项目使用的是 PostgreSQL 数据库。
+
+* 在 Studio 打开 CUBA 项目，在 CUBA 项目树选择 *Deployment*，打开 *WAR Settings* 对话框，按照下面的介绍对选项进行配置。
++
+** 勾选 *Build WAR*
+** 设置 application home 目录为 `.`（当前目录）
+** 勾选 *Include JDBC driver*
+** 勾选 *Include Tomcat's context.xml*
+** 点击 *Custom context.xml path* 旁边的 *Generate* 按钮，在弹窗中填写数据库连接信息
+** 点开生成的 `modules/core/web/META-INF/war-context.xml` 文件，检查连接参数和用户名密码：
++
+[source, xml]
+----
+include::{sourcesdir}/deployment/war-context.xml[]
+----
+** 勾选 *Single WAR for Middleware and Web Client*
+** 点击 *Custom web.xml path* 旁边的 *Generate* 按钮。
+** 拷贝下面的代码然后粘贴到 *App properties* 字段：
++
+[source, groovy]
+----
+[
+  'cuba.automaticDatabaseUpdate' : true
+]
+----
++
+** 保存部署设置，等待 Gradle 刷新项目结构。
+--
+
+构建 WAR 文件::
++
+--
+双击新的 *Build WAR* 项目树节点或者执行 `buildWar` Gradle 任务构建 WAR 文件：
+
+[source,plain]
+----
+gradlew buildWar
+----
+
+--
+
+应用程序配置::
++
+--
+
+* 从 https://mvnrepository.com/artifact/com.github.jsimone/webapp-runner 下载 Tomcat Webapp Runner。Webapp Runner 的版本需要跟 Tomcat 的版本匹配，比如，Webapp Runner 8.5.11.3 版本能兼容 Tomcat 8.5.11 版本。下载下来的 JAR 包重命名成 `webapp-runner.jar` 然后放到 `$PROJECT_FOLDER` 目录。
+
+* 从 https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-dbcp 下载 Tomcat DBCP。版本需要能兼容 Tomcat 的版本，比如 8.5.11。创建 `$PROJECT_FOLDER/libs` 目录，将下载的 JAR 文件重命名为 `tomcat-dbcp.jar` 然后放到这个目录。
+
+* 在 `$PROJECT_FOLDER` 目录创建新文件 `Procfile`。文件包含如下内容：
++
+[source,plain]
+----
+web: java $JAVA_OPTS -cp webapp-runner.jar:libs/* webapp.runner.launch.Main --enable-naming --port $PORT build/distributions/war/app.war
+----
+--
+
+Git 配置::
++
+--
+在 `$PROJECT_FOLDER` 目录打开终端窗口，运行以下命令：
+
+[source,plain]
+----
+git init
+heroku git:remote -a morning-beach-4895
+git add .
+git commit -am "Initial commit"
+----
+--
+
+应用部署::
++
+--
+打开终端窗口，运行以下命令：
+
+在 *nix 系统：
+
+[source,plain]
+----
+heroku jar:deploy webapp-runner.jar --includes libs/tomcat-dbcp.jar:build/distributions/war/app.war --app morning-beach-4895
+----
+
+Windows 系统：
+
+[source,plain]
+----
+heroku jar:deploy webapp-runner.jar --includes libs\tomcat-dbcp.jar;build\distributions\war\app.war --app morning-beach-4895
+----
+
+在 Heroku 的 dashboard 打开 *Resources* 标签页。能看到一个新的 Dyno（Heroku 的服务实例），还有从 `Procfile` 读取出来的命令：
+
+image::heroku_dyno.png[align="center"]
+
+应用程序现在正在部署了，可以查看日志了解部署进度。
+--
+
+日志监控::
++
+--
+在命令行窗口等待弹出 `++https://morning-beach-4895.herokuapp.com/  deployed to Heroku++` 消息。
+
+需要跟踪查看应用系统的日志，可以使用以下命令：
+
+[source,plain]
+----
+heroku logs --tail --app morning-beach-4895
+----
+--
+
+部署成功之后，可以通过浏览器访问类似 `++https://morning-beach-4895.herokuapp.com++` 这样的 URL 来访问服务。
+
+或者可以通过 Heroku dashboard 的 *Open app* 按钮打开应用。
+

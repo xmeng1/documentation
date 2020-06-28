@@ -1,0 +1,55 @@
+:sourcesdir: ../../../../source
+
+[[entity_extension]]
+==== 扩展实体
+
+在应用程序项目中，从 `com.haulmont.cuba.security.entity.User` 中派生一个实体类，添加需要的属性和相应的访问方法：
+
+[source, java]
+----
+include::{sourcesdir}/extension/entity_extension_1.java[]
+----
+
+应使用<<entity_annotation,@Entity>>注解指定实体的新名称。由于父实体没有定义<<inheritance_annotation,继承策略>>，因此使用的是默认继承策略 `SINGLE_TABLE`。这意味着子实体将与父实体存储在同一个表中，并且不需要给子实体添加<<table_annotation,@Table>>注解。其它父实体注解（<<namePattern_annotation,@NamePattern>>、 <<listeners_annotation,@Listeners>>等）会自动应用于子实体，并且可以在子实体中覆盖。
+
+新实体类的一个重要元素是 `@Extends` 注解，它需要一个父类作为参数。它可以创建一个子实体的注册表，并强制平台机制在所有地方使用子实体来代替父实体。注册表由 `ExtendedEntities` 类实现，该类是一个名为 `cuba_ExtendedEntities` 的 *Spring* bean，也可以通过<<metadata,元数据>>接口访问。
+
+
+将新属性的本地化名称添加到 `com.sample.sales.entity`<<message_packs,消息包>>：
+
+`messages.properties`
+
+[source, properties]
+----
+ExtUser.address=Address
+----
+
+`messages_ru.properties`
+
+[source, properties]
+----
+ExtUser.address=Адрес
+----
+
+在项目的<<persistence.xml,persistence.xml>>文件中注册新实体：
+
+[source, xml]
+----
+<class>com.sample.sales.entity.ExtUser</class>
+----
+
+将相应表的更新脚本添加到<<db_scripts,数据库创建和更新脚本>>：
+
+[source, sql]
+----
+include::{sourcesdir}/extension/entity_extension_2.sql[]
+----
+
+要在界面中使用新的实体属性，请为新实体创建<<views,视图>>，新视图的名称与基础实体的名称保持一致。新视图应继承基础视图并定义新属性，例如：
+
+[source, xml]
+----
+include::{sourcesdir}/extension/entity_extension_3.xml[]
+----
+
+继承的视图将包含其父视图中的所有属性。如果基础视图继承 `_local` 视图，并且在新视图中只添加本地属性，则不需要继承视图，在这种情况下，可以省略该步骤。

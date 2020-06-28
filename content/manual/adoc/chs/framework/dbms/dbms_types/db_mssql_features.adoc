@@ -1,0 +1,19 @@
+:sourcesdir: ../../../../../source
+
+[[db_mssql_features]]
+===== MS SQL Server 特性
+
+*Microsoft SQL Server* 使用表的聚集索引。
+
+默认情况下，聚集索引以表的主键为基础，但是，CUBA 应用程序使用的 `UUID` 类型的键不适合聚集索引。建议使用 `nonclustered` 修饰符创建 UUID 主键：
+
+[source, sql]
+----
+create table SALES_CUSTOMER (
+    ID uniqueidentifier not null,
+    CREATE_TS datetime,
+    ...
+    primary key nonclustered (ID)
+)^
+----
+

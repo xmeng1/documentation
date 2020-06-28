@@ -1,0 +1,247 @@
+:sourcesdir: ../../../../../../source
+
+
+[[jpql_functions]]
+====== JPQL 函数
+
+下表描述了 CUBA 框架支持和不支持的 JPQL 函数。
+
+[cols="1,1,5",width="100%"]
+|===
+|函数 |支持 |查询
+
+//Aggregate functions with scalar expression
+
+.2+|聚合函数
+
+|支持
+
+m|SELECT AVG(o.quantity) FROM app_Order o
+
+|_不支持: 带标量表达式的聚合函数(EclipseLink 特性)_
+
+m|_SELECT AVG(o.quantity)/2.0 FROM app_Order o_
+
+_SELECT AVG(o.quantity * o.price) FROM app_Order o_
+
+//ALL, ANY, SOME
+
+|ALL、 ANY、 SOME
+
+|支持
+
+m|SELECT emp FROM app_Employee emp WHERE emp.salary > ALL (SELECT m.salary FROM app_Manager m WHERE m.department = emp.department)
+
+//Arithmetic Functions (INDEX, SIZE, ABS, SQRT, MOD)
+
+|算术函数 (INDEX 、 SIZE 、 ABS 、 SQRT 、 MOD)
+
+|支持
+
+m|SELECT w.name FROM app_Course c JOIN c.studentWaitlist w WHERE c.name = 'Calculus' AND INDEX(w) = 0
+
+  SELECT w.name FROM app_Course c WHERE c.name = 'Calculus' AND SIZE(c.studentWaitlist) = 1
+
+  SELECT w.name FROM app_Course c WHERE c.name = 'Calculus' AND ABS(c.time) = 10
+
+  SELECT w.name FROM app_Course c WHERE c.name = 'Calculus' AND SQRT(c.time) = 10.5
+
+  SELECT w.name FROM app_Course c WHERE c.name = 'Calculus' AND MOD(c.time, c.time1) = 2
+
+//CASE Expression
+
+.2+|UPDATE 查询中的 CASE 表达式
+
+| 支持
+
+m|SELECT e.name, f.name, CONCAT(CASE WHEN f.annualMiles > 50000 THEN 'Platinum ' WHEN f.annualMiles > 25000 THEN 'Gold ' ELSE '' END, 'Frequent Flyer')
+  FROM app_Employee e JOIN e.frequentFlierPlan f
+
+|_不支持: UPDATE 查询中的 CASE_
+
+m|_UPDATE app_Employee e SET e.salary = CASE e.rating WHEN 1 THEN e.salary * 1.1 WHEN 2 THEN e.salary * 1.05 ELSE e.salary * 1.01 END_
+
+//Date Functions (CURRENT_DATE, CURRENT_TIME, CURRENT_TIMESTAMP)
+
+| 日期 函数(CURRENT_DATE、CURRENT_TIME、CURRENT_TIMESTAMP)
+
+| 支持
+
+m|SELECT e FROM app_Order e WHERE e.date = CURRENT_DATE
+
+//EclipseLink Functions (CAST, REGEXP, EXTRACT)
+
+.2+|EclipseLink 函数 (CAST、 REGEXP、 EXTRACT)
+
+|支持
+
+m|SELECT EXTRACT(YEAR FROM e.createTs) FROM app_MyEntity e WHERE EXTRACT(YEAR FROM e.createTs) > 2012
+
+  SELECT e FROM app_MyEntity e WHERE e.name REGEXP '.*'
+
+  SELECT CAST(e.number text) FROM app_MyEntity e WHERE e.path LIKE CAST(:ds$myEntityDs.id text)
+
+|_不支持: GROUP BY 子句中的 CAST_
+
+m|_SELECT e FROM app_Order e WHERE e.amount > 100 GROUP BY CAST(e.orderDate date)_
+
+//Entity Type Expression
+
+.2+|实体类型表达式
+
+|支持: 实体类型作为参数
+
+m|SELECT e FROM app_Employee e WHERE TYPE(e) IN (:empType1, :empType2)
+
+|_不支持: 直接链接到实体类型_
+
+m|_SELECT e FROM app_Employee e WHERE TYPE(e) IN (app_Exempt, app_Contractor)_
+
+//Function Invocation
+
+.2+|函数调用
+
+|支持: 比较子句中使用函数结果
+
+m|SELECT u FROM sec$User u WHERE function('DAYOFMONTH', u.createTs) = 1
+
+|_不支持: 直接使用函数返回值_
+
+m|_SELECT u FROM sec$User u WHERE function('hasRoles', u.createdBy, u.login)_
+
+//IN
+
+|IN
+
+|支持
+
+m|SELECT e FROM Employee e, IN(e.projects) p WHERE p.budget > 1000000
+
+//IS EMPTY collection
+
+|IS EMPTY 集合
+
+|支持
+
+m|SELECT e FROM Employee e WHERE e.projects IS EMPTY
+
+//KEY/VALUE
+
+|键/值 KEY/VALUE
+
+|_不支持_
+
+m|_SELECT v.location.street, KEY(i).title, VALUE(i) FROM app_VideoStore v JOIN v.videoInventory i WHERE v.location.zipcode = '94301' AND VALUE(i) > 0_
+
+//Literals
+.2+|字面量
+
+|支持
+
+m|SELECT e FROM app_Employee e WHERE e.name = 'Bob'
+
+  SELECT e FROM app_Employee e WHERE e.id = 1234
+
+  SELECT e FROM app_Employee e WHERE e.id = 1234L
+
+  SELECT s FROM app_Stat s WHERE s.ratio > 3.14F
+
+  SELECT s FROM app_Stat s WHERE s.ratio > 3.14e32D
+
+  SELECT e FROM app_Employee e WHERE e.active = TRUE
+
+|_不支持: 时间和日期字符串_
+
+m|_SELECT e FROM app_Employee e WHERE e.startDate = {d'2012-01-03'}_
+
+  _SELECT e FROM app_Employee e WHERE e.startTime = {t'09:00:00'}_
+
+  _SELECT e FROM app_Employee e WHERE e.version = {ts'2012-01-03 09:00:00.000000001'}_
+
+//MEMBER OF
+
+.2+|MEMBER OF
+
+|支持: 字段或者查询结果
+
+m|SELECT d FROM app_Department d WHERE (select e from app_Employee e where e.id = :eParam) MEMBER OF e.employees
+
+|_不支持: 字面量_
+
+m|_SELECT e FROM app_Employee e WHERE 'write code' MEMBER OF e.codes_
+
+//NEW in SELECT
+
+|SELECT 中使用 NEW
+
+|支持
+
+m|_SELECT NEW com.acme.example.CustomerDetails(c.id, c.status, o.count) FROM app_Customer c JOIN c.orders o WHERE o.count > 100_
+
+//NULLIF/COALESCE
+
+|NULLIF/COALESCE
+
+|支持
+
+m|SELECT NULLIF(emp.salary, 10) FROM app_Employee emp
+
+  SELECT COALESCE(emp.salary, emp.salaryOld, 10) FROM app_Employee emp
+
+//NULLS FIRST, NULLS LAST in order by
+
+|order by 中使用 NULLS FIRST, NULLS LAST
+
+|支持
+
+m|SELECT h FROM sec$GroupHierarchy h ORDER BY h.level DESC NULLS FIRST
+
+//String Functions (CONCAT, SUBSTRING, TRIM, LOWER, UPPER, LENGTH, LOCATE)
+
+.2+|字符串函数 (CONCAT、 SUBSTRING 、 TRIM 、 LOWER 、 UPPER 、 LENGTH 、 LOCATE)
+
+|支持
+
+m|SELECT x FROM app_Magazine x WHERE CONCAT(x.title, 's') = 'JDJs'
+
+  SELECT x FROM app_Magazine x WHERE SUBSTRING(x.title, 1, 1) = 'J'
+
+  SELECT x FROM app_Magazine x WHERE LOWER(x.title) = 'd'
+
+  SELECT x FROM app_Magazine x WHERE UPPER(x.title) = 'D'
+
+  SELECT x FROM app_Magazine x WHERE LENGTH(x.title) = 10
+
+  SELECT x FROM app_Magazine x WHERE LOCATE('A', x.title, 4) = 6
+
+  SELECT x FROM app_Magazine x WHERE TRIM(TRAILING FROM x.title) = 'D'
+
+|_不支持: 带特定字符的 TRIM_
+
+m|_SELECT x FROM app_Magazine x WHERE TRIM(TRAILING 'J' FROM x.title) = 'D'_
+
+//Subquery
+.2+|子查询
+
+|支持
+
+m|SELECT goodCustomer FROM app_Customer goodCustomer WHERE goodCustomer.balanceOwed < (SELECT AVG(c.balanceOwed) FROM app_Customer c)
+
+|_不支持: 子查询语句 FROM 中使用路径表达式而不是实体名称_
+
+m|_SELECT c FROM app_Customer c WHERE (SELECT AVG(o.price) FROM c.orders o) > 100_
+
+//TREAT
+.2+|TREAT
+
+|支持
+
+m|SELECT e FROM app_Employee e JOIN TREAT(e.projects AS app_LargeProject) p WHERE p.budget > 1000000
+
+|_不支持: WHERE 从句中使用 TREAT_
+
+m|_SELECT e FROM Employee e JOIN e.projects p WHERE TREAT(p as LargeProject).budget > 1000000_
+
+|===
+
+

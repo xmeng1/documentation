@@ -1,0 +1,34 @@
+:sourcesdir: ../../../../source
+
+[[infrastructure_interfaces]]
+==== 基础设施接口
+
+基础设施接口提供对平台的常用功能的访问。它们中的大多数位于 *global* <<app_modules,模块>>中，并且可以在中间层和客户端层使用。但是，其中一些（例如 <<persistence,Persistence>> ）只能用于中间层代码。
+
+基础接口由 Spring bean 实现，因此可以将它们注入其它任何托管组件（<<managed_beans,beans>>、 <<services,中间件服务>>、通用<<screen_controller,界面控制器>>）。
+
+此外，与任何其它 bean 一样，基础接口可以通过 `AppBeans` 类的静态方法获取，然后可以在非托管组件（POJO、helper 类等）中使用。
+
+include::infrastructure_interfaces/configuration.adoc[]
+
+include::infrastructure_interfaces/dataManager.adoc[]
+
+include::infrastructure_interfaces/entityStates.adoc[]
+
+include::infrastructure_interfaces/events.adoc[]
+
+include::infrastructure_interfaces/messages.adoc[]
+
+include::infrastructure_interfaces/metadata.adoc[]
+
+include::infrastructure_interfaces/resources.adoc[]
+
+include::infrastructure_interfaces/scripting.adoc[]
+
+include::infrastructure_interfaces/security.adoc[]
+
+include::infrastructure_interfaces/timeSource.adoc[]
+
+include::infrastructure_interfaces/userSessionSource.adoc[]
+
+include::infrastructure_interfaces/uuidSource.adoc[]

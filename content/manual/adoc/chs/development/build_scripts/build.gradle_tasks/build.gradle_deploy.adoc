@@ -1,0 +1,21 @@
+:sourcesdir: ../../../../../source
+
+[[build.gradle_deploy]]
+===== 部署
+
+`deploy` – `CubaDeployment` 类型的任务，<<fast_deployment,快速部署>>一个模块到 Tomcat。在 build.gradle 里的 *core*，*web* 和 *portal* 模块中声明。可用参数：
+
+* `appName` – 从模块创建的 web 应用程序名称。实际上是 `tomcat/webapps` 一个子目录的名称。
+
+* `jarNames` – 构建一个模块时生成的 JAR 文件（不带版本号）列表。这些 JAR 文件需要放在 web 程序的 `WEB-INF/lib` 目录里。所有其它的模块工件（artifacts）和依赖包将会放在 `tomcat/shared/lib`。
+
+示例：
+
+[source, groovy]
+----
+task deploy(dependsOn: assemble, type: CubaDeployment) {
+    appName = 'app-core'
+    jarNames = ['cuba-global', 'cuba-core', 'app-global', 'app-core']
+}
+----
+

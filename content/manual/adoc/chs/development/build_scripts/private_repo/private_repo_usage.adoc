@@ -1,0 +1,18 @@
+:sourcesdir: ../../../../../source
+
+[[private_repo_usage]]
+===== 使用私仓
+
+至此私仓已经可以用了。在界面上方显示 *cuba-group* 的 URL，比如：
+
+----
+http://localhost:8081/nexus/content/groups/cuba-group
+----
+
+- 在 {studio_man_url}[Studio] 中找到已注册的仓库列表。如果正在创建新项目，列表在 *New Project* 窗口。如果是打开已经存在的项目，列表在 *CUBA > Project Properties* 窗口。
+- 在新建仓库的对话框中，输入仓库的 URL 和认证信息：`admin / admin123`。
+- 保存仓库信息之后，勾选该仓库的复选框则可以在项目中使用该仓库。
+- 保存项目属性或者继续使用项目创建向导。
+
+在初次构建的过程中，新仓库会下载必要的工件（artifacts）并且存在缓存以供下次使用。可以从 `c:\nexus-2.14.3-02\sonatype-work` 找到这些文件。
+

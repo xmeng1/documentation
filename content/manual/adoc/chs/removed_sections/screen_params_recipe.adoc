@@ -1,0 +1,4 @@
+[[screen_params_recipe]]
+=== 为界面传递参数
+
+参阅 <<opening_screens>>。

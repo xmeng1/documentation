@@ -1,0 +1,23 @@
+:sourcesdir: ../../../../../source
+
+[[build.gradle_debugWidgetSet]]
+===== 调试 WidgetSet
+
+`debugWidgetSet` - `CubaWidgetSetDebug` 类型的任务，启动 GWT 代码服务器（Code Server）用来在浏览器里面调试 widgets。
+
+使用示例：
+
+[source, groovy]
+----
+include::{sourcesdir}/development/build_gradle_debugWidgetSet_1.groovy[]
+----
+
+需要确保 `web-toolkit` 模块在 `runtime`  配置里有一个 Servlet API 库的依赖：
+
+[source, groovy]
+----
+include::{sourcesdir}/development/build_gradle_debugWidgetSet_2.groovy[]
+----
+
+参考 <<debug_widgets>> 查询怎么在浏览器里面调试代码。
+

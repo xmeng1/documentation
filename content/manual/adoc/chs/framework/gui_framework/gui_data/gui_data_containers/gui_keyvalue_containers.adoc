@@ -1,0 +1,15 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_keyvalue_containers]]
+====== 键值对容器
+
+`KeyValueContainer` 和 `KeyValueCollectionContainer` 是用来处理 `KeyValueEntity` 的。这个实体可以包含在运行时定义的任意数量的属性。
+
+键值对容器定义了下列特殊的方法：
+
+* `addProperty()` 由于容器可以保存带有任意数量属性的实体，需要在使用此方法的时候指定是添加什么属性。这个方法接收属性名称和对应的类型，类型可以是<<datatype,数据类型>>格式，也可以是 Java 类。在使用 Java 类的情况下，这个类要么是实体类，要么是有数据类型支持的类。
+
+* `setIdName()` 是一个可选择调用的方法，通过这个方法可以将一个属性定义为实体的标识符属性。也就是说，保存在此容器内的 `KeyValueEntity` 实体将使用指定的属性作为标识符。否则，`KeyValueEntity` 将使用随机生成的 UUID 作为标识符。
+
+* `getEntityMetaClass()` 返回 `MetaClass` 接口的动态实现类，这个类反映了 `KeyValueEntity` 实例的当前结构，实例的结构是通过之前调用 `addProperty()` 来定义的。
+

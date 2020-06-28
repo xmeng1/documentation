@@ -1,0 +1,58 @@
+:sourcesdir: ../../../../../../source
+
+[[polymer2_typescript_components]]
+====== 使用 TypeScript 创建 Polymer 组件
+
+Polymer 团队通过 TypeScript 装饰器提供了更方便和简洁的创建组件类的途径。先看看下面这个例子：
+
+[source,typescript]
+----
+/// <reference path="../bower_components/cuba-app/cuba-app.d.ts" />
+/// <reference path="../bower_components/app-layout/app-drawer/app-drawer.d.ts" />
+/// <reference path="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.d.ts" />
+
+namespace myapp {
+
+  // Create shortcuts to decorators
+  const {customElement, property, observe, query} = Polymer.decorators;
+
+  @customElement('myapp-component')
+  class MyappComponent extends (Polymer.mixinBehaviors([CubaAppAwareBehavior, CubaLocalizeBehavior], Polymer.Element) as
+    new () => Polymer.Element & CubaAppAwareBehavior & CubaLocalizeBehavior) {
+
+    @property({type: Boolean})
+    enabled: boolean;
+
+    @property({type: String})
+    caption: string;
+
+    @query('#drawer')
+    drawer: AppDrawerElement;
+
+    @observe('app')
+    _init(app: cuba.CubaApp) {
+      ...
+    }
+
+    @computed('enabled', 'caption')
+    get enabledCaption() {
+      ...
+    }
+  }
+}
+----
+
+* `/// <reference path="..."/>` - 允许通过这种方式引入 TypeScript 中其它元素或者类库。
+
+* `@customElements('element-name')` 装饰器使得无需定义 `static get is()` 方法，并且无需手动调用 `customElements.define()`。
+
+* `@property()` 装饰器可以指定组件的属性。
+
+* `@query('.css-selector')` 装饰器可以给组件选择 DOM 元素。
+
+* `@observe('propertyName')` 装饰器可以定义属性观察者。
+
+* `@computed()` 装饰器可以定义计算方法。
+
+参考 https://github.com/Polymer/polymer-decorators[polymer-decorators] github 仓库了解更多示例。
+

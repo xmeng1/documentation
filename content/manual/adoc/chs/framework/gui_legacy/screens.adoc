@@ -1,0 +1,24 @@
+:sourcesdir: ../../../../source
+
+[[screens]]
+==== 界面（历史版本）
+
+[WARNING]
+====
+这是旧版本的 API。对于从 7.0 开始的新 API，请参阅 <<gui_screens>>。
+====
+
+通过一个 <<screen_xml,XML 描述>>和一个<<screen_controller,界面控制器>>来定义一个通用 UI 界面。XML 描述中含有对控制器类的链接。
+
+要从主菜单或者通过 Java 代码（比如从不同界面的控制器）调用一个界面，这个界面的 XML 描述需要在项目的 <<screens.xml,screens.xml>> 文件里注册。用户登录之后打开的默认界面可以通过 <<cuba.web.defaultScreenId,cuba.web.defaultScreenId>> 这个应用程序属性来设置。
+
+应用程序的主菜单内容根据<<menu.xml,menu.xml>>文件生成。
+
+include::screens/screen_types.adoc[]
+
+include::screens/screen_xml.adoc[]
+
+include::screens/screen_controller.adoc[]
+
+include::screens/screen_agent.adoc[]
+

@@ -1,0 +1,24 @@
+:sourcesdir: ../../../../../source
+
+[[build.gradle_buildInfo]]
+===== 构建信息
+
+CUBA gradle 插件自动在 `global` 模块的配置里添加 `buildInfo` 任务。这个任务会在 `build-info.properties` 文件里写入应用程序的信息，然后这个文件会被打包到 `global` 工件（`app-global-1.0.0.jar`）里。`BuildInfo` bean 在运行时会读取这些信息，然后显示在 *Help > About* 窗口。其它的业务机制也可以调用这个 bean，以便于获取应用程序名称，版本之类的信息。
+
+下面这些任务参数可以根据需要指定：
+
+* `appName` - 应用程序名称。默认值会从 `settings.gradle` 中的项目名称（project name）读取。
+
+* `artifactGroup` - 工件组，一般习惯上会使用项目的包名根目录。
+
+* `version` - 应用程序版本。默认值是通过 `cuba.artifact.version` 属性设定的。
+
+* `properties` - 一组任意的属性键值对，默认是空。
+
+使用自定义的 `buildInfo` 任务示例：
+
+[source, groovy]
+----
+include::{sourcesdir}/development/build_gradle_buildInfo_1.groovy[]
+----
+

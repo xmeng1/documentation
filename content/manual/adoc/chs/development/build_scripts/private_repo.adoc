@@ -1,0 +1,26 @@
+:sourcesdir: ../../../../source
+
+[[private_repo]]
+==== 安装配置私仓
+
+这节介绍了怎样安装一个 Maven 私仓，使用这个私仓替换 CUBA 公共仓库，并且用来存储平台工件和其它的依赖。以下这些情况推荐使用私仓：
+
+- 在不稳定或者很慢的互联网环境。尽管 Gradle 会在开发者的机器上缓存下载下来的工件，但是时不时的还是需要连接到工件仓库，比如当第一次运行构建或者在一个新版本的平台上开始构建。
+- 由于组织级别的安全措施，不能直接访问互联网。
+- 不打算为 CUBA Premium 插件续费，但是将来还需要使用已经下载过的付费插件构建项目。
+
+以下是安装和配置私仓的步骤：
+
+- 在有互联网的网络安装仓库管理软件。
+- 配置私仓作为 CUBA 公共仓库的代理。
+- 修改项目构建脚本使用私仓。可以通过 Studio 或者直接修改 `build.gradle`。
+- 启动完整项目构建流程，以此来在私仓中缓存所有必须的工件。
+
+include::private_repo/private_repo_install.adoc[]
+
+include::private_repo/private_repo_configure.adoc[]
+
+include::private_repo/private_repo_usage.adoc[]
+
+include::private_repo/private_repo_in_isolated_network.adoc[]
+

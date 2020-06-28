@@ -1,0 +1,174 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_SuggestionPickerField]]
+====== 建议选择器字段
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=dataaware-suggestion-picker-field" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/SuggestionPickerField.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`SuggestionPickerField` 组件用于根据用户输入的字符串搜索实体实例。它与 <<gui_SearchPickerField,SearchPickerField>> 的不同之处在于它在用户输入每个字符时自动刷新选项列表，不需要按 Enter 键。
+选项列表是根据应用程序开发人员定义的逻辑在后端加载。
+
+`SuggestionPickerField` 也是一种<<gui_PickerField,PickerField>>，在右侧可以有操作按钮。
+
+image::gui_suggestionPickerField_1.png[align="center"]
+
+该组件的 XML 名称： `suggestionPickerField`
+
+`SuggestionPickerField` 用于选择并引用实体属性，因此通常设置它的 `dataContainer` 和 `property` 属性：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/suggestionPickerField.xml[]
+----
+
+`suggestionPickerField` 的属性：
+
+[[gui_suggestionPickerField_asyncSearchDelayMs]]
+* `asyncSearchDelayMs` - 设置最后一次按键到执行异步搜索之前需要延迟的时间。
+
+[[gui_suggestionPickerField_metaClass]]
+* `metaClass` - 设置链接到组件的 `MetaClass` ，如果在不绑定数据组件的情况下使用该组件，比如，没有设置 <<gui_attr_dataContainer,dataContainer>> 和 <<gui_attr_property,property>>。
+
+[[gui_suggestionPickerField_minSearchStringLength]]
+* `minSearchStringLength` - 设置执行建议搜索需要的最小字符串长度。
+
+[[gui_suggestionPickerField_popupWidth]]
+* `popupWidth` - 设置建议选项弹出框的宽度。
++
+可选项：
++
+** `auto` - 弹出框的宽度等于建议选项的最大长度，即自动宽度，
++
+** `parent` - 弹出框的宽度等于主组件的宽度，
++
+** 绝对（比如 `"170px"`）或相对（比如 `"50%"`）值。
+
+[[gui_suggestionPickerField_suggestionsLimit]]
+* `suggestionsLimit` - 设置显示的建议选项的最大数量。
+
+[TIP]
+====
+`suggestionPickerField` 和其对应的弹出框的外观可以使用<<gui_attr_stylename,stylename>>属性进行<<web_theme_extension_styles,定制>>。弹出框应该与主组件拥有相同的样式名：比如，如果主组件有自定义的样式名 `"my-awesome-stylename"`，对应的弹出框应该有样式名 `"c-suggestionfield-popup my-awesome-stylename"`。
+====
+
+`suggestionPickerField` 的元素：
+
+[[gui_suggestionPickerField_actions]]
+* `actions` - 可选元素，用于描述与组件相关的各种操作，除了自定义的操作，`suggestionPickerField` 支持下列标准 <<std_picker_actions,PickerField 操作>> ： `picker_lookup`、`picker_clear`、`picker_open`。
+
+
+[[gui_suggestionPickerField_SearchExecutor]]
+SuggestionPickerField 的基本用法::
++
+--
+一般情况下，给组件设置 `SearchExecutor` 就可以了。`SearchExecutor` 是一个包含单个方法的功能接口：`List<E extends Entity> search(String searchString, Map<String, Object> searchParams)`:
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/suggestionPickerField.java[]
+----
+
+[WARNING]
+====
+`search()` 方法在后台线程中执行，因此它无法访问可视化组件或可视化组件使用的数据源。可直接调用 <<dataManager,DataManager>> 或中间件服务；或处理并返回预先加载到界面的数据。
+====
+
+`searchString` 参数可用于使用用户输入的字符串过滤候选值。也可以使用 `escapeForLike()` 方法来搜索包含特殊符号的值：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/suggestionPickerField_3.java[]
+----
+--
+
+[[gui_suggestionPickerField_ParametrizedSearchExecutor]]
+ParametrizedSearchExecutor 的用法::
++
+--
+在前面的例子中，`searchParams` 是一个空的字典。要定义参数，应该使用 `ParametrizedSearchExecutor`：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/suggestionPickerField_1.java[]
+----
+--
+
+[[gui_suggestionPickerField_EnterActionHandler]]
+EnterActionHandler 和 ArrowDownActionHandler 的用法::
++
+--
+使用该组件的另一种方法是设置 `EnterActionHandler` 或 `ArrowDownActionHandler`。在建议弹出框隐藏的情况下，户按下 *Enter* 或 *Arrow Down* 键时会触发这些监听器。它们也是具有单一方法和单个参数 - `currentSearchString` 的功能接口。可以设置自己的操作处理器并使用 `SuggestionField.showSuggestions()` 方法，该方法接收一个实体列表参数用于显示建议选项。
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/suggestionPickerField_2.java[]
+----
+--
+
+'''
+
+suggestionPickerField 的属性::
+<<gui_attr_align,align>> -
+<<gui_suggestionPickerField_asyncSearchDelayMs,asyncSearchDelayMs>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_captionProperty,captionProperty>> -
+<<gui_attr_colspan,colspan>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_attr_inputPrompt,inputPrompt>> -
+<<gui_suggestionPickerField_metaClass,metaClass>> -
+<<gui_suggestionPickerField_minSearchStringLength,minSearchStringLength>> -
+<<gui_suggestionPickerField_popupWidth,popupWidth>> -
+<<gui_attr_property,property>> -
+<<gui_attr_required,required>> -
+<<gui_attr_requiredMessage,requiredMessage>> -
+<<gui_attr_responsive,responsive>> -
+<<gui_attr_rowspan,rowspan>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_suggestionPickerField_suggestionsLimit,suggestionsLimit>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+suggestionPickerField 的元素::
+<<gui_suggestionPickerField_actions,actions>> -
+<<gui_suggestionField_query,query>> -
+<<gui_validator,validator>>
+
+suggestionPickerField 的预定义样式::
+<<gui_attr_stylename_huge,huge>> -
+<<gui_attr_stylename_large,large>> -
+<<gui_attr_stylename_small,small>> -
+<<gui_attr_stylename_tiny,tiny>>
+
+API::
+<<gui_api_addValueChangeListener,addValueChangeListener>> -
+<<gui_api_contextHelp,setContextHelpIconClickHandler>> -
+<<gui_LookupField_setOptionCaptionProvider,setOptionCaptionProvider>> -
+<<gui_PickerField_iconProvider, setOptionIconProvider>> -
+<<gui_suggestionField_OptionsStyleProvider,setOptionsStyleProvider>>
+
+'''
+

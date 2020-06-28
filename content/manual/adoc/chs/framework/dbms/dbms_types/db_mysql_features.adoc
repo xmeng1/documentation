@@ -1,0 +1,46 @@
+:sourcesdir: ../../../../../source
+
+[[db_mysql_features]]
+===== MySQL 数据库特性
+
+[WARNING]
+====
+对于不使用 UTF-8 字符集的数据库，不能执行框架中带有约束的数据脚本。此时需要修改数据库的 _Charset_ 和 _Collation name_ 属性，可以通过 *Data Store Properties* 窗口的 *Connection params* 字段传递以下参数实现：
+
+[source, plain]
+----
+?useUnicode=true&characterEncoding=UTF-8
+----
+====
+
+MySQL 不支持部分索引(partial indexes)，因此为<<soft_deletion,支持软删除>>的实体实现唯一约束的唯一方法是在索引中使用 `DELETE_TS` 列。但是还有另一个问题：MySQL 在具有唯一约束的列中允许存在多个 NULL 值。由于标准 `DELETE_TS` 列可以为 null，因此它不能在唯一索引中使用。建议使用以下变通方案为支持软删除的实体创建唯一约束：
+
+. 在数据库表中创建一个 `DELETE_TS_NN` 列。此列不为空，并被初始化为默认值：
++
+[source, sql]
+----
+create table DEMO_CUSTOMER (
+    ...
+    DELETE_TS_NN datetime(3) not null default '1000-01-01 00:00:00.000',
+    ...
+)
+----
+
+. 创建一个触发器，当更改 `DELETE_TS` 值时将更改 `DELETE_TS_NN` 值：
++
+[source, sql]
+----
+create trigger DEMO_CUSTOMER_DELETE_TS_NN_TRIGGER before update on DEMO_CUSTOMER
+for each row
+    if not(NEW.DELETE_TS <=> OLD.DELETE_TS) then
+        set NEW.DELETE_TS_NN = if (NEW.DELETE_TS is null, '1000-01-01 00:00:00.000', NEW.DELETE_TS);
+    end if
+----
+
+. 创建一个唯一索引，包括唯一列和 `DELETE_TS_NN`：
++
+[source, sql]
+----
+create unique index IDX_DEMO_CUSTOMER_UNIQ_NAME on DEMO_CUSTOMER (NAME, DELETE_TS_NN)
+----
+

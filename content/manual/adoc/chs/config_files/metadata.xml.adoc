@@ -1,0 +1,56 @@
+:sourcesdir: ../../../source
+
+[[metadata.xml]]
+=== metadata.xml
+
+这种类型的文件用来注册自定义的<<datatype,数据类型>>以及非持久化实体并且设置<<meta_annotations,元注解（meta-annotations）>>。
+
+XML schema 标准： {xsd_url}/metadata.xsd。
+
+
+项目的 `metadata.xml` 文件通过 <<cuba.metadataConfig,cuba.metadataConfig>> 应用程序属性来指定。
+
+文件有如下结构：
+
+`metadata` – 根元素。
+
+`metadata` 的元素：
+
+* `datatypes` - 自定义类型的一个可选描述。
++
+`datatypes` 的元素：
+
+** `datatype` - 数据类型描述，有如下属性：
++
+--
+*** `id` - 标识符，用来在 <<metaProperty_annotation,@MetaProperty>> 注解中表示这个数据类型。
+*** `class` - 定义实现类
+*** `sqlType` - 可选参数，用来保存此数据类型值的数据库 SQL 类型（数据库字段类型）。CUBA Studio 会在生成数据库脚本的时候使用这个 SQL 类型。参考 <<datatype_custom_example,>> 了解细节。
+
+`datatype` 元素可以包含其它依赖这个数据类型实现的属性。
+--
+
+* `metadata-model` – 项目元数据模型描述符。
++
+`metadata-model` 的属性：
+
+** `root-package` – 项目包的根目录。
+
++
+`metadata-model` 的元素：
+
+** `class` – 非持久化实体类
+
+* `annotations` – 包含实体<<meta_annotations,元注解>>的设置。
++
+`annotations` 元素包含 `entity` 元素定义元注解设置的实体类。每个 `entity` 元素必须包含 `class` 属性来指定实体类，以及一组 `annotation` 元素。
++
+`annotation` 元素用来定义元注解，用 `name` 属性来指定元注解的名称。元注解的其它属性通过一组 `attribute` 子元素来指定。
+
+示例：
+
+[source, xml]
+----
+include::{sourcesdir}/config_files/metadata_1.xml[]
+----
+

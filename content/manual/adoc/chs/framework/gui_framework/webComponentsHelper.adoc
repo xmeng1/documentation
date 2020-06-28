@@ -1,0 +1,22 @@
+:sourcesdir: ../../../../source
+
+[[webComponentsHelper]]
+==== 使用 Vaadin 组件
+
+要在 Web 客户端直接使用实现了<<gui_vcl,可视化组件库>>中所述组件接口的 Vaadin 组件，请使用以下 `Component` 接口方法
+
+* `unwrap()` – 获取给定 CUBA 组件的底层 Vaadin 组件。
+
+* `unwrapComposition()` - 获取 Vaadin 组件，该组件是给定 CUBA 组件实现中的最外层封装容器。对于简单的组件，例如<<gui_Button,Button>>，此方法返回与 `unwrap()` - `com.vaadin.ui.Button` 相同的对象。对于复杂的组件，例如<<gui_Table,Table>>，`unwrap()` 将返回相应的对象- `com.vaadin.ui.Table`，而 `unwrapComposition()` 将返回 `com.vaadin.ui.VerticalLayout`，它包含表格(Table)以及与其一起定义的<<gui_ButtonsPanel,ButtonsPanel>>和 `RowsCount` 。
+
+这些方法接收要返回的底层组件的类，例如：
+
+[source, java]
+----
+com.vaadin.ui.TextField vTextField = textField.unwrap(com.vaadin.ui.TextField.class);
+----
+
+还可以使用 `WebComponentsHelper` 类的 `unwrap()` 和 `getComposition()` 静态方法，将 CUBA 组件传递给它们。
+
+请注意，如果界面位于项目的 *gui* 模块中，则只能使用 CUBA 组件的通用接口。要使用组件的 `unwrap()` 方法，应该将整个界面放入 *web* 模块，或使用<<companions,控制器友类>>机制。
+

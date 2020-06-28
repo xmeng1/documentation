@@ -1,0 +1,72 @@
+:sourcesdir: ../../../../../../source
+
+[[datasource_decl_creation]]
+====== 声明式创建
+
+[WARNING]
+====
+这是旧版本的 API。对于从 7.0 开始的新 API，请参阅 <<gui_data>>。
+====
+
+典型的情况下，数据源声明在界面描述文件的 `dsContext` 元素中。根据声明元素相对位置的不同，可以创建两种类型的数据源：
+
+* 如果元素直接落在了 `dsContext` 的范围内，比如一个普通的 `Datasource` 或者 `CollectionDatasource`，会创建一个能独立加载实体或者实体集合的数据源；
+
+* 如果元素落在了其它数据源的元素内，则会创建一个 `NestedDatasource` - 嵌套的数据源，它是外层数据源的子数据源。
+
+下面为声明一个数据源的示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui/datasources_2.xml[]
+---- 
+
+在上述例子中，`carDs` 包含一个实体实例 `Car`，其中嵌套 `allocationsDs` 和 `repairsDs`，分别指向 `Car.driverAllocations` 和 `Car.repairs` 两个关联属性。`Car` 实例和其相关实体都由外部调用时设置到数据源中。如果当前界面为<<screen_edit,编辑界面>>，上述设置在界面打开时会自动设置。`colorsDs` 还包含指向 `Color` 实体的集合数据源，这个数据源则是由特定 JPQL<<datasource_query,查询语句>>使用 _local <<views,视图>>设置。
+
+以下是 XML 描述：
+
+`dsContext` – 根节点。
+
+`dsContext` 元素：
+
+* `datasource` – 定义包含一个实体示例的数据源。
++
+属性：
+
+** `id` – 数据源标识符，需要在当前 `DsContext` 中唯一。
+
+** `class` – 对应数据源 Java 实体类。
+
+** `view` – 实体<<views,视图>>的名称。如果数据源需要自己载入实例，该视图会在载入时用到。否则，这个视图为外部程序指示如何为当前数据源载入实体。
+
+** `allowCommit` – 如果设置为 `false`，该数据源的 `isModified()` 方法永远返回 `false`，并且 `commit()` 方法什么都不做。因此，实体内该数据源所有改动都被忽略。该属性默认为 `true`，即，改动都会被记录并且保存。
+
+** `datasourceClass` - 必要时设置，为数据源的 <<datasource_custom_class, 自定义实现类>>。
+
+* `collectionDatasource` – 指对应实例集合的数据源。
++
+--
+`collectionDatasource` 属性：
+
+** `refreshMode` – 数据源更新模式，默认为 `ALWAYS`。如果设置为 `NEVER`，当调用 `refresh()` 时，数据源不载入数据，只是将状态置为 `Datasource.State.VALID`，通知监听器和需要排序的实例。当你在代码中使用预先载入或者创建好的实体设置 `CollectionDatasource` 时，`NEVER` 模式会有用。例如：
++
+[source, java]
+----
+include::{sourcesdir}/gui/datasources_3.java[]
+---- 
+
+** `softDeletion` – 设置为 false 时，载入数据时禁用<<soft_deletion,软删除>>模式，即，被删除的示例也会被载入。默认值为 `true`。
+
+`collectionDatasource` 元素：
+
+** `query` – 载入实体的查询语句。
+--
+
+* `groupDatasource` – 与 `collectionDatasource` 完全类似，但是会创建适合与 <<gui_GroupTable,GroupTable>> 组件结合使用的数据源。
+
+* `hierarchicalDatasource` – 类似 `collectionDatasource`，但是会创建适合与 <<gui_Tree,Tree>> 、 <<gui_TreeTable,TreeTable>> 组件结合使用的数据源。
++
+`hierarchyProperty` 为特定属性，指定基于哪个属性组建 hierarchy 层级树数据结构。
+
+如上所述，数据源对应类需要由 XML 元素明确指定，以及通过 XML 元素的相互关系确定。不过如果需要定制化数据源，可以通过 `datasourceClass` 指定。
+

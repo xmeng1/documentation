@@ -1,0 +1,164 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_SideMenu]]
+====== 侧边菜单
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/mainwindow/SideMenu.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`SideMenu` 组件提供了定制<<main_window_layout,主窗口布局>>、管理菜单项、添加图标和标记(badges)以及应用自定义样式的方法。
+
+它也可以像其它可视化组件一样用在任何界面中。要将 `SideMenu` 组件添加到界面，应该将 `xmlns：main ="http://schemas.haulmont.com/cuba/mainwindow.xsd"` 命名空间添加到界面描述中。
+
+image::gui_sidemenu.png[align="center"]
+
+该组件的 XML 名称： `sideMenu`
+
+在界面 XML 描述中定义该组件的示例:
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/sidemenu.xml[]
+----
+
+CUBA Studio 为主窗口提供了界面模板，其中包含 `sideMenu` 组件和侧边面板中的预定义样式：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/sidemenu_default.xml[]
+----
+
+*sideMenu 属性：*
+
+[[gui_SideMenu_selectOnClick]]
+* `selectOnClick` 属性设置为 `true` 时，会在鼠标单击时突出显示选中的菜单项。默认值为 `false`。
+
+image::gui_sidemenu_2.png[align="center"]
+
+*SideMenu 接口的方法：*
+
+[[gui_SideMenu_createMenuItem]]
+* `createMenuItem` - 创建一个新菜单项，但不将此项添加到菜单。对于整个菜单，`Id` 必须是唯一的。
+
+[[gui_SideMenu_addMenuItem]]
+* `addMenuItem` - 添加菜单项到菜单。
+
+[[gui_SideMenu_removeMenuItem]]
+* `removeMenuItem` - 从菜单项列表中移除菜单项。
+
+* `getMenuItem` - 根据 `id`  从菜单树中获取菜单项。
+
+* `hasMenuItems` - 如果菜单包含菜单项，则返回 `true`。
+
+`SideMenu` 组件用于显示菜单项。`MenuItem` API 允许在界面控制器中创建菜单项。以下方法可用于根据应用程序业务逻辑动态更新菜单项。以编程方式添加菜单项的示例：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/sidemenu_add.java[]
+----
+
+image::gui_sidemenu_3.png[align="center"]
+
+*MenuItem 接口的方法：*
+
+[[gui_SideMenu_MenuItem_setCaption]]
+* `setCaption` - 设置菜单项名称。
+
+[[gui_SideMenu_MenuItem_setCaptionAsHtml]]
+* `setCaptionAsHtml` - 启用或禁用 HTML 模式的菜单名称。
+
+[[gui_SideMenu_MenuItem_setBadgeText]]
+* `setBadgeText` - 设置菜单项的标记文本。标记是显示在菜单项右侧的小部件，例如：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/sidemenu_badge.java[]
+----
++
+image::gui_sidemenu_4.png[align="center"]
+
++
+标记文本可以在 <<gui_Timer,Timer>> 组件的配合下动态更新：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/sidemenu_timer.java[]
+----
++
+image::gui_sidemenu_5.png[align="center"]
+
+[[gui_SideMenu_MenuItem_setIcon]]
+* `setIcon` - 设置菜单项图标。
+
+[[gui_SideMenu_MenuItem_setCommand]]
+* `setCommand` - 设置菜单项命令，或点击菜单项时要执行的操作。
+
+[[gui_SideMenu_MenuItem_addChildItem]]
+* `addChildItem/removeChildItem` - 添加或移除子菜单的菜单项。
+
+[[gui_SideMenu_MenuItem_setExpanded]]
+* `setExpanded` - 默认展开或折叠包含子菜单的菜单项。
+
+[[gui_SideMenu_MenuItem_setStyleName]]
+* `setStyleName` - 给组件设置一个或多个自定义样式名，并且会覆盖所有已定义的用户样式。多个样式通过空格分隔的样式名列表指定。样式名必须是有效的 CSS class 名称。
++
+标准的 `sideMenu` 模板包含一些预定义样式： `c-sidemenu-layout` 、 `c-sidemenu-panel` 和 `c-sidemenu-title`。默认的 `c-sidemenu` 样式在 `Halo` 和 `Hover` 这两个主题及它们的扩展主题中支持。
+
+[[gui_SideMenu_MenuItem_setTestId]]
+* `setTestId` - 调用用于 UI 测试的 `cuba-id` 值。
+
+`PopupButton` 的展示可以使用带 `$cuba-sidemenu-++*++` 和 `$cuba-responsive-sidemenu-++*++` 前缀的 SCSS 变量进行自定义。可以在创建一个 <<web_theme_extension,主题扩展>> 或者一个 <<web_theme_creation,自定义主题>> 之后在可视化编辑器里修改这些变量的值。
+
+'''
+
+sideMenu 的属性::
+
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_css,css>> -
+<<gui_attr_description,description>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_height,height>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_SideMenu_selectOnClick,selectOnClick>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+ftsfield 属性::
+
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_description,description>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_height,height>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+sideMenu 的 API::
+<<gui_SideMenu_addMenuItem,addMenuItem>> -
+<<gui_SideMenu_createMenuItem,createMenuItem>> -
+<<gui_SideMenu_removeMenuItem,removeMenuItem>>
+
+menuItem 的 API::
+<<gui_SideMenu_MenuItem_addChildItem,addChildItem>> -
+<<gui_SideMenu_MenuItem_addChildItem,removeChildItem>> -
+<<gui_SideMenu_MenuItem_setBadgeText,setBadgeText>> -
+<<gui_SideMenu_MenuItem_setCaption,setCaption>> -
+<<gui_SideMenu_MenuItem_setCaptionAsHtml,setCaptionAsHtml>> -
+<<gui_SideMenu_MenuItem_setCommand,setCommand>> -
+<<gui_SideMenu_MenuItem_setExpanded,setExpanded>> -
+<<gui_SideMenu_MenuItem_setIcon,setIcon>> -
+<<gui_SideMenu_MenuItem_setStyleName,setStyleName>> -
+<<gui_SideMenu_MenuItem_setTestId,setTestId>>
+
+'''
+

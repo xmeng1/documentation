@@ -1,0 +1,99 @@
+:sourcesdir: ../../../source
+
+[[proxy_configuration_uberjar]]
+=== UberJAR 的代理服务配置
+
+本章节介绍配置 Nginx HTTP-server 作为 CUBA Uber JAR 应用程序的代理。
+
+NGINX::
+--
+对于 Nginx，下面有两种配置方法，所有示例都在 Ubuntu 16.04 测试通过。
+
+. Direct Proxy - 直接代理
+. Redirect to Path - 转发路径
+
+假设，web 应用程序运行在 `++http://localhost:8080/app++`。
+
+[TIP]
+====
+Uber JAR 应用程序使用 Jetty 9.2 web 服务器。需要提前在 JAR 中配置 Jetty 用来分发 Nginx headers。
+====
+--
+
+[[proxy_for_jetty]]
+Jetty 配置::
++
+--
+* *使用内部的 jetty.xml*
++
+首先，在项目根目录创建 Jetty 配置文件 `jetty.xml`，拷贝以下代码：
++
+[source,xml]
+----
+include::{sourcesdir}/deployment/jetty.xml[]
+----
++
+在 `build.gradle` 中添加 `webJettyConfPath` 属性到 `buildUberJar` 任务：
++
+[source,groovy]
+----
+task buildUberJar(type: CubaUberJarBuilding) {
+    singleJar = true
+    coreJettyEnvPath = 'modules/core/web/META-INF/jetty-env.xml'
+    appProperties = ['cuba.automaticDatabaseUpdate' : true]
+    webJettyConfPath = 'jetty.xml'
+}
+----
++
+可以在 Studio 中通过 *Deployment > UberJAR Settings* 来生成 `jetty-env.xml` 文件，或者用以下代码：
++
+[source, xml]
+----
+include::{sourcesdir}/deployment/jetty-env.xml[]
+----
++
+使用以下命令构建 Uber JAR：
++
+[source,plain]
+----
+gradlew buildUberJar
+----
++
+应用程序 JAR 包会被放置在 `build/distributions/uberJar` 目录，名称为 `app.jar`。
++
+运行应用程序：
++
+[source,plain]
+----
+java -jar app.jar
+----
++
+按照 <<install_nginx,Tomcat 部分>>的介绍安装和配置 Nginx。
++
+按照选择配置 Nginx 的方法不同，可以通过 `++http://localhost/app++` 或者 `++http://localhost++` 地址访问应用。
+
+* *使用外部的 jetty.xml*
++
+按照上面的描述使用和项目根目录的 `jetty.xml` 文件相同的配置文件。将这个文件放在其它目录，比如说用户主目录，不需要修改 `build.gradle` 里的 `buildUberJar` 任务。
++
+使用下列命令构建 Uber JAR：
++
+[source,plain]
+----
+gradlew buildUberJar
+----
++
+应用程序打包完了放在 `build/distributions/uberJar` 目录，默认名称是 `app.jar`。
++
+首先，用带参数 `-jettyConfPath` 运行程序：
++
+[source,plain]
+----
+java -jar app.jar -jettyConfPath jetty.xml
+----
++
+然后按照 <<install_nginx,Tomcat 部分>>的介绍安装和配置 Nginx。
++
+按照选择配置 Nginx 的方法和 `jetty.xml` 文件的配置不同，可以通过 `++http://localhost/app++` 或者 `++http://localhost++` 地址访问应用。
+--
+

@@ -1,0 +1,146 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_GridLayout]]
+====== 网格布局
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-grid" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/GridLayout.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`GridLayout` 容器将组件放置到网格中。
+
+image::gui_gridlayout.png[align="center"]
+
+该组件的 XML 名称：`grid`
+
+使用示例： 
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/gridlayout_1.xml[]
+---- 
+
+`grid` 元素:
+
+[[gui_GridLayout_columns]]
+* `columns` – 必须的元素，描述网格列。该元素需要有一个 `count` 属性或嵌套的 `column` 元素。
++
+[[gui_GridLayout_columns_count]]
+在最简单的情况下，只须使用 `count` 属性设置列数即可。如果容器宽度以像素或百分比显式定义，则列宽度平均分配。
+
++
+[[gui_GridLayout_column_flex]]
+要非均等地分配界面空间，应为每列定义具有 `flex` 属性的 `column` 元素。
++
+网格示例，其中第二列和第四列占用所有剩余的水平空间，第四列占用的空间是第二列的三倍：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/gridlayout_2.xml[]
+---- 
++
+如果未定义 `flex`，或者设置为 0，则根据其内容设置列的宽度，此时需要至少有另一列设置了非零的 `flex`。在上面的示例中，第一列和第三列将根据最大文本长度设置宽度。
++
+[TIP]
+====
+如果需要展示剩余可用空间，整个容器宽度应设置为像素或百分比。否则，将根据内容长度计算列宽，并且 `flex` 属性不会起作用，也就看不到可用空间了。
+====
+
+[[gui_GridLayout_rows]]
+* `rows` − 必须的元素，包含一组行。每一行都使用自己的 `row` 元素定义。
+
++
+[[gui_GridLayout_row_flex]]
+`row` 元素也可以有 `flex` 属性，与 `column` 的 flex 定义类似，影响具有给定总高度的网格的垂直可用空间的分布。
++
+`row` 元素应包含显示在网格当前行单元格中的组件元素。一行中的组件数量不应超过定义的列数，但可以比定义的列数少。
+在 `grid` 容器中的任何组件都可以有 <<gui_attr_colspan,colspan>> 和 <<gui_attr_rowspan,rowspan>> 属性。这些属性设置相应组件占用的列数和行数。例如，下面就是将 `Field3` 字段扩展为包含三列的方式：
+
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/gridlayout_3.xml[]
+----
+
+这时，组件会按以下方式放置：
+
+image::gui_gridlayout_colspan.png[align="center"]
+
+[[gui_GridLayout_LayoutClickListener]]
+可以使用 `LayoutClickListener` 接口拦截在 `GridLayout` 区域上的点击。
+
+<<gui_api_getComponent,getComponent()>> 方法允许通过其列和行索引获取 `GridLayout` 的子组件：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gridlayout_1.java[]
+----
+
+[[gui_GridLayout_addShortcutAction]]
+可以在 `GridLayout` 中使用键盘快捷键。使用 `addShortcutAction()` 方法设置快捷方式和要执行的操作：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gridlayout.java[]
+----
+
+'''
+
+grid 的属性::
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_id,id>> -
+<<gui_attr_margin,margin>> -
+<<gui_attr_spacing,spacing>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+grid 的属性::
+<<gui_GridLayout_columns,columns>> -
+<<gui_GridLayout_rows,rows>>
+
+columns 的属性::
+<<gui_GridLayout_columns_count,count>>
+
+column 的属性::
+<<gui_GridLayout_column_flex,flex>>
+
+row 的属性::
+<<gui_GridLayout_row_flex,flex>> -
+<<gui_attr_visible,visible>>
+
+API::
+<<gui_api_add,add>> -
+<<gui_api_shortcut,addShortcutAction>> -
+<<gui_api_addLayoutClickListener,addLayoutClickListener>> -
+<<gui_api_getComponent,getComponent>> -
+<<gui_api_getComponentNN,getComponentNN>> -
+<<gui_api_getComponents,getComponents>> -
+<<gui_api_margin,getMargin>> -
+<<gui_api_getOwnComponent,getOwnComponent>> -
+<<gui_api_getOwnComponents,getOwnComponents>> -
+<<gui_api_remove,remove>> -
+<<gui_api_removeAll,removeAll>> -
+<<gui_api_margin,setMargin>> -
+<<gui_api_spacing,setSpacing>>
+
+'''
+

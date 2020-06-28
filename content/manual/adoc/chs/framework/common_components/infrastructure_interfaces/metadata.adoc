@@ -1,0 +1,29 @@
+:sourcesdir: ../../../../../source
+
+[[metadata]]
+===== Metadata
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/global/Metadata.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`Metadata` 接口提供对元数据会话和<<views,视图>>仓库的访问功能。
+
+接口方法:
+
+* `getSession()` – 返回<<metadata_framework,元数据>>会话实例。
+
+* `getViewRepository()` – 返回<<views,视图>>仓库实例。
+
+* `getExtendedEntities()` – 返回 `ExtendedEntities` 类实例，用于处理扩展实体。在<<entity_extension>>章节查看更多信息。
+
+* `create()` – 创建一个实体实例，此方法考虑了可能的<<entity_extension,实体扩展>>。
++
+对于持久化的 `BaseLongIdEntity` 和 `BaseIntegerIdEntity` 子类，在创建后立即分配标识符。新标识符是通过自动创建的数据库序列获取的。默认情况下，序列在主<<data_store,数据存储>>中创建。但是，如果 <<cuba.useEntityDataStoreForIdSequence,cuba.useEntityDataStoreForIdSequence>> 应用程序属性设置为 true，则会在实体所属的数据存储中创建序列。
+
+* `getTools()` – 返回 `MetadataTools` 接口实例（见下文）。
+
+include::metadata/metadataTools.adoc[]
+

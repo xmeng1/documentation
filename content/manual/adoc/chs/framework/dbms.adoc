@@ -1,0 +1,13 @@
+:sourcesdir: ../../../source
+
+[[dbms]]
+=== 数据库
+本节介绍如何配置数据库连接以使用特定的 DBMS。同时介绍了一种数据库迁移的机制，该机制可以创建数据库，并在应用程序开发和上线运行后的整个周期中使其保持最新。
+
+数据库相关的组件属于 Middleware <<app_tiers,block>>；应用程序的其它 block 无法直接访问数据库。
+
+include::dbms/db_connection.adoc[]
+
+include::dbms/dbms_types.adoc[]
+
+include::dbms/db_scripts.adoc[]

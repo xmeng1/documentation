@@ -1,0 +1,24 @@
+:sourcesdir: ../../../source
+
+[[project_creation]]
+=== 创建项目
+
+推荐使用 *CUBA Studio* 创建新项目。可以参考本手册的<<qs_create_project,快速开始>>章节。
+
+另一个方式是通过 https://www.cuba-platform.com/marketplace/cuba-cli[CUBA CLI] 创建：
+
+. 打开终端并且启动 CUBA CLI。
+
+. 输入命令 `create-app`。可以用 tab 键自动补全命令。
+
+. CLI 会询问项目配置。按回车键使用默认值，或者也可以自定义配置：
++
+--
+* *Project name* – 项目名称。对于示例项目，CLI 会生成随机名称可以用来做默认选项。
+* *Project namespace* – 命名空间，用来做实体名称和数据库表名称的前缀。命名空间只能由拉丁字母组成，越短越好。
+* *Platform version* – 项目中使用的平台版本。平台工件会在项目构建的过程中从仓库自动下载。
+* *Root package* – Java 类的包名根目录。
+* *Database* – 使用的 SQL 数据库。
+--
+
+完成之后，在当前目录的一个新目录会创建这个空项目。可以使用 Studio、CLI 或者任意其它 IDE 继续开发。

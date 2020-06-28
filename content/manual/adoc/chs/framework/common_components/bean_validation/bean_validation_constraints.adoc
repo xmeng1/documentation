@@ -1,0 +1,149 @@
+:sourcesdir: ../../../../../source
+
+[[bean_validation_constraints]]
+===== 定义约束
+
+可以使用 `javax.validation.constraints`  包中的注解或者自定义注解来定义约束。可以在一个实体或 POJO 类声明、字段或 getter 方法以及中间件<<services,服务>>方法上设置注解。
+
+在实体字段上使用标准验证注解的示例：
+
+[source, java]
+----
+include::{sourcesdir}/common/bean_validation_1.java[]
+----
+
+使用自定义类级别注解的示例(见<<bean_validation_custom_constraints,下文>>):
+
+[source, java]
+----
+include::{sourcesdir}/common/bean_validation_2.java[]
+----
+
+验证服务方法的参数和返回值的示例
+
+[source, java]
+----
+include::{sourcesdir}/common/bean_validation_3.java[]
+----
+
+如果需要方法参数的级联验证，可以使用 `@Valid` 注解，在上面的例子中，还将验证声明在 `Task` 对象上的约束。
+
+[[bean_validation_constraint_groups]]
+约束组::
++
+--
+约束组允许根据应用程序逻辑仅应用所有已定义约束的子集。例如，可能想强制用户输入实体属性的值，但是同时又能够通过某种内部机制设置此属性为空，为此，应该在约束注解上指定 `groups` 属性。然后，只有将相同的组传递给验证机制时，约束才会生效。
+
+平台将以下约束组传递给验证机制:
+
+* `RestApiChecks` - 在 {rest_man_url}[REST API] 中验证时。
+* `ServiceParametersChecks` -  验证服务参数时。
+* `ServiceResultChecks` - 验证服务返回值时。
+* `UiComponentChecks` - 验证单个 UI 字段时。
+* `UiCrossFieldChecks` -  在实体编辑器提交时进行类级别约束验证时。
+* `javax.validation.groups.Default` - 除了 UI 编辑器上的提交操作之外，都会传递这个组。
+--
+
+[[bean_validation_messages]]
+验证消息::
++
+--
+约束可包含要显示给用户的消息。
+
+消息可以直接在验证注解上设置，例如:
+
+[source, java]
+----
+include::{sourcesdir}/common/bean_validation_4.java[]
+----
+
+也可以将消息放在<<message_packs,本地化消息包>>中并且使用以下格式在注解中指定消息: `{msg://message_pack/message_key}` 或简单的 `{msg://message_key}`  (仅用于实体中)。例如:
+
+[source, java]
+----
+include::{sourcesdir}/common/bean_validation_5.java[]
+----
+
+或者，如果为实体定义约束并且消息在实体消息包中:
+
+[source, java]
+----
+include::{sourcesdir}/common/bean_validation_19.java[]
+----
+
+消息可以包含参数和表达式。参数包含在 `{}`  中，可使用的参数包括本地化消息或注解参数，例如 `{min}` 、 `{max}` 、 `{value}`。表达式包含在 `${}` 中并且可以包含验证值变量( `validatedValue` ) 、注解参数(如 `value` 或 `min`) 和 JSR-341 (EL 3.0)表达式。例如:
+
+[source, java]
+----
+include::{sourcesdir}/common/bean_validation_6.java[]
+----
+
+本地化消息值也可以包含参数和表达式。
+--
+
+[[bean_validation_custom_constraints]]
+自定义约束::
++
+--
+可以使用编程或声明式验证来创建自己的特定领域约束。
+
+要以编程方式的验证器创建约束，请执行以下操作:
+
+. 在项目的 *global*  模块中创建注解。使用 `@Constraint` 进行标注。这个注解必须包含 `message` 、 `groups` 和 `payload` 属性:
++
+[source, java]
+----
+include::{sourcesdir}/common/bean_validation_7.java[]
+----
+
+. 在项目的 *global* 模块中创建验证器类:
++
+[source, java]
+----
+include::{sourcesdir}/common/bean_validation_8.java[]
+----
+
+. 使用注解:
++
+[source, java]
+----
+include::{sourcesdir}/common/bean_validation_9.java[]
+----
+
+还可以使用现有的约束的组合来创建自定义约束，例如:
+
+[source, java]
+----
+include::{sourcesdir}/common/bean_validation_10.java[]
+----
+
+当使用复合约束时，生成的“约束违反”集合将包含每个约束的“约束违反”。如果想返回单个“约束违反”，请使用 `@ReportAsSingleViolation` 注解这个复合注解类。
+--
+
+[[bean_validation_related_objects]]
+关联对象验证::
++
+--
+对关联对象进行级联验证，请使用 `@Valid` 注解标记引用字段。
+
+[source, java]
+----
+include::{sourcesdir}/common/bean_validation_11.java[]
+----
+
+在上面的示例中，当验证 `Cart` 实例时，将检查产品列表以确保它至少包含一个实例，并且还会验证列表中的所有  `Product` 实例。
+--
+
+[[bean_validation_cuba_annotations]]
+CUBA 定义的验证注解::
++
+--
+除了使用 `javax.validation.constraints` 包中的标准注解之外，可以使用在 CUBA 框架中定义的以下注解:
+
+* `@RequiredView` -  可以添加到服务方法定义中，以确保实体实例加载了<<views,视图>>中指定的所有属性。如果注解标记到方法上，则检查返回值。如果注解标记到参数上，则检查参数。如果返回值或者参数是集合，则检查集合中的所有元素。例如:
+
+[source, java]
+----
+include::{sourcesdir}/common/bean_validation_18.java[]
+----
+--

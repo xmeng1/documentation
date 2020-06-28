@@ -1,0 +1,54 @@
+:sourcesdir: ../../../../../source
+
+[[exceptionHandlers]]
+===== 处理客户端层的异常
+
+在客户端层抛出或从中间层传递的未处理的异常，将被传递给 Web 客户端 block 的特殊处理机制。
+
+一个异常处理类是实现了 `UiExceptionHandler` 接口的<<managed_beans, Spring bean>>，在其 `handle()` 方法中执行处理异常的逻辑并返回 `true`，或者如果这个处理器无法处理传递的异常，则立即返回 `false`。这个行为能够为处理器创建一个 "责任链"。
+
+建议这个处理器继承 `AbstractUiExceptionHandler` 基类，该基类能够解析异常链(包括打包在 `RemoteException` 中的异常链)并且可以处理特定的异常类型。此处理器支持的异常类型是通过将字符串数组从处理器的构造器传递给基类构造器来定义的。数组中的每个字符串应包含一个要处理的异常的完整类名。
+
+假设有如下异常类：
+
+[source, java]
+----
+include::{sourcesdir}/common/exceptionHandlers_0.java[]
+----
+
+那么处理此异常的处理器必须有如下构造器：
+
+[source, java]
+----
+include::{sourcesdir}/common/exceptionHandlers_1.java[]
+----
+
+如果在客户端无法访问异常类，请使用字符串指定其名称：
+
+[source, java]
+----
+include::{sourcesdir}/common/exceptionHandlers_2.java[]
+----
+
+在使用 `AbstractUiExceptionHandler` 作为基类的情况下，业务逻辑在 `doHandle()` 方法中，如下所示：
+
+[source, java]
+----
+include::{sourcesdir}/common/exceptionHandlers_3.java[]
+----
+
+如果异常类的名称不足以确定是否可以将此处理器应用于此异常，则应该定义 `canHandle()` 方法。此方法也接收异常的文本信息。如果处理器能够应用于此异常，则方法必须返回 `true`。例如：
+
+[source, java]
+----
+include::{sourcesdir}/common/exceptionHandlers_4.java[]
+----
+
+[[dialogs_showExceptionDialog]]
+
+通过 `doHandle()` 方法的 `UiContext` 参数可以获取到 `Dialogs` 接口，此接口提供了一个用来展示异常的特殊对话框，对话框中包含了一个可折叠的区域，这里能展示异常所有堆栈信息。这个对话框用在默认的异常处理器中，但是也可以为自己定义的异常使用，示例：
+
+[source, java]
+----
+include::{sourcesdir}/common/exceptionHandlers_5.java[]
+----

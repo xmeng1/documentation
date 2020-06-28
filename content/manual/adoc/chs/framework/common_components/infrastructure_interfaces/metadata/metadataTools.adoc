@@ -1,0 +1,38 @@
+:sourcesdir: ../../../../../../source
+
+[[metadataTools]]
+====== MetadataTools
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/global/MetadataTools.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`MetadataTools` 是一个<<managed_beans, Spring bean>>，包含了处理元数据的其它方法。可以通过使用 `Metadata.getTools()` 方法访问 `MetadataTools` 接口，也可以像其它 bean 一样，通过注入或 `AppBeans` 类来获取。
+
+`MetadataTools` 接口的方法:
+
+* `getAllPersistentMetaClasses()` – 返回持久化实体<<metaClass,元类>>的集合。
+* `getAllEmbeddableMetaClasses()` – 返回可嵌入实体元类的集合。
+* `getAllEnums()` – 返回用作实体属性类型的枚举类的集合。
+* `format()` – 根据给定<<metaProperty,元属性(meta-property)>> 的数据类型格式化传递的值。
+* `isSystem()` – 检查元属性是否是系统级属性，即在<<entity_base_classes,基础实体接口>>中定义的。
+* `isPersistent()` – 检查元属性是否是持久化属性，即属性有对应的数据库字段。
+* `isTransient()` – 检查元属性或任意属性是否为非持久化的。
+* `isEmbedded()` – 检查元属性是否为嵌入对象。
+* `isAnnotationPresent()` – 检查在一个类或其父类中是否存在指定的注解。
+* `getNamePatternProperties()` – 返回实例名称中包含的属性的元属性集合，实例名由 `Instance.getInstanceName()` 方法返回。请参阅 <<namePattern_annotation,@NamePattern>>。
+
+可以通过在应用程序中 <<bean_extension,覆盖>> `MetadataTools` bean 来扩展其方法集。使用扩展接口的示例：
+
+[source, java]
+----
+include::{sourcesdir}/common/metadatatools_1.java[]
+----
+
+[source, java]
+----
+include::{sourcesdir}/common/metadatatools_2.java[]
+----
+

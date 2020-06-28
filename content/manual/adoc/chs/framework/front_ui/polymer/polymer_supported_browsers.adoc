@@ -1,0 +1,10 @@
+:sourcesdir: ../../../../../source
+
+[[polymer_supported_browsers]]
+===== 支持的浏览器
+参考 Polymer 的 https://polymer-library.polymer-project.org/2.0/docs/browsers[网站] 了解支持的浏览器。
+
+[WARNING]
+====
+如果需要适配老浏览器，千万不要使用 Polymer 客户端。
+====

@@ -1,0 +1,15 @@
+:sourcesdir: ../../../../source
+
+[[debug_setup]]
+==== 连接调试器
+
+可以通过两种方式启动 Tomcat 服务的调试模式。一种是通过 <<build_task_start,Gradle 任务>> ：
+
+`gradlew start`
+
+另一种是通过运行安装的 *Tomcat* 的 `++bin/debug.*++` 文件。
+
+启动之后，应用服务可以从 8787 端口接收调试器的连接。端口号可以在 `++bin/setenv.*++` 文件中的 `++JPDA_OPTS++` 变量修改。
+
+如果使用 *Intellij IDEA* 调试，需要创建一个 *Remote* 类型的 *Run/Debug Configuration* 元素，并且设置调试连接的 *Port* 为 8787（默认值）。
+

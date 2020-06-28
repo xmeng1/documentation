@@ -1,0 +1,42 @@
+:sourcesdir: ../../../../../source
+
+[[entity_localization]]
+===== 实体和属性名称本地化
+
+要在 UI 中显示实体和属性的本地化名称，请在包含实体的 Java 包中创建特殊的消息包。在消息文件中使用以下格式：
+
+
+* 实体名称键 – 简单类名（不带包名）。
+
+* 属性名称键 – 简单类名，后面跟上以点分隔的属性名。
+
+
+`com.abc.sales.entity.Customer` 实体的默认英文本地化示例 – `/com/abc/sales/entity/messages.properties` 文件：
+
+[source, xml]
+----
+Customer=Customer
+Customer.name=Name
+Customer.email=Email
+
+Order=Order
+Order.customer=Customer
+Order.date=Date
+Order.amount=Amount
+----
+
+
+此类消息包通常由框架隐式地使用，例如，被 <<gui_Table,Table>> 和 <<gui_FieldGroup,FieldGroup>> 可视化组件使用。除此之外，还可以使用以下方法来获取实体和属性的名称：
+
+
+* 编程方式 – 通过 <<messageTools,MessageTools>> `getEntityCaption()` 、 `getPropertyCaption()` 方法；
+
+
+* 在界面 XML 描述中 – 根据 <<messageTools.loadString,MessageTools.loadString()>> 规则引用消息： `++msg://{entity_package}/{key}++`，例如：
+
++
+[source, xml]
+----
+caption="msg://com.abc.sales.entity/Customer.name"
+----
+

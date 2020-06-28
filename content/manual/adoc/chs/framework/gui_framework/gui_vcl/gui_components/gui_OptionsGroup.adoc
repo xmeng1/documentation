@@ -1,0 +1,172 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_OptionsGroup]]
+====== 选项组
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-optionsgroup" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/OptionsGroup.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+这是一个允许用户从选项列表中进行选择的组件。单选框用于选择单个值；一组复选框用于选择多个值。
+
+image::gui_optionsGroup.png[align="center"]
+
+该组件对应的 XML 名称： `optionsGroup`
+
+* 使用 `OptionsGroup` 的最简单的情况是为实体属性选择枚举值。例如，`Customer` 实体具有 `CustomerGrade` 类型的 `grade` 属性，`CustomerGrade` 属性就是一个枚举值。就可以使用 `OptionsGroup` 来编辑这个属性，如下所示：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/optionsgroup_1.xml[]
+---- 
++
+上面的示例中，为 `Customer` 实体定义了<<gui_data_containers,数据容器>> `customerDc` 。在 `optionsGroup` 组件中，指向数据容器的链接在 <<gui_attr_dataContainer,dataContainer>> 属性中指定，实体属性的名称在 <<gui_attr_property,property>> 属性中设置。
++
+组件的显示效果：
+
+image::gui_optionsGroup_customerGrade.png[align="center"]
+
+* 组件选项列表可通过 `setOptionsList()` 、 `setOptionsMap()` 和 `setOptionsEnum()` 方法任意地指定，也可以使用 `optionsDatasource` 或 `optionsEnum` XML 属性来指定。
+
+[[gui_OptionsGroup_setOptionsList]]
+** `setOptionsList()` 方法允许以编程方式指定组件选项列表。为此，在 XML 描述中声明一个组件：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/optionsgroup_2.xml[]
+---- 
++
+然后将该组件注入控制器，并在 `onInit()` 方法中指定选项列表：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/optionsgroup_3.java[]
+---- 
++
+该组件将会如下显示：
++
+image::gui_optionsGroup_integerList.png[align="center"]
++
+根据所选的选项，组件的 `getValue()` 方法将返回 `Integer` 类型的值：2 、 4 、 5 、 7。
+
+[[gui_OptionsGroup_setOptionsMap]]
+** `setOptionsMap()` 方法允许分别指定选项的字符串名称和选项值。例如，我们可以在控制器的 `onInit()` 方法中为已经在 XML 描述中配置的 `optionsGroupWithMap` 组件设置以下选项 map：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/optionsgroup_4.java[]
+---- 
++
+该组件将会如下显示：
++
+image::gui_optionsGroup_integerMap.png[align="center"]
++
+根据所选的选项，该组件的 `getValue()` 方法将返回 `Integer` 类型的值：2、 4 、 5、 7，而不是界面上显示的字符串。
+
+[[gui_OptionsGroup_setOptionsEnum]]
+** `setOptionsEnum()` 方法将一个枚举类作为参数。选项列表中将显示枚举值的本地化名称，而组件的值将是枚举值。
+
+** 该组件可以从数据容器中获取选项列表。为此，需要使用 <<gui_attr_optionsContainer,optionsContainer>> 属性。示例：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/optionsgroup_5.xml[]
+---- 
++
+在这种情况下，`coloursField` 组件将显示 `coloursDc` 数据容器中的 `Colour` 实体的<<namePattern_annotation,实例名 >>，它的 `getValue()` 方法将返回所选的实体实例。
++
+使用 <<gui_attr_captionProperty,captionProperty>> 属性，可以指定一个实体属性作为选项的显示名称。
+
+[[gui_OptionsGroup_multiselect]]
+* `multiselect` 属性用于将 `OptionsGroup` 转换为多选模式。如果启用 `multiselect`，组件将显示为一组独立的复选框，组件值是所选选项的列表。
++
+例如，在 XML 描述中创建该组件：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/optionsgroup_6.xml[]
+---- 
++
+并为其设置一个选项列表 – `RoleType` 枚举值：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/optionsgroup_7.java[]
+---- 
++
+那么该组件将会如下显示：
++
+image::gui_optionsGroup_roleType_multi.png[align="center"]
++
+在这种情况下，组件的 `getValue()` 方法将返回一个 `java.util.List`，其中包含 `RoleType.READONLY` 和 `RoleType.DENYING` 枚举值。
++
+上面的示例同时展示了 `OptionsGroup` 组件显示数据模型中枚举值的本地化名称的功能。
++
+还可以通过将 `java.util.List` 值传递给 `setValue()` 方法以编程方式选择一些值：
++
+[source, java]
+----
+optionsGroup.setValue(Arrays.asList(RoleType.STANDARD, RoleType.ADMIN));
+----
+
+[[gui_OptionsGroup_orientation]]
+* `orientation` 属性定义了分组元素的排列方向。默认情况下元素垂直排列。可以使用 `horizontal` 值设置为水平方向。
+
+`OptionsGroup` 的展示可以使用带 `$cuba-optiongroup-*` 前缀的 SCSS 变量进行自定义。可以在创建一个 <<web_theme_extension,主题扩展>> 或者一个 <<web_theme_creation,自定义主题>> 之后在可视化编辑器里修改这些变量的值。
+
+'''
+
+optionsGroup 的属性::
+<<gui_attr_align,align>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_captionProperty,captionProperty>> -
+<<gui_attr_colspan,colspan>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_OptionsGroup_multiselect,multiselect>> -
+<<gui_attr_height,height>> -
+<<gui_attr_optionsContainer,optionsContainer>> -
+<<gui_attr_optionsDatasource,optionsDatasource>> -
+<<gui_attr_optionsEnum,optionsEnum>> -
+<<gui_OptionsGroup_orientation,orientation>> -
+<<gui_attr_property,property>> -
+<<gui_attr_required,required>> -
+<<gui_attr_requiredMessage,requiredMessage>> -
+<<gui_attr_responsive,responsive>> -
+<<gui_attr_rowspan,rowspan>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+optionsGroup 的元素::
+<<gui_validator,validator>>
+
+API::
+<<gui_api_addValueChangeListener,addValueChangeListener>> -
+<<gui_api_contextHelp,setContextHelpIconClickHandler>> -
+<<gui_LookupField_setOptionCaptionProvider,setOptionCaptionProvider>> -
+<<gui_OptionsGroup_setOptionsEnum,setOptionsEnum>> -
+<<gui_OptionsGroup_setOptionsList,setOptionsList>> -
+<<gui_OptionsGroup_setOptionsMap,setOptionsMap>>
+
+'''

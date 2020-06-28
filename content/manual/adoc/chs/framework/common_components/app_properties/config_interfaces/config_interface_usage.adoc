@@ -1,0 +1,40 @@
+:sourcesdir: ../../../../../../source
+
+[[config_interface_usage]]
+====== 使用配置接口
+
+要在应用程序中创建配置接口，请执行以下操作：
+
+* 创建一个继承自 `com.haulmont.cuba.core.config.Config` 的接口（不要与实体类 `com.haulmont.cuba.core.entity.Config` 混淆）。
+
+* 添加 `@Source` 注解以指定应属性值的存储位置：
+
+** `SourceType.SYSTEM` – 将使用 `System.getProperty()` 方法从给定 JVM 的系统属性中获取值。
+
+
+** `SourceType.APP` – 将从 `*app.properties` 文件中获取值。
+
+** `SourceType.DATABASE` – 将从数据库中获取值。
+
+* 创建属性访问方法（getters / setters）。如果不打算通过代码更改属性值，那么就不要创建 setter 方法。getter 方法的返回类型即是属性的类型。可能的属性类型描述<<config_interface_property_types,在这里>>。
+
+* 添加 `@Property` 注解，定义 getter 方法对应的属性名称。
+
+* 如果某个特定属性的来源与接口上定义的来源不同，可以为该属性单独设置 `@Source` 注解。
+
+* 如果 `@Source` 值是 `SourceType.DATABASE`，则可以在平台提供的 *Administration > Application Properties* 界面上编辑该属性。可以使用 `@Secret` 注解以掩码的方式在界面上显示属性值（将使用<<gui_PasswordField,PasswordField>>而不是常规的文本字段）。
+
+[TIP]
+====
+配置接口必须定义在应用程序的根包内（或者根包的内部包内）。
+====
+
+例如:
+
+[source, java]
+----
+include::{sourcesdir}/common/configinterface_3.java[]
+----
+
+不要创建任何实现类，因为当注入配置接口或通过<<configuration,Configuration>>获取配置接口时，平台将自动创建所需的代理类。
+

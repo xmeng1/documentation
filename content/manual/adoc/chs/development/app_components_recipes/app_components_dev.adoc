@@ -1,0 +1,133 @@
+:sourcesdir: ../../../../source
+
+[[app_components_dev]]
+==== 创建应用程序组件
+
+如果正在开发可复用的应用程序组件，本节包含一些有用的建议。
+
+[[app_components_dev_naming]]
+命名规则::
++
+--
+. 使用标准的反转域名表示法选择根 java 包，例如 `com.jupiter.amazingsearch`。
++
+根包不应该以任何其它组件或应用程序的根包开头。例如，如果有一个带有 `com.jupiter.tickets` 根包的应用程序，则不能将 `com.jupiter.tickets.amazingsearch` 包用于组件。原因是 Spring 从指定的根包开始扫描 bean 的类路径，并且每个组件的扫描空间必须是唯一的。
+
+. 命名空间用作数据库表的前缀，因此对于公共组件，应该是一个表示综合含义的单词(或缩写)，如 `jptams`，而不仅仅是 `search`。这样可以将目标应用程序中命名冲突的风险降到最低。不能在命名空间中使用下划线和短横，只能使用字母和数字。
+
+. 模块前缀应该与命名空间名称一致，但可以包含短横，如 `jpt-amsearch`。
+
+. 使用命名空间作为 bean 名称和应用程序属性的前缀，例如：
++
+[source, java]
+----
+@Component("jptams_Finder")
+@Property("jptams.ignoreCase")
+----
+--
+
+[[app_components_dev_install_local]]
+安装到本地 Maven 仓库::
++
+--
+要使组件可用于本地计算机上的项目，请通过执行 *CUBA > Advanced > Install app component* 主命令将其安装到本地 Maven 仓库中。这个命令实际上只是在停止 Gradle 守护进程之后运行 `install` Gradle 任务。
+--
+
+[[app_components_dev_upload]]
+上传到远程 Maven 仓库::
++
+--
+. 按照<<private_repo>>中的说明设置私仓。
+
+. 指定项目的仓库和凭证，由于使用私仓，此处不能设置标准 CUBA 仓库。
+
+. 在文本编辑器中打开组件项目的 `build.gradle`，并将 `uploadRepository` 添加到 `cuba` 部分：
++
+[source,groovy]
+----
+include::{sourcesdir}/development/app_comp_upload_1.groovy[]
+----
+
+. 在 Studio 中打开组件项目。
+
+. 从命令行运行 `uploadArchives` Gradle 任务。组件的工件将被上传到仓库。
+
+. 从本地 Maven 仓库中删除组件工件，以确保在下一次装载应用程序项目时会从远程仓库下载组件：只需删除位于用户主目录中的 `.m2/repository/com/company` 文件夹。
+
+. 现在，当装载并运行使用此组件的应用程序时，将从远程仓库中下载依赖的扩展组件。
+--
+
+[[app_components_dev_upload_bintray]]
+上传到 Bintray::
++
+--
+. 首先，在 https://bintray.com/signup/oss 注册账号
++
+[TIP]
+====
+可以在 Bintray 上使用社交账户登录（GitHub，Gmail，Twitter），但稍后必须重置密码，因为获取 API 密钥需要此帐户的密码（见下文）。
+====
+
+. 获取 Bintray 用户名。可以在登录 Bintray 后看到的 URL 中找到。例如，在 `\https://bintray.com/vividphoenix` 中，`vividphoenix` 是用户名。
+
+. 获取 API 密钥。可以在 Bintray 编辑个人资料界面中找到。在 API 密钥部分，系统会要求输入帐户密码以获取密钥。然后，将能够使用此密钥和用户名进行 Bintray 的 Gradle 插件验证：
++
+** Bintray 凭证可以添加为环境变量：
++
+[source, plain]
+----
+BINTRAY_USER=your_bintray_user
+BINTRAY_API_KEY=9696c1cb90752357ded8fdf20eb3fa921bf9dbbb
+----
++
+** 除了环境变量，也可以在项目的 `build.gradle` 文件中显式定义这些参数：
++
+[source, plain]
+----
+bintray {
+    user = 'bintray_user'
+    key = 'bintray_api_key'
+    ...
+}
+----
++
+** 或者，可以在命令行中提供 Bintray 凭据的参数：
++
+[source, plain]
+----
+./gradlew clean assemble bintrayUpload -Pcuba.artifact.version=1.0.0 -PbintrayUser=your_bintray_user -PbintrayApiKey=9696c1cb90752357ded8fdf20eb3fa921bf9dbbb
+----
+
+. 创建 _Maven_ 类型的公共仓库。对于开源（OSS）仓库，必须设置许可证类型。
++
+Bintray 会隐式的使用仓库内的包。此时，还不是必须要创建组件包，因为在之后的 `gradle bintrayUpload` 任务会自动创建。
+
+. 在 `build.gradle` 中，添加 Bintray 上传插件的依赖如下：
++
+[source, groovy]
+----
+include::{sourcesdir}/development/bintray_plugin.groovy[]
+----
+
+. 在 `build.gradle` 结尾，添加 Bintray 插件设置：
++
+[source, groovy]
+----
+include::{sourcesdir}/development/bintray_plugin_settings.groovy[]
+----
++
+** `pkg:repo` 是仓库（使用 `main`），
+** `pkg:name` 是包名（使用唯一名称，例如 `amazingsearch`），
+** `pkg:desc` 将显示在 Bintray 界面上的可选组件包描述，
+** `pkg:userOrg` - 是仓库所属组织的名称（如果没有设置，默认情况下 `BINTRAY_USER` 将用作组织名称）。
+
+. 现在，可以使用以下命令构建和上传项目：
++
+[source, plain]
+----
+./gradlew clean assemble bintrayUpload -Pcuba.artifact.version=1.0.0
+----
+
+. 如果在 CUBA 市场上发布扩展组件，则其仓库将链接到标准 CUBA 仓库，用户不必在其项目中指定仓库。
+--
+

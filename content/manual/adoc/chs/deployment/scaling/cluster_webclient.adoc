@@ -1,0 +1,15 @@
+:sourcesdir: ../../../../source
+
+[[cluster_webclient]]
+==== 配置 Web 客户端集群
+
+本章节介绍如下部署配置：
+
+image::cluster_webclient.png[align="center"]
+
+`host1` 和 `host2` 服务器上部署了实现 Web 客户端 block 的 `app` Tomcat 实例。用户通过 `++http://host0/app++` 地址访问负载均衡，负载均衡会转发用户请求到不同的服务。`host3` 服务器部署了实现 Middleware block 的 `app-core` Tomcat 实例。
+
+include::cluster_webclient/cluster_webclient_lb.adoc[]
+
+include::cluster_webclient/cluster_webclient_tomcat.adoc[]
+

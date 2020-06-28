@@ -1,0 +1,14 @@
+:sourcesdir: ../../../../../source
+
+[[email_attachments]]
+===== 电子邮件附件
+
+`EmailAttachment` 对象是一个包装器，包含附件的信息：字节数组（ `data` 字段）、文件名（ `name` 字段），如有必要，还可在包含邮件中可以使用的附件唯一标识（`contentId` 字段，虽然是可选字段，但很有用）。
+
+附件标识可用于在邮件消息体中插入图片。为此，在创建 `EmailAttachment` 时指定了唯一的 `contentId` （例如，`myPic`）。使用 `cid:myPic` 格式的表达式可以在消息体中插入附件路径。因此，要插入图片，可以指定以下 HTML 元素：
+
+[source, xml]
+----
+<img src="cid:myPic"/>
+----
+

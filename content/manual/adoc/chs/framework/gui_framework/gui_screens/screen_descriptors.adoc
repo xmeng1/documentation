@@ -1,0 +1,70 @@
+:sourcesdir: ../../../../../source
+
+[[screen_descriptors]]
+===== 界面 XML 描述
+
+界面描述是一个 XML 文件，包含<<gui_vcl,可视化组件>>、<<gui_data,数据组件>>和一些界面参数的声明性定义。
+
+XML 架构定义在 {xsd_url}/screen/window.xsd 中。
+
+界面描述具有 `window` 根元素。
+
+根元素属性：
+
+* `class` − <<screen_controller,控制器>>类的名称。
+
+* `messagesPack` − 界面的默认<<message_packs,消息包>>。它用于在控制器中使用 `getMessage()` 方法获取本地化消息，也作为 XML 描述中使用不指定包名的消息键获取本地化消息时的默认消息包。
+
+* `caption` − 窗口标题，可以是一个对上述消息包中的<<messageTools.loadString,消息的链接>>，例如，
++
+[source, properties]
+----
+caption="msg://credits"
+----
+
+* `focusComponent` − 界面显示时应该获得输入焦点的组件的标识符。
+
+界面描述的元素：
+
+* `data` − 定义界面的<<gui_data,数据组件>>。
+
+* `dialogMode` - 定义界面作为对话框打开时的尺寸及行为的设置。
++
+--
+`dialogMode` 的属性:
+
+** `closeable` - 定义对话框窗口是否有关闭按钮。可选值：`true` 、`false`。
+
+** `closeOnClickOutside` - 当窗口是模式窗口时，定义是否允许通过单击窗口之外的区域来关闭对话框窗口。可选值：`true` 、`false`。
+
+
+** `forceDialog` - 指定界面应始终以对话框方式打开，无论在调用代码中选择了哪种 `WindowManager.OpenType`。可选值：`true` 、 `false`。
+
+** `height` - 设置对话框窗口的高度。
+
+** `maximized` - 如果设置了 `true` 值，则对话窗口将最大化显示。可选值：`true` 、 `false`。
+
+** `modal` -指定对话框窗口是否是模式窗口。可选值：`true` 、`false`。
+
+** `positionX` - 设置对话框窗口左上角的 `x` 坐标。
+
+** `positionY` - 设置对话框窗口左上角的 `y` 坐标。
+
+** `resizable` - 定义用户是否可以更改对话窗口的大小。可选值：`true` 、 `false`。
+
+** `width` - 设置对话框窗口的宽度。
+
+例如：
+
+[source, xml]
+----
+include::{sourcesdir}/gui/dialogs_4.xml[]
+----
+--
+
+* `actions` – 定义界面的<<gui_Action,操作>>列表。
+
+* `timers` – 定义界面的<<gui_Timer,计时器>>列表。
+
+
+* `layout` − 界面布局的根元素。

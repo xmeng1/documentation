@@ -1,0 +1,106 @@
+:sourcesdir: ../../../../../source
+
+[[build.gradle_buildWar]]
+===== 构建 War
+
+`buildWar` – `CubaWarBuilding` 类型的任务，会构建一个 WAR 包，包含所有的应用程序代码和所有的依赖包。需要在 `build.gradle` 文件的根目录声明。生成的 WAR 包会在项目的 `build/distributions` 目录。
+
+[TIP]
+====
+可以通过 Studio 里的 *Deployment > WAR Settings* 界面配置这个任务。
+====
+
+任何 CUBA 应用程序包含至少两个 <<app_tiers,block>>：中间件（Middleware）和 web 客户端（Web Client）。所以部署程序最自然的方法就是创建两个单独的 WAR 包：中间件一个，web 客户端一个。这样做的话也可以在用户数量增长的时候方便进行扩展。但是单独的包会重复包含一些两边都依赖的包，因此会增加整个程序的大小。还有就是扩展的部署选择也不常用，反而会使得部署流程更加复杂。`CubaWarBuilding` 任务可以创建这两种类型的 WAR 包：每个 block 一个包，或者包含两个 block 的包，后面这种情况下，应用程序的那些 block 会在一个 web 应用程序里面被不同的类加载器加载。
+
+给中间件和 web 客户端创建不同的 WAR 包::
++
+--
+可以采用这样的 task 配置:
+
+[source, groovy]
+----
+include::{sourcesdir}/development/build_gradle_buildWar_2.groovy[]
+----
+
+任务参数：
+
+* `appName` - web 应用程序的名称，默认值是读取 *Modules prefix*，比如 `app`。
+
+* `appProperties` - 定义<<app_properties,应用程序属性>>键值对。这些属性会以 WAR 包里面的 `/WEB-INF/local.app.properties` 文件为基础增加。
++
+`appProperties = ['cuba.automaticDatabaseUpdate': 'true']` 会在应用程序第一次启动的时候创建数据库，如果没有现成的数据库，需要设置这个参数。
+
+* `singleWar` - 如果要为 blocks 构建单独的 WAR，需要设置这个为 `false`。
+
+* `includeJdbcDriver` - 是否包含项目里当前使用的 JDBC 驱动，默认是 `false`。
+
+* `includeContextXml` - 是否包含项目里当前使用的 Tomcat 的 `context.xml` 文件，默认值是 `false`。
+
+* `coreContextXmlPath` - 如果 `includeContextXml` 设置为 `true`，使用这个参数设置一个配置文件的相对目录用来替换项目 `context.xml` 文件。
+
+* `hsqlInProcess` - 如果设置成 `true`，`context.xml` 里面的数据库 URL 会按照 HSQL in-process 模式修改。
+
+* `coreProject` - 用来作为 core 模块（Middleware）的 Gradle 项目。如果没定义，则会使用标准的 *core* 模块。
+
+* `webProject` - 用来作为 web 模块（Web Client）的 Gradle 项目。如果没定义，则会使用标准的 *web* 模块。
+
+* `portalProject` - 用来作为 portal 模块（Web Portal）的 Gradle 项目。如果项目包含了 *portal* 模块，需要设置这个参数，比如，`portalProject = project(':app-portal')`。
+
+* `coreWebXmlPath`, `webWebXmlPath`, `portalWebXmlPath` - 用来作为相应模块 `web.xml` 的文件的相对目录。
+
++
+使用自定义 `web.xml` 文件的例子:
++
+[source, groovy]
+----
+include::{sourcesdir}/development/build_gradle_buildWar_4.groovy[]
+----
+
+* `logbackConfigurationFile` - <<logging,日志>>配置文件的相对目录。
++
+示例:
++
+[source, groovy]
+----
+task buildWar(type: CubaWarBuilding) {
+    // ...
+    logbackConfigurationFile = 'etc/war-logback.xml'
+}
+----
+
+* `useDefaultLogbackConfiguration` - 当设置成 `true` （也是默认值）的时候，这个任务会拷贝标准的 `logback.xml` 配置文件。
+
+* `frontBuildDir` - <<front_ui,Front UI>> 构建生成的目录名称。默认是 `build`。如需自定义，可以修改这个参数。
+--
+
+[[build.gradle_buildWar_single]]
+创建单一的 WAR 包::
++
+--
+需要创建包含中间件和 web 客户端 block 的单一 WAR 包，可以用下面这个配置：
+
+[source, groovy]
+----
+include::{sourcesdir}/development/build_gradle_buildWar_1.groovy[]
+----
+
+除了上面这些参数之外，以下这些参数也可以使用：
+
+* `singleWar` - 不设置或者设置成 `true`。
+
+* `webXmlPath` - 用来作为单一 WAR 包 `web.xml` 的文件相对目录。这个文件定义了两个 servlet 上下文的监听器，用来加载程序 block：`SingleAppCoreServletListener` 和 `SingleAppWebServletListener`。通过上下文参数给这两个监听器传递所需要的所有参数。
++
+`single-war-web.xml` 示例:
++
+[source, xml]
+----
+include::{sourcesdir}/development/build_gradle_buildWar_3.xml[]
+----
+
+单个 WAR 包部署时所有的 sevlets 和 filters 需要通过编程的方式注册，参考<<servlet_registration>>。
+
+单一 WAR 包只包含 *core* 和 *web 客户端* 模块。如果需要部署 *portal* 模块，需要用另外的 WAR 包。
+--
+
+参考 <<war_deployment>> 章节详细介绍 WAR 部署的各种情况和步骤。
+

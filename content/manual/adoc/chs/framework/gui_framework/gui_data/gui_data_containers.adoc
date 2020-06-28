@@ -1,0 +1,18 @@
+
+:sourcesdir: ../../../../../source
+
+[[gui_data_containers]]
+===== 数据容器
+
+数据容器在数据模型和可视化组件之间形成一个薄薄的处理层。容器用来容纳实体实例和实体集合、提供实体元类型、视图和选中的集合中实体的信息，以及为各种事件注册监听器。
+
+.数据容器接口
+image::gui_data/containers.svg[align="center"]
+
+include::gui_data_containers/gui_instance_container.adoc[]
+
+include::gui_data_containers/gui_collection_container.adoc[]
+
+include::gui_data_containers/gui_property_containers.adoc[]
+
+include::gui_data_containers/gui_keyvalue_containers.adoc[]

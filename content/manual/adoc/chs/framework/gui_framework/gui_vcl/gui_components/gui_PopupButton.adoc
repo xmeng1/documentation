@@ -1,0 +1,139 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_PopupButton]]
+====== 弹窗按钮
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-popupbutton" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/PopupButton.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+这是一个带弹窗的按钮。弹窗中可以包含操作列表或自定义内容。
+
+image::PopupButton.png[align="center"]
+
+该组件的 XML 名称： `popupButton`
+
+`PopupButton` 可以使用<<gui_attr_caption,caption>>属性指定按钮名称，使用<<gui_attr_icon,icon>>属性指定按钮图标。使用<<gui_attr_description,description>>属性定义提示文字。下图显示了不同类型的按钮：
+
+image::gui_popupButtonTypes.png[align="center"]
+
+`popupButton` 的元素：
+
+[[gui_PopupButton_actions]]
+* `actions` - 指定下拉列表内的操作。
++
+操作的属性中只有 `caption` 、  `enable` 、 `visible` 能起作用。`description` 和 `shortcut` 属性会被忽略。`icon` 属性的处理取方式决于应用程序属性 <<cuba.gui.showIconsForPopupMenuActions,cuba.gui.showIconsForPopupMenuActions>> 和组件的 `showActionIcons` 属性。后者优先。
+
++
+下面是一个按钮示例，其中包含一个具有两个操作的下拉列表：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/popupButton_1.xml[]
+----
++
+可以定义新的操作，也可以使用当前界面中元素已定义的操作，例如：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/popupButton_3.xml[]
+----
+
+[[gui_PopupButton_popup]]
+* `popup` - 为弹窗设置自定义的内容。如果设置了自定义弹出内容，则会忽略操作。
++
+下面是自定义弹出布局的示例：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/popupButton_2.xml[]
+----
++
+image::gui_popupButton_custom.png[align="center"]
+
+`popupButton` 的属性:
+
+[[gui_PopupButton_autoClose]]
+* `autoClose` - 定义是否应在操作触发后自动关闭弹窗。
+
+[[gui_PopupButton_closePopupOnOutsideClick]]
+* `closePopupOnOutsideClick` - 如果设置为 `true`，则单击弹窗外部时将其关闭。这不会影响单击按钮本身的行为。
+
+[[gui_PopupButton_menuWidth]]
+* `menuWidth` - 设置弹窗宽度。
+
+[[gui_PopupButton_popupOpenDirection]]
+* `popupOpenDirection` - 设置弹窗的打开方向。可能的取值：
++
+** `BOTTOM_LEFT`,
++
+** `BOTTOM_RIGHT`,
++
+** `BOTTOM_CENTER`.
+
+[[gui_PopupButton_showActionIcons]]
+* `showActionIcons` - 显示操作按钮的图标。
+
+[[gui_PopupButton_togglePopupVisibilityOnClick]]
+* `togglePopupVisibilityOnClick` - 定义在弹窗上连续点击是否切换弹窗可见性。
+
+`PopupButton` 接口的方法：
+
+[[gui_PopupButton_PopupVisibilityListener]]
+* `addPopupVisibilityListener()` - 添加一个监听器来拦截组件的可见性更改事件。
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gui_PopupButton.java[]
+----
++
+也可以通过订阅相应事件来跟踪 `PopupButton` 的可见性状态更改。
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gui_PopupButton_2.java[]
+----
+
+`PopupButton` 的展示可以使用带 `$cuba-popupbutton-*` 前缀的 SCSS 变量进行自定义。可以在创建一个 <<web_theme_extension,主题扩展>> 或者一个 <<web_theme_creation,自定义主题>> 之后在可视化编辑器里修改这些变量的值。
+
+'''
+
+popupButton 的属性::
+<<gui_attr_align,align>> -
+<<gui_PopupButton_autoClose,autoClose>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_PopupButton_closePopupOnOutsideClick,closePopupOnOutsideClick>> -
+<<gui_attr_css,css>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_PopupButton_menuWidth,menuWidth>> -
+<<gui_PopupButton_popupOpenDirection,popupOpenDirection>> -
+<<gui_PopupButton_showActionIcons,showActionIcons>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_PopupButton_togglePopupVisibilityOnClick,togglePopupVisibilityOnClick>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+popupButton 的元素::
+<<gui_PopupButton_actions,actions>> -
+<<gui_PopupButton_popup,popup>>
+
+API::
+<<gui_PopupButton_PopupVisibilityListener,addPopupVisibilityListener>>
+
+'''
+

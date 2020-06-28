@@ -1,0 +1,188 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_GroupTable]]
+====== 分组表格
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=group-table" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/GroupTable.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`GroupTable` 分组表格能动态支持按任意字段把数据分组。如果需要基于某列分组，则把该列拖拽到 image:gui_groupTableIcon.png[] 元素的左侧。被分组的数据可以通过 image:gui_groupBox_plus.png[]/image:gui_groupBox_minus.png[] 按钮展开/收起。
+
+image::gui_groupTableDragColumn.png[align="center"]
+
+该组件对应的 XML 名称为: `groupTable`。
+
+必须为 `GroupTable` 分组表格定义 `CollectionContainer` 类型的<<gui_collection_container,数据容器>>或者<<datasources,groupDatasource 分组数据源>>。否则，分组功能不可用。示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/grouptable_1.xml[]
+---- 
+
+[[gui_GroupTable_group]]
+`group` 是 <<gui_Table_columns,columns>> 中的可选元素，它包含若干列 `column`，打开对应界面时，会默认将数据按这些列进行分组。
+
+下面的例子中，我们会使用 <<gui_Table_columns,columns>> 元素的 <<gui_Table_columns_includeAll,includeAll>> 属性，以及 `group` 元素。
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/gui_groupTable_includeAll.xml[]
+----
+
+结果是给 `name` 列设置了一个特殊的属性，并且 `GroupTable` 按照 `address` 列做了分组。
+
+[[gui_GroupTable_groupAllowed]]
+可以针对每个列 `column` 设置 `groupAllowed` 布尔值属性，控制该列是否可以用来分组数据。
+
+[[gui_GroupTable_showTotalAggregation]]
+如果 `aggregatable` 属性设置为 `true`, 则会针对每组显示聚合结果；并在第一行显示针对所有行的聚合结果。如果 `showTotalAggregation` 属性设置为 `false`, 针对所有行的聚合结果则不会显示。
+
+如果 `multiselect` 多选属性设置为 `true`, 按下 *Ctrl* 键并单击分组行时，该组会展开，该组的所有行都会被选上。但反过来不同，如果整组都被选上，*Ctrl+单击* 并不会反选所有组数据。通过 *Ctrl* 还是可以反选特定的行。
+
+`GroupTable` 分组表格接口的方法: ::
++
+--
+[[gui_GroupTable_groupByColumns]]
+* `groupByColumns()` - 基于给定列进行分组。
++
+以下示例中，会将数据先以 department 分组，再以 city 分组:
++
+[source, java]
+----
+groupTable.groupByColumns("department", "city");
+----
+
+[[gui_GroupTable_ungroupByColumns]]
+* `ungroupByColumns()` - 取消基于给定列的分组。
++
+以下示例中，会取消针对 department 的分组, 但基于 city 的分组会保留。
++
+[source, java]
+----
+groupTable.ungroupByColumns("department");
+----
+
+[[gui_GroupTable_ungroup]]
+* `ungroup()` - 取消所有分组。
+
+[[gui_GroupTable_AggregationDistributionProvider]]
+* `setAggregationDistributionProvider()` 方法与 `Table` 组件的<<gui_Table_AggregationDistributionProvider,同名>>方法类似，不同之处在于，当创建 provider 时，会使用 `GroupAggregationDistributionContext<V>` 对象，包含了附加的信息：
++
+[[gui_GroupTable_groupInfo]]
+** `GroupInfo groupInfo` – 带有分组行信息的对象：分组的所有列的属性及其值。
+
+[[gui_GroupTable_getAggregationResults]]
+* `getAggregationResults()` 方法会为特定的 <<gui_GroupTable_groupInfo,GroupInfo>> 对象返回一个聚合值的映射（map），键值为表格列的标识符，值为聚合值。
+
+--
+
+`GroupTable` 分组表格的其它功能类似于普通<<gui_Table,表格>>.
+
+'''
+
+GroupTable 的属性列表::
+<<gui_attr_align,align>> -
+<<gui_Table_aggregatable,aggregatable>> -
+<<gui_Table_aggregationStyle,aggregationStyle>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_Table_columnControlVisible,columnControlVisible>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_Table_allowPopupMenu,contextMenuEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_Table_editable,editable>> -
+<<gui_Table_emptyStateLinkMessage,emptyStateLinkMessage>> -
+<<gui_Table_emptyStateMessage,emptyStateMessage>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_id,id>> -
+<<gui_Table_multiLineCells,multiLineCells>> -
+<<gui_Table_multiselect,multiselect>> -
+<<gui_Table_presentations,presentations>> -
+<<gui_Table_reorderingAllowed,reorderingAllowed>> -
+<<gui_attr_settingsEnabled,settingsEnabled>> -
+<<gui_GroupTable_showTotalAggregation,showTotalAggregation>> -
+<<gui_Table_sortable,sortable>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_attr_textSelectionEnabled,textSelectionEnabled>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+GroupTable 的元素::
+<<gui_Table_actions,actions>> -
+<<gui_Table_buttonsPanel,buttonsPanel>> -
+<<gui_Table_columns,columns>> -
+<<gui_Table_rows,rows>> -
+<<gui_Table_rowsCount,rowsCount>>
+
+<<gui_Table_columns,columns>>的属性::
+<<gui_Table_columns_includeAll, includeAll>> -
+<<gui_Table_columns_exclude, exclude>>
+
+<<gui_Table_columns,columns>>的元素::
+<<gui_Table_columns,column>> -
+<<gui_GroupTable_group,group>>
+
+<<gui_Table_columns,column 列>>属性列表::
+<<gui_Table_column_align,align>> -
+<<gui_Table_column_caption,caption>> -
+<<gui_attr_captionProperty,captionProperty>> -
+<<gui_Table_column_collapsed,collapsed>> -
+<<gui_DateField_dateFormat,dateFormat>> -
+<<gui_Table_column_editable,editable>> -
+<<gui_Table_column_expandRatio,expandRatio>> -
+<<gui_GroupTable_groupAllowed,groupAllowed>> -
+<<gui_Table_column_id,id>> -
+<<gui_Table_column_link,link>> -
+<<gui_Table_column_linkInvoke,linkInvoke>> -
+<<gui_Table_column_linkScreen,linkScreen>> -
+<<gui_Table_column_linkScreenOpenType,linkScreenOpenType>> -
+<<gui_Table_column_maxTextLength,maxTextLength>> -
+<<gui_attr_optionsDatasource,optionsDatasource>> -
+<<gui_DateField_resolution,resolution>> -
+<<gui_Table_column_sort,sort>> -
+<<gui_Table_column_sortable,sortable>> -
+<<gui_attr_visible,visible>> -
+<<gui_Table_column_width,width>>
+
+<<gui_Table_columns,column 列>>的元素::
+<<gui_Table_column_aggregation,aggregation>> -
+<<gui_formatter,formatter>>
+
+<<gui_Table_column_aggregation,aggregation>> 的属性::
+<<gui_Table_column_aggregation_editable,editable>> -
+<<gui_Table_column_aggregation_strategyClass,strategyClass>> -
+<<gui_Table_column_aggregation,type>> -
+<<gui_Table_column_aggregation_valueDescription,valueDescription>>
+
+<<gui_Table_rows,rows 行集合>>的属性::
+<<gui_attr_datasource,datasource>>
+
+API::
+<<gui_Table_ColumnCollapseListener,addColumnCollapseListener>> -
+<<gui_Table_SelectionListener,addSelectionListener>> -
+<<gui_GroupTable_getAggregationResults,getAggregationResults>> -
+<<gui_GroupTable_groupByColumns,groupByColumns>> -
+<<gui_GroupTable_AggregationDistributionProvider,setAggregationDistributionProvider>> -
+<<gui_Table_CellClickListener,setClickListener>> -
+<<gui_Table_setEmptyStateLinkClickHandler,setEmptyStateLinkClickHandler>> -
+<<gui_GroupTable_ungroup,ungroup>> -
+<<gui_GroupTable_ungroupByColumns,ungroupByColumns>>
+
+'''
+

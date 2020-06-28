@@ -1,0 +1,123 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_TreeTable]]
+====== 树形表格
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=tree-table" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/TreeTable.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`TreeTable` 组件是在最左列显示一个"树结构"的具有层级关系的表格。这个组件用于具有自引用关系的实体。比如，文件系统或公司的组织结构图。
+
+image::gui_treeTable.png[align="center"]
+
+组件的 XML 名称: `treeTable`
+
+`TreeTable` 组件的 <<gui_attr_dataContainer,dataContainer>> 属性应该包含指向<<gui_collection_container,集合数据容器>>的引用。`hierarchyProperty` 属性定义实体的一个属性，此属性也指向相同的实体。
+
+下面是一个在界面 XML 描述中定义 `treeTable` 组件的示例:
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/treetable_1.xml[]
+---- 
+
+`TreeTable` 的功能与简单的<<gui_Table,Table>>组件相似。
+
+'''
+
+treeTable 的属性::
+<<gui_attr_align,align>> -
+<<gui_Table_aggregatable,aggregatable>> -
+<<gui_Table_aggregationStyle,aggregationStyle>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_Table_columnControlVisible,columnControlVisible>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_Table_allowPopupMenu,contextMenuEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_Table_editable,editable>> -
+<<gui_Table_emptyStateLinkMessage,emptyStateLinkMessage>> -
+<<gui_Table_emptyStateMessage,emptyStateMessage>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_id,id>> -
+<<gui_Table_multiLineCells,multiLineCells>> -
+<<gui_Table_multiselect,multiselect>> -
+<<gui_Table_presentations,presentations>> -
+<<gui_Table_reorderingAllowed,reorderingAllowed>> -
+<<gui_attr_settingsEnabled,settingsEnabled>> -
+<<gui_Table_sortable,sortable>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_attr_textSelectionEnabled,textSelectionEnabled>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+treeTable 的元素::
+<<gui_Table_actions,actions>> -
+<<gui_Table_buttonsPanel,buttonsPanel>> -
+<<gui_Table_columns,columns>> -
+<<gui_Table_rows,rows>> -
+<<gui_Table_rowsCount,rowsCount>>
+
+<<gui_Table_columns,columns>> 的属性::
+<<gui_Table_columns_includeAll, includeAll>> -
+<<gui_Table_columns_exclude, exclude>>
+
+<<gui_Table_columns,column>> 的属性::
+<<gui_Table_column_align,align>> -
+<<gui_Table_column_caption,caption>> -
+<<gui_attr_captionProperty,captionProperty>> -
+<<gui_Table_column_collapsed,collapsed>> -
+<<gui_DateField_dateFormat,dateFormat>> -
+<<gui_Table_column_editable,editable>> -
+<<gui_Table_column_expandRatio,expandRatio>> -
+<<gui_Table_column_id,id>> -
+<<gui_Table_column_link,link>> -
+<<gui_Table_column_linkInvoke,linkInvoke>> -
+<<gui_Table_column_linkScreen,linkScreen>> -
+<<gui_Table_column_linkScreenOpenType,linkScreenOpenType>> -
+<<gui_Table_column_maxTextLength,maxTextLength>> -
+<<gui_attr_optionsDatasource,optionsDatasource>> -
+<<gui_DateField_resolution,resolution>> -
+<<gui_Table_column_sort,sort>> -
+<<gui_Table_column_sortable,sortable>> -
+<<gui_attr_visible,visible>> -
+<<gui_Table_column_width,width>>
+
+<<gui_Table_columns,column>> 的元素::
+<<gui_Table_column_aggregation,aggregation>> -
+<<gui_formatter,formatter>>
+
+<<gui_Table_column_aggregation,aggregation>> 的属性::
+<<gui_Table_column_aggregation_editable,editable>> -
+<<gui_Table_column_aggregation_strategyClass,strategyClass>> -
+<<gui_Table_column_aggregation,type>> -
+<<gui_Table_column_aggregation_valueDescription,valueDescription>>
+
+<<gui_Table_rows,rows>> 的属性::
+<<gui_attr_datasource,datasource>>
+
+API::
+<<gui_Table_ColumnCollapseListener,addColumnCollapseListener>> -
+<<gui_Table_SelectionListener,addSelectionListener>> -
+<<gui_Table_getAggregationResults,getAggregationResults>> -
+<<gui_Table_AggregationDistributionProvider,setAggregationDistributionProvider>> -
+<<gui_Table_CellClickListener,setClickListener>> -
+<<gui_Table_setEmptyStateLinkClickHandler,setEmptyStateLinkClickHandler>>
+
+'''

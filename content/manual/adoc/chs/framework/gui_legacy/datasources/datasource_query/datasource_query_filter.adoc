@@ -1,0 +1,62 @@
+:sourcesdir: ../../../../../../source
+
+[[datasource_query_filter]]
+====== 查询条件过滤
+
+[WARNING]
+====
+这是旧版本的 API。对于从 7.0 开始的新 API，请参阅 <<gui_data>>。
+====
+
+根据用户输入的条件不同，可以在运行时改变数据源的查询结果。因而可以有效的在数据库级别做数据过滤。
+
+提供此功能最简单的方法就是将数据源连接到一个特殊的可视化组件上：<<gui_Filter,过滤器控件>>。
+
+如果因为某些原因，全局的过滤器不太合适，可以在查询语句的文本中嵌入一个特殊的 XML 标记。通过这个标记可以根据用户在界面的可视化组件中输入的值进行过滤。
+
+此过滤器中可以使用以下 XML 元素：
+
+* `filter` – 过滤器的根节点元素。这个元素只能直接包含一个条件
+
+** `and`, `or` – 逻辑条件，可以包含任意数量的其它条件和语句。
+
+** `c` – JPQL 条件，会被添加在查询语句的 `where` 部分。如果此查询语句不包含 `where` 从句，则会被添加在第一个条件前面。可以通过一个可选的 `join` 属性来指定需要关联查询的实体，`join` 属性的值会被原封不懂的添加到查询的主实体之后，所以 `join` 属性的内容需要包含必要的 join 关键字或者逗号。
+
+条件和语句只有在相应的参数有值的时候才会被添加到最终形成的查询语句中，比如当这些值不是 `null` 的时候。
+
+[WARNING]
+====
+只能在查询过滤器中使用 <<datasource_query_params_custom,custom>>，<<datasource_query_params_param,param>>，<<datasource_query_params_component,component>> 和 <<datasource_query_params_session,session>> 这四个参数。<<datasource_query_params_ds,ds>> 参数有可能会出问题。
+====
+
+示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui/datasources_13.xml[]
+---- 
+
+上面的例子中，如果给数据源的 `refresh()` 方法传递了 `state` 和 `initiator` 参数，并且 `barCodeFilterField` 这个可视化组件也有值，那么组成的查询语句会是这样：
+
+[source, jpql]
+----
+select distinct d from app_GeneralDoc d, app_DocRole dr
+where
+(
+  (dr.doc.id = d.id and d.processState = :custom$state)
+  and
+  (d.barCode like :component$barCodeFilterField)
+)
+or
+(dr.doc.id = d.id and dr.user.id = :custom$initiator)
+----
+
+但是如果 `barCodeFilterField` 组件是空的，并且只有 `initiator` 参数传给了 `refresh()` 方法，那么组成的语句会是这样：
+
+[source, jpql]
+----
+select distinct d from app_GeneralDoc d, app_DocRole dr
+where
+(dr.doc.id = d.id and dr.user.id = :custom$initiator)
+----
+

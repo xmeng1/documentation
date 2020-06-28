@@ -1,0 +1,64 @@
+:sourcesdir: ../../../source
+
+[[gui_framework]]
+=== 通用用户界面（GUI）
+
+通用用户界面 (Generic UI, GUI) 框架可以使用 Java 和 XML 来创建 UI 界面。XML 是方式是可选的，但是使用这个方式可以声明式的创建界面布局并且减少构建用户界面的代码量。
+
+.通用用户界面结构
+image::ClientStructure.svg[align="center"]
+
+应用程序的界面包含了以下部分：
+
+* <<screen_descriptors,界面 XML 描述>> – 声明式定义界面布局和数据组件的 XML 文件。
+* <<screen_controllers,界面控制器>> – 处理界面生成事件、UI 展示控制以及编程方式操控界面组件的 Java 类。
+
+应用程序界面的代码跟可视化组件接口（VCL 接口）交互。这些接口通过使用 Vaadin 框架组件实现。
+
+<<gui_vcl,可视化组件库>>(VCL)包含大量即用型组件。
+
+<<gui_data,数据组件>>为可视化组件绑定到实体以及在界面控制器中处理实体提供统一的接口。
+
+<<gui_web,客户端的基础设施>>包含包含主应用程序窗口和其它的通用客户端机制。
+
+include::gui_framework/gui_screens.adoc[]
+
+include::gui_framework/gui_vcl.adoc[]
+
+include::gui_framework/gui_data.adoc[]
+
+include::gui_framework/gui_facets.adoc[]
+
+include::gui_framework/gui_Action.adoc[]
+
+include::gui_framework/gui_dialogs.adoc[]
+
+include::gui_framework/gui_notifications.adoc[]
+
+include::gui_framework/background_tasks.adoc[]
+
+include::gui_framework/gui_themes.adoc[]
+
+include::gui_framework/gui_icons.adoc[]
+
+include::gui_framework/html_attributes.adoc[]
+
+include::gui_framework/shortcuts.adoc[]
+
+include::gui_framework/url_history_navigation.adoc[]
+
+include::gui_framework/composite_components.adoc[]
+
+include::gui_framework/pluggable_component_factories.adoc[]
+
+include::gui_framework/webComponentsHelper.adoc[]
+
+include::gui_framework/own_components.adoc[]
+
+include::gui_framework/gui_web.adoc[]
+
+include::gui_framework/web_login.adoc[]
+
+include::gui_framework/gui_anonymous_access.adoc[]
+
+include::gui_framework/unsupported_browser_page.adoc[]

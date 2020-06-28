@@ -1,0 +1,16 @@
+:sourcesdir: ../../../../../../source
+
+[[query_case_insensitive]]
+====== 不区分大小写的子串搜索
+
+可以在查询参数的值中使用 `(?i)` 前缀来简单地指定忽略大小写的子串(Substring)搜索。例如这条查询语句：
+
+[source, jpql]
+----
+select c from sales_Customer c where c.name like :name
+----
+
+如果传递字符串 `(?i)%doe%` 作为 `name` 参数的值，则查询将返回 `John Doe`，如果数据库中存在此类记录，即使字符的大小写不同。出现这种结果是因为 ORM 将执行条件为 `lower(C.NAME) like ?` 的 SQL 查询。
+
+请注意，这样的查询不能使用在此字段上的索引，即使数据库中已对该字段建立了索引。
+

@@ -1,0 +1,87 @@
+:sourcesdir: ../../../../../source
+
+[[url_routing]]
+===== 路由 API
+
+本章节介绍路由 API 的关键内容。
+
+[[url_route_registration]]
+路由注册::
++
+--
+要为一个界面注册路由，需要在界面控制器添加 `@Route` 注解，示例：
+
+[source, java]
+----
+include::{sourcesdir}/gui/url_new_screen_registration.java[]
+----
+
+该注解有三个参数：
+
+* `path`（或 `value`）是路由本身的值；
+* `parentPrefix` 用来做路由压缩（squashing）（参阅 <<url_route_squashing,以下>>）。
+* `root` 是一个布尔值属性，用来确定一个路由是否是为根界面定义的（比如<<login_screen,登录界面>>或者 <<main_window_layout,主界面>>）。默认值为 `false`。
+
+如果需要为<<screens,旧界面>>定义路由，可以在<<screens.xml,screens.xml>>文件中为界面元素添加 `route` 属性（`routeParentPrefix` 可选，即对应 `parentPrefix` 参数；`rootRoute` 对应 `root` 参数），示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui/url_legacy_screen_registration.xml[]
+----
+--
+
+[[url_route_squashing]]
+路由压缩::
++
+--
+此功能目的是为了在打开多个带有相同部分路由的界面时保持 URL 干净易读。举例说明：
+
+对 `Order` 实体，假设有浏览和编辑界面：
+
+[source, java]
+----
+include::{sourcesdir}/gui/url_routes_squashing1.java[]
+----
+
+在打开浏览界面之后马上打开编辑界面，就能用上 URL 压缩，此时，URL 压缩用来避免 URL 中重复的 `orders` 路由部分。需要在编辑界面的 `@Route` 注解中用 `parentPrefix` 参数指定路由的重复部分：
+
+[source, java]
+----
+include::{sourcesdir}/gui/url_routes_squashing2.java[]
+----
+
+现在，当跟浏览界面在同一标签页打开编辑界面时，地址将像这样：`app/#main/0/orders/edit?id=...`
+--
+
+[[url_ui_state_mapping]]
+UI 状态与 URL 的映射::
++
+--
+使用 `UrlRouting` bean 可以根据当前界面和一些参数来更改当前应用程序的 URL。其包含如下方法：
+
+* `pushState()` – 更改地址并添加新的浏览器历史记录；
+* `replaceState()` – 替换地址但不添加新的浏览器历史记录；
+* `getState()` – 将当前状态作为 `NavigationState` 对象返回。
+
+`pushState()/replaceState()` 方法接受当前界面控制器和一组参数（map 形式，可选）为输入参数。
+
+使用 `UrlRouting` 的示例，请参阅<<mapping_state_to_url,后面>>部分。
+--
+
+[[url_navigation_filter]]
+导航过滤::
++
+--
+导航过滤器可以用来阻止切换到某些路由。
+
+导航过滤器是实现了 `NavigationFilter` 接口的 Spring bean。可以使用 `@Order` 注解来配置所有导航过滤器的调用顺序。常量 `NavigationFilter.HIGHEST_PLATFORM_PRECEDENCE` 和 `NavigationFilter.LOWEST_PLATFORM_PRECEDENCE` 用来定义框架中的过滤器优先级范围。
+
+`NavigationFilter` 接口有 `allowed()` 方法，可以使用两个输入参数：当前导航状态 `fromState` 和请求的导航状态 `toState`。此方法返回 `AccessCheckResult` 实例并检查是否允许从当前导航状态切换到请求导航状态。
+
+`CubaLoginScreenFilter` 是一个导航过滤器的例子。设计用来在用户已经登录的情况下，检查当前会话是否已授权能拒绝导航至登录界面：
+
+[source, java]
+----
+include::{sourcesdir}/gui/url_navigation_filter.java[]
+----
+--

@@ -1,0 +1,107 @@
+:sourcesdir: ../../../../../../source
+
+[[vaadin_addon_sample_gui]]
+====== 集成 Vaadin 组件到通用 UI 中
+
+在<<vaadin_addon_sample,前一节>>中，我们在项目中包含了第三方 Stepper 组件。在本节中，我们将它集成到 CUBA 通用 UI 中。这样就允许开发人员在界面 XML 描述中以声明方式使用组件，并通过<<gui_data,数据组件>>将其绑定到数据模型实体。
+
+为了在 CUBA 通用 UI 中集成 Stepper，需要创建以下文件：
+
+* `Stepper` - 在 *web* 模块 *gui* 子文件夹的该组件接口。
+
+* `WebStepper` - 在 *web* 模块 *gui* 子文件夹的该组件实现。
+
+* `StepperLoader` - 在 *web* 模块 *gui* 子文件夹的组件 XML 加载器。
+
+* `ui-component.xsd` - 一个新的组件 XML 结构定义。如果这个文件已经存在，在文件中添加关于此新组件的信息。
+
+* `cuba-ui-component.xml` - 在 *web* 模块中注册新组件加载器的文件。如果该文件已存在，在文件中添加关于此新组件的信息。
+
+在 IDE 中打开项目。
+
+创建相应的文件，并添加必要的更改。
+
+* 在 *web* 模块的 *gui* 子文件夹创建 `Stepper` 接口。用以下代码替换其内容：
++
+[source, java]
+----
+include::{sourcesdir}/ui_component/vaadin_gui/Stepper.java[]
+----
++
+组件的基础接口是 `Field`，用于显示和编辑实体属性。
+
+* 创建 `WebStepper` 类 - *web* 模块的 *gui* 子文件夹中的组件实现。用以下代码替换其内容：
++
+[source, java]
+----
+include::{sourcesdir}/ui_component/vaadin_gui/WebStepper.java[]
+----
++
+所选择的基类是 `WebV8AbstractField`，其实现了 `Field` 接口的方法。
+
+* *web* 模块的 *gui* 子文件夹中的 `StepperLoader` 类从 XML 描述中加载组件。
++
+[source, java]
+----
+include::{sourcesdir}/ui_component/vaadin_gui/StepperLoader.java[]
+----
++
+`AbstractFieldLoader` 类包含用于加载 `Field` 组件的基本属性的代码。所以 `StepperLoader` 只加载特定于 `Stepper` 组件的属性。
+
+* *web* 模块中的 `cuba-ui-component.xml` 文件注册新组件及其加载器。用以下代码替换其内容：
++
+[source, xml]
+----
+include::{sourcesdir}/ui_component/vaadin_gui/cuba-ui-component.xml[]
+----
+
+* *web* 模块中的 `ui-component.xsd` 文件包含自定义可视化组件的 XSD。添加 `stepper` 元素及其属性定义。
++
+[source, xml]
+----
+include::{sourcesdir}/ui_component/vaadin_gui/ui-component.xsd[]
+----
+
+我们来看一下如何将新组件添加到界面。
+
+* 可以删除<<vaadin_addon_sample,前一章节>>的改动或者为实体生成编辑界面。
+
+* 将 `stepper` 组件添加到编辑界面。可以使用声明式的方式或者编程的方式进行添加。我们分别看看这两种方法。
+
+. 在 XML 描述中声明式的使用该组件。
++
+--
+* 打开 `customer-edit.xml` 文件。
+
+* 定义新的命名空间 `xmlns:app="http://schemas.company.com/agd/0.1/ui-component.xsd"`。
+
+* 从 `form` 中删除 `score` 字段。
+
+* 将 `stepper` 组件添加到界面上。
+
+这时，界面 XML 描述应如下所示：
+
+[source, xml]
+----
+include::{sourcesdir}/ui_component/vaadin_gui/customer-edit-gui-declarative.xml[]
+----
+
+在上面的例子中，`stepper` 组件与 `Customer` 实体的 `score` 属性相关联。该实体的实例由 `customerDc` 实例容器管理。
+--
+
+. 在 Java 控制器中以编程的方式创建组件。
++
+[source, xml]
+----
+include::{sourcesdir}/ui_component/vaadin_gui/customer-edit-gui-programmatic.xml[]
+----
++
+[source, java]
+----
+include::{sourcesdir}/ui_component/vaadin_gui/CustomerEditGuiProgrammatic.java[]
+----
+
+* 启动应用程序服务。将生成如下所示的编辑界面：
+
+image::ui_component/customer_edit_result.png[align="center",358,250]
+

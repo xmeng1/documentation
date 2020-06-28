@@ -1,0 +1,62 @@
+:sourcesdir: ../../../../../source
+
+[[cluster_webclient_lb]]
+===== 安装和配置负载均衡
+
+这里介绍在 *Ubuntu 14.04* 上安装 *Apache HTTP Server* 作为负载均衡。
+
+. 安装 *Apache HTTP Server* 和 *mod_jk* 模块：
++
+`$ sudo apt-get install apache2 libapache2-mod-jk`
+
+. 用以下内容替换 `/etc/libapache2-mod-jk/workers.properties` 文件内容：
++
+[source,plain]
+----
+workers.tomcat_home=
+workers.java_home=
+ps=/
+
+worker.list=tomcat1,tomcat2,loadbalancer,jkstatus
+
+worker.tomcat1.port=8009
+worker.tomcat1.host=host1
+worker.tomcat1.type=ajp13
+worker.tomcat1.connection_pool_timeout=600
+worker.tomcat1.lbfactor=1
+
+worker.tomcat2.port=8009
+worker.tomcat2.host=host2
+worker.tomcat2.type=ajp13
+worker.tomcat2.connection_pool_timeout=600
+worker.tomcat2.lbfactor=1
+
+worker.loadbalancer.type=lb
+worker.loadbalancer.balance_workers=tomcat1,tomcat2
+
+worker.jkstatus.type=status
+----
+
+. 添加下面的这些内容到 `/etc/apache2/sites-available/000-default.conf`：
++
+[source, xml]
+----
+<VirtualHost *:80>
+...
+    <Location /jkmanager>
+        JkMount jkstatus
+        Order deny,allow
+        Allow from all
+    </Location>
+
+    JkMount /jkmanager/* jkstatus
+    JkMount /app loadbalancer
+    JkMount /app/* loadbalancer
+
+</VirtualHost>
+----
+
+. 重启 Apache HTTP 服务:
++
+`$ sudo service apache2 restart`
+

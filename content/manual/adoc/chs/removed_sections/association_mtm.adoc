@@ -1,0 +1,4 @@
+[[association_mtm]]
+=== 多对多关联
+
+参阅 https://www.cuba-platform.com/guides/data-modelling-many-to-many-association[数据模型：多对多关联] 向导。

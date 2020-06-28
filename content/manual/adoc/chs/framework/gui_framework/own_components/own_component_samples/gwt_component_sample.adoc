@@ -1,0 +1,103 @@
+:sourcesdir: ../../../../../../source
+
+[[gwt_component_sample]]
+====== 创建 GWT 组件
+
+在本节中，我们介绍如何创建一个简单的 GWT 组件（由 5 颗星组成的评级字段）及其在应用程序界面中的用法。
+
+image::ui_component/rating_field_component.png[align="center"]
+
+在 CUBA Studio 中创建一个新项目，并将其命名为 `ratingsample`。
+
+创建 *web-toolkit* 模块。一个简便的方法就是使用 *CUBA Studio*：在主菜单，点击 *CUBA > Advanced > Manage modules > Create 'web-toolkit' Module*。
+
+为了创建 GWT 组件，需要创建下列文件：
+
+* `RatingFieldWidget.java` - *web-toolkit* 模块中的 GWT 部件。
+
+* `RatingFieldServerComponent.java` - Vaadin 组件类。
+
+* `RatingFieldState.java` - 组件状态类。
+
+* `RatingFieldConnector.java` - 连接器，用于连接客户端代码和服务器组件。
+
+* `RatingFieldServerRpc.java` - 为客户端定义服务器 API 的类。
+
+现在创建需要的文件并对其进行必要的更改。
+
+* 在 *web-toolkit* 模块中创建 `RatingFieldWidget` 类。使用下面代码作为其内容：
++
+[source, java]
+----
+include::{sourcesdir}/ui_component/gwt/RatingFieldWidget.java[]
+----
++
+部件（Widget）是一个客户端类，负责在 Web 浏览器中显示组件并处理浏览器事件。它定义了与服务端配合起来工作的接口。在这个的例子中，这些接口是 `setValue()` 方法和 `StarClickListener` 接口。
+
+* `RatingFieldServerComponent` 是一个 Vaadin 组件类。它定义了服务端代码 API、访问器方法、事件监听器和数据源连接。开发人员在应用程序代码中使用的是这个类的方法。
++
+[source, java]
+----
+include::{sourcesdir}/ui_component/gwt/RatingFieldServerComponent.java[]
+----
+
+* `RatingFieldState` 状态类定义客户端和服务器之间发送的数据。它包含在服务端自动序列化并在客户端上反序列化的公共字段。
++
+[source, java]
+----
+include::{sourcesdir}/ui_component/gwt/RatingFieldState.java[]
+----
+
+* `RatingFieldServerRpc` 接口定义了客户端可调用的服务器 API。它的方法可以由 Vaadin 内置的 RPC 机制调用。我们将在此组件中实现此接口。
++
+[source, java]
+----
+include::{sourcesdir}/ui_component/gwt/RatingFieldServerRpc.java[]
+----
+
+* 在 *web-toolkit* 模块中创建 `RatingFieldConnector` 类，连接器将客户端代码与服务端连接起来。
++
+[source, java]
+----
+include::{sourcesdir}/ui_component/gwt/RatingFieldConnector.java[]
+----
+
+`RatingFieldWidget` 类中不定义组件的外观样式，只为关键元素指定样式名称。要定义组件的外观，需要创建样式表文件。简便方法就是使用 *CUBA Studio*：在主菜单，点击 *CUBA > Advanced > Manage themes > Create theme extension*。在弹窗中选择 `hover` 主题。另一个方法是使用 https://www.cuba-platform.com/marketplace/cuba-cli[CUBA CLI] 的 `extend-theme` 命令。`hover` 主题使用了 *FontAwesome* 的象形符号字体替代了 <<icon_set,icons>>。
+
+建议以 SCSS 混入(Mixin)的形式将组件样式放到 `components/componentname` 目录中的单独文件 `componentname.scss` 中。在 *web* 模块的 `themes/hover/com.company.ratingsample` 目录中创建 `components/ratingfield` 目录结构。然后在 `ratingfield` 目录中创建 `ratingfield.scss` 文件：
+
+image::ui_component/gwt_theme_ext_structure.png[align="center"]
+
+[source, css]
+----
+include::{sourcesdir}/ui_component/gwt/ratingfield.scss[]
+----
+
+将此文件包含在 `hover-ext.scss` 主题文件中：
+
+[source, css]
+----
+include::{sourcesdir}/ui_component/gwt/hover-ext.scss[]
+----
+
+为了演示组件的工作原理，我们在 *web* 模块中创建一个新的界面。
+
+将界面命名为 `rating-screen`。
+
+在 IDE 中打开 `rating-screen.xml` 文件。Rating 组件需要一个容器，我们在界面 XML 中声明它：
+
+[source, xml]
+----
+include::{sourcesdir}/ui_component/gwt/rating-screen.xml[]
+----
+
+打开 `RatingScreen.java` 界面控制器并添加将组件放置到界面上的代码。
+
+[source, java]
+----
+include::{sourcesdir}/ui_component/gwt/RatingScreen.java[]
+----
+
+启动应用程序服务并查看结果。
+
+image::ui_component/rating_screen_result.png[align="center"]

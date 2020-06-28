@@ -1,0 +1,104 @@
+:sourcesdir: ../../../../../../source
+
+[[polymer_working_with_data]]
+====== 处理数据
+
+如果需要加载数据，只需要在 HTML 中放置需要的 https://cuba-elements.github.io/cuba-elements/components/cuba-data/[cuba-data] 元素，并且设置必须属性。
+
+*实体加载*
+
+使用 https://cuba-elements.github.io/cuba-elements/components/cuba-data/#cuba-entities[cuba-entities] 来加载实体。一旦设置了 `entity-name` 和 `view` 属性，这个元素可以加载实体列表，并且通过 `data` 属性将数据暴露给 Polymer 数据绑定的变量：
+
+[source,html]
+----
+<cuba-entities entity-name="sec$User" view="_local" data="{{users}}"></cuba-entities>
+----
+
+然后可以很简单的展示数据：
+
+[source,html]
+----
+<template is="dom-repeat" items="[[users]]" as="user">
+  <div>[[user.login]]</div>
+</template>
+----
+
+
+*实体查询*
+
+按照 {rest_man_url}#rest_api_v2_queries_config[此处] 描述定义一个查询。
+
+使用 https://cuba-elements.github.io/cuba-elements/components/cuba-data/#cuba-query[cuba-query] 元素来获取查询结果。可以选择性的通过 `params` 属性传递参数：
+
+[source,html]
+----
+<cuba-query id="query"
+            auto="[[auto]]"
+            entity-name="sec$User"
+            query-name="usersByName"
+            data="{{users}}">
+</cuba-query>
+
+<template is="dom-repeat" items="[[users]]" as="user">
+  <div>[[user.login]]</div>
+</template>
+----
+
+*服务调用*
+
+用 {rest_man_url}#rest_api_v2_services_config[这里] 的方法暴露服务及其方法。使用 https://cuba-elements.github.io/cuba-elements/components/cuba-data/#cuba-service[cuba-service] 元素来调用这个方法：
+
+[source,html]
+----
+<cuba-service service-name="cuba_ServerInfoService"
+              method="getReleaseNumber"
+              data="{{releaseNumber}}"
+              handle-as="text"></cuba-service>
+
+Release number: [[releaseNumber]]
+----
+
+*实体创建*
+
+`cuba-entity-form` 和 `cuba-service-form` 元素能帮助发送数据到后台。
+
+在下面的例子中，绑定 `user` 对象到 `entity` 属性，并通过这个属性保存到数据库。
+
+[source,html]
+----
+<cuba-entity-form id="entityForm"
+                  entity-name="sec$User"
+                  entity="[[user]]"
+                  on-cuba-form-response="_handleFormResponse"
+                  on-cuba-form-error="_handleFormError">
+
+  <label>Login: <input type="text" name="login" value="{{user.login::input}}"></label>
+  <label>Name: <input type="text" name="login" value="{{user.name::input}}"></label>
+
+  <button on-tap="_submit">Submit</button>
+
+</cuba-entity-form>
+
+<paper-toast id="successToast">Entity created</paper-toast>
+<paper-toast id="errorToast">Entity creation error</paper-toast>
+----
+
+[source,javascript]
+----
+_submit: function() {
+  this.$.entityForm.submit();
+},
+_handleFormResponse: function() {
+  this.user = getUserStub();
+  this.$.successToast.open();
+},
+_handleFormError: function() {
+  this.$.errorToast.open();
+}
+----
+
+[TIP]
+====
+如果在使用上面的例子中的 REST API 时不想强制用户登录，需要启用 {rest_man_url}#rest_api_v2_anonymous[REST API 匿名访问] 。
+====
+

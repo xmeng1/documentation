@@ -1,0 +1,97 @@
+:sourcesdir: ../../../../../../source
+
+[[js_library_sample]]
+====== 使用 JavaScript 库
+
+在此示例中，我们将使用 *jQuery UI* 库中的 https://jqueryui.com/slider/#range[Slider] 组件。拥有两个拖拽手柄的滑动条，用于定义取值范围。
+
+在 CUBA Studio 中创建一个新项目，并将其命名为 `jscomponent`。
+
+为了使用 Slider 组件，需要创建以下文件：
+
+* `SliderServerComponent` - 与 JavaScript 集成的 Vaadin 组件。
+
+* `SliderState` - Vaadin 组件的状态类。
+
+* `slider-connector.js` - Vaadin 组件的 JavaScript 连接器。
+
+集成至通用 UI 的过程跟<<vaadin_addon_sample_gui>>描述的一致，这里就不再重复了。
+
+下面在 *web* 模块的 `toolkit/ui/slider` 子目录创建需要的文件，并做相应修改。
+
+* `SlideState` 状态类定义在服务器和客户端之间传输的数据。在这个例子中，它是最小值、最大值和选定值。
+
++
+[source, java]
+----
+include::{sourcesdir}/ui_component/js/SliderState.java[]
+----
+
+* Vaadin 服务端组件 `SliderServerComponent`。
++
+[source, java]
+----
+include::{sourcesdir}/ui_component/js/SliderServerComponent.java[]
+----
++
+
+服务端组件定义了 getter 方法和 setter 方法来处理滑块状态，也定义了一个值更改监听器接口。该类继承自 `AbstractJavaScriptComponent`。
++
+
+在类构造器中的调用 `addFunction()` 方法为客户端的 `valueChanged()` 方法的 RPC 调用定义了一个处理程序。
++
+`@JavaScript` 和 `@StyleSheet` 注解指向的文件，必须在网页上加载。在这个的示例中，这些是 jquery-ui 库的 JavaScript 文件、位于<<using_webjars,WebJar 资源>>的 jquery-ui 的样式表以及 Vaadin 服务组件 Java 包里面的连接器。
+
+* JavaScript 连接器 `slider-connector.js`.
++
+[source, javascript]
+----
+include::{sourcesdir}/ui_component/js/slider-connector.js[]
+----
++
+连接器是一个在加载网页时初始化 JavaScript 组件的函数。该函数名称必须与服务端组件类名对应，其中包名中的点用下划线代替。
++
+Vaadin 为连接器函数添加了几种有用的方法。`this.getElement()` 返回组件的 HTML DOM 元素，`this.getState()` 返回一个状态对象。
++
+这里的连接器执行以下操作：
++
+--
+* 初始化 jQuery UI 库的 `slider` 组件。当滑块的位置发生任何变化时，将调用 `slide()` 函数，该函数又调用连接器的 `valueChanged()` 方法。`valuedChanged()` 是在服务端 `SliderServerComponent` 类中定义的方法。
+
+* 定义 `onStateChange()` 函数。在服务端更改状态对象时调用它。
+--
+
+为了演示组件的工作原理，我们创建有三个属性的 `Product` 实体：
+
+* String 类型的 `name`
+* Double 类型的 `minDiscount`
+* Double 类型的 `maxDiscount`
+
+为实体生成标准界面。确保 *Module* 字段的值为 `Module: 'app-web_main'`（只有在项目添加了 *gui* 模块之后才会显示这个字段）。
+
+`slider` 组件将设置产品的最小和最大折扣值。
+
+打开 `product-edit.xml` 文件。通过将 `editable="false"` 属性添加到相应的元素，使 `minDiscount` 和 `maxDiscount` 字段不可编辑。然后添加一个 box，将作为 Vaadin 组件的容器使用。
+
+这时，编辑界面的 XML 描述应如下所示：
+
+[source, xml]
+----
+include::{sourcesdir}/ui_component/js/product-edit.xml[]
+----
+
+打开 `ProductEit.java` 文件。用以下代码替换其内容：
+
+[source, java]
+----
+include::{sourcesdir}/ui_component/js/ProductEdit.java[]
+----
+
+`onInitEntity()` 方法为新产品的折扣设置初始值。
+
+`onBeforeShow()` 方法初始化 `slider` 组件，设置 `slider` 的当前值、最小值和最大值，并定义值更改监听器。当滑块移动时，可编辑实体的相应字段将被设置成新值。
+
+启动应用程序服务并打开产品编辑界面。更改滑块位置时会改变文本框的值。
+
+image::ui_component/product_edit.png[align="center"]
+

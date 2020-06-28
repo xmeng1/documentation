@@ -1,0 +1,31 @@
+:sourcesdir: ../../../../../../source
+
+[[frame]]
+====== 界面子框架
+
+[WARNING]
+====
+这是旧版本的 API。对于从 7.0 开始的新 API，请参阅 <<screen_controllers>>。
+====
+
+子框架（Frame）是可重用的界面。界面子框架通过 <<gui_Frame,frame>> XML 元素添加在别的界面中。
+
+子框架的控制器必须扩展 <<abstractFrame,AbstractFrame>> 类。
+
+[TIP]
+====
+在 Studio 里面可以使用 *Blank frame* 模板创建界面框架。
+====
+
+以下是一些界面框架和框架内包含的其它界面交互的规则：
+
+* 框架内的界面组件可以通过“.”来获得引用：`++frame_id.component_id++`。
+
+* 框架内的界面组件也可以在控制器中通过调用 `++getComponent(component_id)++` 方法获得，但是这个方法只有在框架内没有相同 id 的组件才能用。比如，frame 内的组件名称会覆盖界面的组件名称。
+
+* 界面的<<datasources,数据源>>可以在子界面框架内访问，有三种途径：通过调用 `++getDsContext().get(ds_id)++` 方法获得、通过<<screen_controller_injection,依赖注入>>获得、通过<<datasource_query,数据源查询>>中的 `++ds$ds_id++` 获得。但是只有在子框架没有声明同名的数据源情况下才能取到（跟组件的情况类似）。
+
+* 从界面上想要获取子框架的数据源，只能通过遍历 `getDsContext().getChildren()` 集合的方法得到。
+
+界面的提交会促使界面内所有子框架内有更改的 datasource 一起提交。
+

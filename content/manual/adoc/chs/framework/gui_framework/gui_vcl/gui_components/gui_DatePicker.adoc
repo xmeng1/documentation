@@ -1,0 +1,95 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_DatePicker]]
+====== 日期选择器
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-datepicker" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/DatePicker.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`DatePicker` 是用来显示和选择日期的控件。跟<<gui_DateField,DateField>>里面的下拉式日期选择器是有一样的外观。
+
+image::gui_datepicker_mini.png[align="center"]
+
+该组件对应的 XML 名称： `datePicker`
+
+* 可以使用<<gui_attr_dataContainer,dataContainer>>或<<gui_attr_datasource,datasource>>以及<<gui_attr_property,property>>属性来创建一个关联数据源的日期选择器：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/datepicker_1.xml[]
+----
++
+在上面这个例子中，界面有 `Order` 实体的数据容器 `orderDc`，`Order` 实体拥有 `date` 属性。XML 里面将 `datePicker` 的 <<gui_attr_dataContainer,dataContainer>> 属性指向这个数据容器，然后将 <<gui_attr_property,property>> 属性指向实体中需要显示在这个控件的字段。
+
+[[gui_DatePicker_range]]
+* 可以通过 `rangeStart` 和 `rangeEnd` 属性来定义可选的日期范围。一旦日期范围设定了，其它在范围之外的日期都会变成不可选状态。
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/datepicker_4.xml[]
+----
++
+image::gui_datepicker_month_range.png[align="center"]
+
+[[gui_DatePicker_resolution]]
+* 日期和时间的精度可以用组件的 `resolution` 属性来定义，这个属性的值需要是 `DatePicker.Resolution` 枚举类型 - `DAY`、`MONTH` 、`YEAR`。默认精度是 `DAY`。
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/datepicker_2.xml[]
+----
++
+image::gui_datepicker_month_resolution.png[align="center"]
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/datepicker_3.xml[]
+----
++
+image::gui_datepicker_year_resolution.png[align="center"]
+
+* 日历中的当前日期是根据用户浏览器的时间戳确定的，依赖操作系统的时区设置。用户会话的<<timeZone,时区>>不会影响此功能。
+
+'''
+
+datePicker 的属性::
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_DateField_datatype,datatype>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_id,id>> -
+<<gui_attr_property,property>> -
+<<gui_DatePicker_range,rangeEnd>> -
+<<gui_DatePicker_range,rangeStart>> -
+<<gui_DatePicker_resolution,resolution>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+API::
+<<gui_api_addValueChangeListener,addValueChangeListener>> -
+<<gui_api_contextHelp,setContextHelpIconClickHandler>>
+
+'''
+

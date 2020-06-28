@@ -1,0 +1,27 @@
+:sourcesdir: ../../../../../source
+
+[[jespa_lib]]
+===== 引入类库
+
+从 link:$$http://www.ioplex.com$$[http://www.ioplex.com] 下载这个库，然后把这个 JAR 上传到 <<build.gradle,build.gradle>> 脚本中注册的一个<<artifact_repository,仓库>>中。仓库可以是 `mavenLocal()` 或者内部仓库（私仓）。
+
+在 `build.gradle` 中的 *web* 模块配置部分添加以下依赖：
+
+[source, groovy]
+----
+include::{sourcesdir}/security/ldap_jespa_2.groovy[]
+----
+
+在 *web* 模块创建一个 `LoginProvider` 的实现类：
+
+[source, java]
+----
+include::{sourcesdir}/security/ldap_jespa_1.java[]
+----
+
+创建一个 bean 用来在 *web* 模块使用别名解析域名：
+
+[source, java]
+----
+include::{sourcesdir}/security/ldap_jespa_3.java[]
+----

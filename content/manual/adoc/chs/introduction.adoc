@@ -1,0 +1,11 @@
+[[introduction]]
+== 框架简介
+
+本章节介绍 CUBA 框架的概览以及使用此平台需要的条件。
+
+include::introduction/overview.adoc[]
+
+include::introduction/hardware_requirements.adoc[]
+
+include::introduction/release_notes.adoc[]
+

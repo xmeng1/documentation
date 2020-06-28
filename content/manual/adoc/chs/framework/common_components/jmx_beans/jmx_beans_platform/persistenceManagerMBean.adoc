@@ -1,0 +1,15 @@
+:sourcesdir: ../../../../../../source
+
+[[persistenceManagerMBean]]
+====== PersistenceManagerMBean
+
+http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/jmx/PersistenceManagerMBean.html[PersistenceManagerMBean] 提供以下功能：
+
+* 管理<<entity_statistics,实体统计信息>>机制。
+
+* 使用 `findUpdateDatabaseScripts()` 方法查看新的数据库更新脚本。使用 `updateDatabase()` 方法触发数据库更新。
+
+* 使用 `jpqlLoadList()` 、 `jpqlExecuteUpdate()` 方法可以在中间层上下文中执行任意的 JPQL 查询
+
+JMX 对象名: `app-core.cuba:type=PersistenceManager`
+

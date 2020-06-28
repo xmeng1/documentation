@@ -1,0 +1,208 @@
+:sourcesdir: ../../../../../source
+
+[[login]]
+===== 登录
+
+CUBA 框架提供内置的可扩展身份验证机制。这些机制包括不同的身份验证方案，例如登录/密码、记住账号、信任和匿名登录。
+
+本节主要介绍中间层的身份验证机制。有关 Web 客户端身份验证机制的详细信息，请参阅 <<web_login>>。
+
+平台在中间件包含以下身份验证机制：
+
+- 由 `AuthenticationManagerBean` 实现的 `AuthenticationManager`。
+-  `AuthenticationProvider` 实现。
+- 由 `AuthenticationServiceBean` 实现的 `AuthenticationService`。
+-  `UserSessionLog` - 参阅<<userSession_log,用户会话日志>>。
+
+.中间件身份验证机制
+image::MiddlewareAuthenticationStructure.png[align="center"]
+
+此外，它还使用以下附加组件：
+
+- 由 `TrustedClientServiceBean` 实现的 `TrustedClientService` - 为受信任客户端提供匿名会话或系统会话。
+- `AnonymousSessionHolder` - 为受信任的客户端创建并保存匿名会话实例。
+- `UserCredentialsChecker` - 检查用户凭据是否可以使用，比如可用于防止暴力破解。
+- `UserAccessChecker` - 检查用户是否可以通过给定的上下文访问系统，例如，控制用户是否可以通过 REST 访问系统、控制指定的 IP 地址是否可以访问系统。
+
+身份验证的主要接口是 `AuthenticationManager`，它包含四个方法：
+
+[source, java]
+----
+include::{sourcesdir}/common/authenticationManager.java[]
+----
+
+有两个方法具有相似的功能： `authenticate()` 和 `login()`。两个方法都检查提供的凭据是否有效且对应于有效用户，然后返回 `AuthenticationDetails` 对象。它们之间的主要区别在于 `login` 方法还激活了用户会话，这样它随后就可以用于调用服务方法。
+
+`Credentials` 表示用于身份验证子系统的一组凭据。平台有 `AuthenticationManager` 支持的以下几种类型的凭据：
+
+适用于所有层：
+
+* `LoginPasswordCredentials`
+* `RememberMeCredentials`
+* `TrustedClientCredentials`
+
+仅适用于中间层：
+
+* `SystemUserCredentials`
+* `AnonymousUserCredentials`
+
+`AuthenticationManager` 的 login / authenticate  方法返回 `AuthenticationDetails` 实例，其中包含 <<userSession,UserSession>> 对象。此对象可用于检查其它权限、读取 *User* 属性和会话属性。平台只有一个内置的 `AuthenticationDetails` 接口实现 -  *SimpleAuthenticationDetails*，它只存储用户会话对象，但是应用程序可以提供自己的带有附加信息的 `AuthenticationDetails` 实现。
+
+*AuthenticationManager*  的 *authenticate()* 方法中执行以下三种操作之一：
+
+ - 如果可以验证输入的是一个有效用户，则返回 `AuthenticationDetails`。
+ - 如果无法通过传递的凭据对象对用户进行身份验证，则抛出 `LoginException`。
+ - 如果不支持传递的凭据对象，则抛出 `UnsupportedCredentialsException`。
+
+`AuthenticationManager` 的默认实现是 `AuthenticationManagerBean`，它将身份验证委托给 `AuthenticationProvider` 实例链。 `AuthenticationProvider` 是一个可以处理特定 `Credentials` 实现的身份验证模块，它还有一个特殊的方法 `supports()`，允许调用者查询它是否支持给定的 `Credentials` 类型。
+
+.标准的用户登录过程
+image::LoginProcedure.png[align="center"]
+
+标准的用户登录过程：
+
+* 用户输入用户名和密码。
+
+* 应用程序客户端使用用户名和密码作为参数调用 `Connection.login()` 方法。
+
+*  `Connection` 创建 `Credentials` 对象并调用 `AuthenticationService` 的 `login()` 方法。
+
+* `AuthenticationService` 将验证操作委托给 `AuthenticationManager` bean ，`AuthenticationManager` bean 使用了 `AuthenticationProvider` 对象链 。`LoginPasswordAuthenticationProvider` 可以使用 `LoginPasswordCredentials` 对象。它通过输入的登录名加载 `User` 对象，使用用户标识符作为盐值再次散列获得的密码哈希值，并将获得的哈希值与存储在 DB 中的密码哈希值进行比较。如果不匹配，则抛出 `LoginException`。
+
+* 如果身份验证成功，则将用户的所有访问参数（角色列表、权限、约束和会话属性）加载到创建的 <<userSession,UserSession>> 实例中。
+
+* 如果启用了<<userSession_log,用户会话日志>>，则会把包含用户会话信息的记录保存到数据库中。
+
+另外请参阅 <<web_login,Web 登录过程>>。
+
+密码散列算法由 `EncryptionModule` 类型 bean 实现，并在 <<cuba.passwordEncryptionModule,cuba.passwordEncryptionModule>> 应用程序属性中指定。默认情况下使用 BCrypt。
+
+[[built_in_authentication_providers]]
+内置验证提供程序::
++
+--
+平台包含以下 `AuthenticationProvider` 接口的实现：
+
+- `LoginPasswordAuthenticationProvider`
+- `RememberMeAuthenticationProvider`
+- `TrustedClientAuthenticationProvider`
+- `SystemAuthenticationProvider`
+- `AnonymousAuthenticationProvider`
+
+所有实现都从数据库加载用户，使用 `UserSessionManager` 验证传递的凭据对象并创建非活动的用户会话。随后调用 `AuthenticationManager.login()` 后，该会话实例将变为活动状态。
+
+`LoginPasswordAuthenticationProvider` 、`RememberMeAuthenticationProvider` 和 `TrustedClientAuthenticationProvider` 使用额外检查插件：实现了 `UserAccessChecker` 接口的 bean。如果有一个 `UserAccessChecker` 实例抛出 `LoginException`，则认为验证失败并抛出 `LoginException`。
+
+
+此外，`LoginPasswordAuthenticationProvider` 和 `RememberMeAuthenticationProvider` 使用 *UserCredentialsChecker* beans 检查凭据实例。*UserCredentialsChecker* 接口只有一个内置实现 - *BruteForceUserCredentialsChecker*，用于检查用户是否使用暴力破解攻击来找出有效凭据。
+--
+
+[[login_exceptions]]
+异常类型::
++
+--
+`AuthenticationManager` 和 `AuthenticationProvider`  的 `authenticate()` 方法和 `login()` 方法会抛出 *LoginException* 或其子类异常。需要确认 此外，如果传递的凭据对象没有可用的 `AuthenticationProvider` bean，则抛出 *UnsupportedCredentialsException*。
+
+请参阅以下异常类：
+
+- `UnsupportedCredentialsException`
+- `LoginException`
+  - `AccountLockedException`
+  - `UserIpRestrictedException`
+  - `RestApiAccessDeniedException`
+
+--
+
+[[login_events]]
+事件::
++
+--
+`AuthenticationManager` 的标准实现 - `AuthenticationManagerBean` 在登录或验证过程中触发以下应用程序 <<events, 事件>> ：
+
+- `BeforeAuthenticationEvent` / `AfterAuthenticationEvent`
+- `BeforeLoginEvent` / `AfterLoginEvent`
+- `AuthenticationSuccessEvent` / `AuthenticationFailureEvent`
+- `UserLoggedInEvent` / `UserLoggedOutEvent`
+- `UserSubstitutedEvent`
+
+中间层的 Spring bean 可以使用 Spring `@EventListener` 注解来处理这些事件：
+
+[source, java]
+----
+include::{sourcesdir}/common/loginEventListener.java[]
+----
+
+上面提到的所有事件的事件处理器（不包括 `AfterLoginEvent` 、 `UserSubstitutedEvent` 和 `UserLoggedInEvent` ）都可以抛出 `LoginException` 来中断身份验证/登录过程。
+
+例如，可以为应用程序实现一个维护模式开关，如果维护模式处于激活状态，它将阻止登录。
+
+[source, java]
+----
+include::{sourcesdir}/common/maintenanceModeValve.java[]
+----
+
+--
+
+[[login_extension_points]]
+扩展点::
++
+--
+
+可以使用以下类型的扩展点来扩展身份验证机制：
+
+- `AuthenticationService` - 替换现有的 `AuthenticationServiceBean`。
+- `AuthenticationManager` - 替换现有的 `AuthenticationManagerBean`。
+- `AuthenticationProvider` 实现类 - 实现额外的或替换现有的 `AuthenticationProvider`。
+- Events - 实现事件处理.
+
+可以使用 Spring Framework 机制替换现有 bean，例如通过在 *core* 模块的 Spring XML 配置中注册新 bean。
+
+[source, xml]
+----
+<bean id="cuba_LoginPasswordAuthenticationProvider"
+      class="com.company.authext.core.CustomLoginPasswordAuthenticationProvider"/>
+----
+
+[source, java]
+----
+include::{sourcesdir}/common/customAuthenticationProvider.java[]
+----
+
+事件处理器可以使用 `@Order` 注解来排序。所有平台 bean 和事件处理器都使用 100 到 1000 之间的 `order` 值，因此可以在平台代码之前或之后添加自定义处理。如果要在平台 bean 之前添加 bean 或事件处理器 - 请使用小于 100 的值。
+
+事件处理器排序：
+[source, java]
+----
+include::{sourcesdir}/common/eventListenerOrder.java[]
+----
+
+AuthenticationProvider 可以使用 *Ordered* 接口并实现 `getOrder()` 方法。
+[source, java]
+----
+include::{sourcesdir}/common/authProviderOrdered.java[]
+----
+
+--
+
+[[login_additional_eatures]]
+额外功能::
++
+--
+* 平台具有防止暴力破解密码的机制。通过中间件上的 <<cuba.bruteForceProtection.enabled,cuba.bruteForceProtection.enabled>> 应用程序属性启用保护。如果启用了保护，则在多次登录尝试失败的情况下，用户登录名和 IP 地址的组合将被限制一段时间。
+用户登录名和 IP 地址组合的最大登录尝试次数由 <<cuba.bruteForceProtection.maxLoginAttemptsNumber,cuba.bruteForceProtection.maxLoginAttemptsNumber>> 应用程序属性定义（默认值为 5）。锁定间隔时间以秒为单位由 <<cuba.bruteForceProtection.blockIntervalSec,cuba.bruteForceProtection.blockIntervalSec>> 应用程序属性定义（默认值为 60）。
+
+* 用户密码（实际上是密码哈希值）可能不存储在数据库中，而是通过外部手段验证，例如，通过 LDAP 集成的方式。在这种情况下，身份验证实际上是由客户端 block 执行的，而中间件通过使用带有 `TrustedClientCredentials` 的 `AuthenticationService.login()` 方法创建基于用户登录名而没有密码的会话来“信任”客户端。此方法需要满足以下条件：
+
+  - 客户端 block 必须传递所谓的受信任密码，该密码在中间件和客户端 block 的  <<cuba.trustedClientPassword,cuba.trustedClientPassword>> 应用程序属性中指定。
+
+  - 客户端 block 的 IP 地址必须位于 <<cuba.trustedClientPermittedIpList,cuba.trustedClientPermittedIpList>> 应用程序属性中指定的列表中。
+
+* 对于计划的自动处理程序和使用 JMX 接口连接中间件 bean 也需要登录系统。事实上，这些操作被视为管理操作，只要数据库中没有更改实体，就不需要身份验证。当实体持久化到数据库时，该过程需要正在执行更改的用户登录，以保证登录的用户对存储的更改负责。
++
+要求自动处理程序或 JMX 调用登录系统的另一个好处是，如果给执行线程设置了用户会话，服务器日志输出就可以显示出日志对应的用户信息。这对日志分析很有帮助，可以很方便地搜索特定处理程序产生的日志。
++
+中间件中处理程序对系统的访问是使用 `AuthenticationManager.login()` 和 `SystemUserCredentials` 完成的，`SystemUserCredentials` 包含将要执行处理程序的用户登录信息（无密码）。最终，会在相应的中间件 block 中创建并缓存 <<userSession,UserSession>> 对象，但这个对象不会在集群中分发。
+
+可在 <<system_authentication>> 中查看有关中间件处理身份验证的更多信息。
+
+--

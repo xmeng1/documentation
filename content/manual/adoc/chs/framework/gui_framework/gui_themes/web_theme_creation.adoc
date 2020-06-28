@@ -1,0 +1,127 @@
+:sourcesdir: ../../../../../source
+
+[[web_theme_creation]]
+===== 创建自定义主题
+
+可以在项目中创建一个或多个应用程序主题，并为用户提供选择最合适的应用程序主题的时机。创建新主题还允许覆盖 `++*-theme.properties 文件++` 中的变量，这些变量定义了一些服务端参数：
+
+* 默认对话框窗口大小。
+
+* 默认输入框宽度。
+
+* 某些组件的尺寸（<<gui_Filter,Filter>> 、<<gui_FileMultiUploadField,FileMultiUploadField>>）。
+
+* 如果 <<cuba.web.useFontIcons,cuba.web.useFontIcons>> 属性启用，则在标准操作和平台界面中使用 *Font Awesome* 图标时，图标名称和 `com.vaadin.server.FontAwesome` 枚举的常量值对应。
+
+可以在 CUBA Studio 、 https://www.cuba-platform.com/marketplace/cuba-cli[CUBA CLI] 中轻松创地建新主题，也可以手动创建。我们看看以 <<custom_theme_hover_dark,Hover Dark>> 自定义主题为例的所有三种创建方式。
+
+在 CUBA Studio 中创建：::
++
+--
+* 在主菜单中，单击 *CUBA > Advanced > Manage themes > Create custom theme*。输入新主题的名称： *hover-dark*。在 *Base theme* 下拉列表中选择 *hover* 主题。
++
+将在 *web* 模块中创建所需的文件结构。`webThemesModule` 模块及其配置将自动被添加到 `settings.gradle` 和<<build.gradle,build.gradle>>文件中。此外，生成的 `deployThemes` gradle 任务允许在不重启服务器的情况下查看主题更改。
+--
+
+手动创建：::
++
+--
+* 在项目的 *web* 模块中创建以下文件结构：
++
+[source, plain]
+----
+include::{sourcesdir}/gui/themes/themes_44.scss[]
+----
+
+* `app-component.scss` 文件：
++
+[source, css]
+----
+include::{sourcesdir}/gui/themes/themes_46.scss[]
+----
+
+* `hover-dark.scss` 文件：
++
+[source, css]
+----
+include::{sourcesdir}/gui/themes/themes_47.scss[]
+----
+
+* `styles.scss` 文件：
++
+[source, css]
+----
+include::{sourcesdir}/gui/themes/themes_48.scss[]
+----
+
+* 在 *web* 模块的 *web* 子目录中创建 `hover-dark-theme.properties` 文件：
++
+[source, plain]
+----
+@include=hover-theme.properties
+----
+
+* 将 `webThemesModule` 模块添加到 `settings.gradle` 文件中：
++
+[source, groovy]
+----
+include::{sourcesdir}/gui/themes/themes_50.groovy[]
+----
+
+* 将 `webThemesModule` 模块配置添加到<<build.gradle,build.gradle>>文件中：
++
+[source, groovy]
+----
+include::{sourcesdir}/gui/themes/themes_49.groovy[]
+----
+
+* 最后，在 `build.gradle` 中创建 `deployThemes` gradle 任务，以查看更改而不重启服务器：
++
+[source, groovy]
+----
+include::{sourcesdir}/gui/themes/themes_51.groovy[]
+----
+--
+
+在 https://www.cuba-platform.com/marketplace/cuba-cli[CUBA CLI]中创建: ::
++
+--
+* 运行 `theme` 命令，然后选择 *hover* 主题。
++
+将在项目的 *web* 模块中创建特定的文件结构。
+
+* 修改生成的文件结构和文件内容，使其与上面的文件相对应。
+
+* 在 *web* 模块的资源目录中创建 `hover-dark-theme.properties` 文件：
++
+[source, plain]
+----
+@include=hover-theme.properties
+----
+
+CLI 将自动更新 `build.gradle` 和 `settings.gradle` 文件。
+--
+
+另请参阅<<custom_theme_facebook,>>部分中的示例。
+
+修改服务端主题参数::
++
+--
+在 Halo 主题中，标准操作和平台界面会默认使用 *Font Awesome* 图标（如果启用了<<cuba.web.useFontIcons,cuba.web.useFontIcons>>）。在这种情况下，可以通过在 `<your_theme>-theme.properties` 文件中设置图标和字体元素名称之间所需的映射来替换标准图标。例如，要在新 Facebook 主题中要为 `create` 操作使用"plus"图标，`facebook-theme.properties` 文件应包含以下内容：
+
+[source, properties]
+----
+@include=halo-theme.properties
+
+cuba.web.icons.create.png = font-icon:PLUS
+----
+
+Facebook 主题中带有修改后的 `create` 操作的标准用户浏览界面的片段：
+
+image::gui_theme_facebook_1.png[align="center"]
+--
+
+include::web_theme_creation/custom_theme_hover_dark.adoc[]
+
+include::web_theme_creation/custom_theme_facebook.adoc[]
+

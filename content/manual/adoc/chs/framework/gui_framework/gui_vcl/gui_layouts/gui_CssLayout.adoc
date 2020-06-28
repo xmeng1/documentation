@@ -1,0 +1,112 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_CssLayout]]
+====== CSS 布局
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/dashboard" class="live-demo-btn" target="_blank">示例程序</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=responsive-csslayout" class="live-demo-btn" target="_blank">在线示例</a>
+
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/CssLayout.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`CssLayout` 是一个容器，可以使用 CSS 完全控制这个容器里的组件的位置和样式。
+
+该组件的 XML 名称： `cssLayout`。
+
+下面是使用 `cssLayout` 实现简单地响应式界面的示例。
+
+在宽屏中显示组件：
+
+image::gui_cssLayout_1.png[align="center"]
+
+在窄屏中显示组件：
+
+image::gui_cssLayout_2.png[align="center"]
+
+界面的 XML 描述:
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/cssLayout_1.xml[]
+----
+
+`modules/web/themes/halo/halo-ext.scss` 文件的内容 (参考 <<web_theme_extension>> 创建这个文件)：
+
+[source, css]
+----
+include::{sourcesdir}/gui_vcl/cssLayout_2.css[]
+----
+* `stylename` 属性允许在 XML 描述或界面控制器中为 `CssLayout` 组件设置预定义样式。
++
+--
+* `v-component-group` 样式用于创建组件分组，即一行无缝连接的组件：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/cssLayout_3.xml[]
+----
++
+image::gui_cssLayout_3.png[align="center"]
+
+* `well` 样式使窗口的外看起来带有下沉阴影效果。
+
+* `card` 样式使布局看起来像卡片。与嵌套的具有属性 `stylename="v-panel-caption"` 的布局组合使用，可以创建复杂的组合布局，例如：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/cssLayout_4.xml[]
+----
+
++
+效果如下:
++
+image::gui_cssLayout_4.png[align="center"]
+--
+
+'''
+
+cssLayout 的属性::
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_id,id>> -
+<<gui_attr_responsive,responsive>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+API::
+<<gui_api_add,add>> -
+<<gui_api_shortcut,addShortcutAction>> -
+<<gui_api_addLayoutClickListener,addLayoutClickListener>> -
+<<gui_api_getComponent,getComponent>> -
+<<gui_api_getComponentNN,getComponentNN>> -
+<<gui_api_getComponents,getComponents>> -
+<<gui_api_getOwnComponent,getOwnComponent>> -
+<<gui_api_getOwnComponents,getOwnComponents>> -
+<<gui_api_indexOf,indexOf>> -
+<<gui_api_remove,remove>> -
+<<gui_api_removeAll,removeAll>>
+
+'''
+

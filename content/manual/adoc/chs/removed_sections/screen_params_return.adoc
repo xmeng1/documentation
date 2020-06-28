@@ -1,0 +1,4 @@
+[[screen_params_return]]
+=== 从调用的界面返回值
+
+参阅 <<opening_screens>>。

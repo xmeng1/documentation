@@ -1,0 +1,4 @@
+[[entity_inheritance]]
+=== 实体继承
+
+参阅 https://www.cuba-platform.com/guides/data-modelling-entity-inheritance[数据模型：实体继承] 向导。

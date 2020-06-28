@@ -1,0 +1,26 @@
+:sourcesdir: ../../../../../../source
+
+[[transactionalDataManager]]
+====== TransactionalDataManager
+
+`TransactionalDataManager` 是一个中间层的 bean，跟 `DataManager` 接口类似，但是可以使用一个已经存在的事务。有如下功能：
+
+* 如果有活跃的事务，则会使用它，否则跟 `DataManager` 一样会创建并提交一个新事务。
+
+* 接收并返回游离态的实体。开发者需要使用合适的<<views,视图>>加载实体并使用 `save()` 方法显式的保存修改的实例至数据库。
+
+* 使用行级安全机制，使用跟 `DataManager` 一样的方式处理动态属性和跨数据存储引用。
+
+下面是在 service 的方法中使用 `TransactionalDataManager` 的简单示例：
+
+[source,java]
+----
+include::{sourcesdir}/common/transactionalDataManager_1.java[]
+----
+
+可以在框架测试代码中找到更复杂的例子： https://github.com/cuba-platform/cuba/blob/{git_branch}/modules/core/test/com/haulmont/cuba/core/DataManagerTransactionalUsageTest.java[DataManagerTransactionalUsageTest.java]
+
+[TIP]
+====
+如果需要在当前事务中处理 <<entityChangedEvent,EntityChangedEvent>> 事件的话，`TransactionalDataManager` 特别有用。可以在事务提交之前从数据库获取更改实体的当前状态。
+====

@@ -1,0 +1,30 @@
+[[deployment]]
+== 应用程序部署
+
+本章节介绍了 CUBA 应用程序部署和操作的不同概念。
+
+下图是一个可能的部署架构。这个架构消除了单点故障，提供了负载均衡和不同客户端的连接。
+
+image::DeploymentStructure.png[align="center"]
+
+最简单的情况，应用程序可以安装在一台机器，并且包含了数据库。根据负载和容错性要求可以选择多样的部署场景，细节请参考 <<scaling,>>。
+
+include::deployment/app_home.adoc[]
+
+include::deployment/app_dirs.adoc[]
+
+include::deployment/deployment_variants.adoc[]
+
+include::deployment/proxy_configuration_tomcat.adoc[]
+
+include::deployment/proxy_configuration_uberjar.adoc[]
+
+include::deployment/scaling.adoc[]
+
+include::deployment/jmx_tools.adoc[]
+
+include::deployment/server_push_settings.adoc[]
+
+include::deployment/health_check_url.adoc[]
+
+include::deployment/db_update_in_prod.adoc[]

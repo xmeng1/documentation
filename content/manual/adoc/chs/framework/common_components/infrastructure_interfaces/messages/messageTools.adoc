@@ -1,0 +1,64 @@
+:sourcesdir: ../../../../../../source
+
+[[messageTools]]
+====== MessageTools
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/global/MessageTools.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`MessageTools` 接口是一个<<managed_beans, Spring bean>>，包含用于处理<<localization,本地化消息>>的其它方法。可以使用 `Messages.getTools()`  方法访问 `MessageTools` 接口，或像任何其它任何 bean 一样，通过注入的方式或 `AppBeans` 类来访问。
+
+`MessageTools` 的方法:
+
+[[messageTools.loadString]]
+* `loadString()` – 返回一个本地化的消息，由 `msg://{messagePack}/{key}` 格式的消息引用指定
++
+消息引用字符串的结构:
++
+--
+** `msg://` – 必须的前缀。
+
+** `{messagePack}` – 消息包的可选名称。如果未指定，则假定包名称作为单独的参数传递给 `loadString()`。
+
+** `{key}` – 包中消息的键名。
+--
++
+消息引用字符串的示例:
++
+[source, properties]
+----
+msg://someMessage
+msg://com.abc.sales.web.customer/someMessage
+----
+
+* `getEntityCaption()` – 返回实体的本地化名称。
+
+* `getPropertyCaption()` – 返回实体属性的本地化名称。
+
+* `hasPropertyCaption()` – 检查实体属性是否被赋予了本地化名称。
+
+* `getLocValue()` – 返回使用 <<localizedValue_annotation,@LocalizedValue>> 注解的实体属性的本地化值。
+
+* `getMessageRef()` – 为<<metaProperty,元属性>>构造一个 <<messageTools.loadString,消息引用字符串>>，可以用这个引用字符串检索实体属性的本地化名称。
+
+* `getDefaultLocale()` – 返回应用程序默认语言环境，这是 <<cuba.availableLocales,cuba.availableLocales>> 应用程序属性中列出的第一个语言环境。
+
+* `useLocaleLanguageOnly()` – 如果应用程序支持的所有语言环境（在 `cuba.availableLocales` 属性中定义）都只指定了语言参数，没有指定 country 和 variant，则返回 `true`。平台机制使用此方法，当语言环境信息是从外部源（例如操作系统或 HTTP 请求）接收到的，此机制需要确定一个最合适的支持语言。
+
+* `trimLocale()` – 如果 `useLocaleLanguageOnly()` 方法返回 `true`，则从传递的语言环境信息中清除除语言参数外的所有信息(country 和 variant)。
+
+在应用程序中可以通过 <<bean_extension,覆盖>> `MessageTools` bean 来扩展它的方法集。下面是使用扩展接口的示例：
+
+[source, java]
+----
+include::{sourcesdir}/common/messagetools_1.java[]
+----
+
+[source, java]
+----
+include::{sourcesdir}/common/messagetools_2.java[]
+----
+

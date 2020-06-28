@@ -1,0 +1,162 @@
+:sourcesdir: ../../../../../source
+
+[[heroku_github_deployment]]
+===== 从 GitHub 部署到 Heroku
+
+这个向导是给使用 GitHub 开发 CUBA 项目的开发者作为参考。
+
+Heroku 账号::
++
+--
+首先，使用浏览器在 Heroku 创建一个账号，免费账号类型 `hobby-dev` 已经足够使用。然后登录账号，并且点击界面顶部的 *New* 按钮创建新项目。
+
+选择一个唯一的名称（或者这个字段空着等着自动分配）并且选择一个服务器地址。然后 Heroku 会创建一个应用，比如 `space-sheep-02453`，这个就是 Heroku 应用程序名称。
+
+第一次使用的时候，Heroku 会切换到 *Deploy* 标签页，选择使用 *GitHub* 部署方式。根据界面提示完成 GitHub 账号的授权。
+点击 *Search* 按钮列出所有的 Git 仓库（repositories），连接需要使用的仓库。当 Heroku 应用程序连接到 GitHub 之后，就可以启用 *Automatic Deploys - 自动部署*。自动部署可以在每次触发 Git push 事件的时候实现自动重新部署 Heroku 应用。在这个向导里面，启用了此自动部署功能。
+--
+
+Heroku CLI::
++
+--
+* 安装 https://devcenter.heroku.com/articles/heroku-command-line[Heroku CLI]
+* 在电脑的任何目录打开命令行窗口，并输入：
++
+[source,plain]
+----
+heroku login
+----
++
+* 按提示输入用户名密码。下面的步骤应该不需要再给这个项目输入用户名密码了。
+--
+
+PostgreSQL 数据库::
++
+--
+* 返回浏览器打开 Heroku https://dashboard.heroku.com[dashboard]
+* 切换到 *Resources* 标签页
+* 点击 *Find more add-ons* 按钮查找数据库插件
+* 找到 *Heroku Postgres* 区域然后点击。根据界面介绍选择 *Login to install* / *Install Heroku Postgres*
+
+或者也可以通过 Heroku CLI 来安装 PostgreSQL：
+
+[source,plain]
+----
+heroku addons:create heroku-postgresql:hobby-dev --app space-sheep-02453
+----
+这里的 `space-sheep-02453` 是 Heroku 应用的名称。
+
+然后可以在 *Resources* 标签页看到新建的数据库。数据库已经连接 Heroku 应用程序。通过这个方式可以看到数据库的用户名密码：切换到 Heroku 数据库的 *Datasource* 界面，下翻到 *Administration* 区域然后点击 *View credentials* 按钮。
+
+[source,plain]
+----
+Host compute.amazonaws.com
+Database zodt
+User artd
+Port 5432
+Password 367f
+URI postgres://artd:367f@compute.amazonaws.com:5432/zodt
+----
+--
+
+项目部署设置::
++
+--
+* 切换到项目根目录 (`$PROJECT_FOLDER`)
+* 拷贝 `modules/core/web/META-INF/context.xml` 到 `modules/core/web/META-INF/heroku-context.xml`
+* 修改 `heroku-context.xml` 文件将数据库连接信息更新进去（参考下面的例子）：
++
+[source, xml]
+----
+include::{sourcesdir}/deployment/heroku-context.xml[]
+----
+--
+
+构建配置::
++
+--
+将下面的 Gradle 任务添加到 `$PROJECT_FOLDER/build.gradle`
+
+[source, groovy]
+----
+include::{sourcesdir}/deployment/heroku_buildGradle.groovy[]
+----
+--
+
+Procfile::
++
+--
+在 Heroku 启动应用的命令是通过一个特殊文件 `Procfile` 来传递的。在 `$PROJECT_FOLDER` 创建 `Procfile` 文件，使用以下内容：
+[source,plain]
+----
+web: cd ./deploy/tomcat/bin && export 'JAVA_OPTS=-Dport.http=$PORT' && ./catalina.sh run
+----
+此处提供了 Tomcat 在启动 Catalina 脚本时需要的 JAVA_OPTS 环境变量值。
+--
+
+Premium 插件::
++
+--
+如果项目使用了 CUBA Premium 插件，需要为 Heroku 应用程序设置额外的变量。
+
+* 打开 Heroku dashboard。
+* 切换到 *Settings* 标签页。
+* 展开 *Config Variables* 区域，点击 *Reveal Config Vars* 按钮。
+* 添加新 *Config Vars*，使用授权码的前后两部分（短横分隔）分别作为 *用户名* 和 *密码*：
+
+[source,plain]
+----
+CUBA_PREMIUIM_USER    | username
+CUBA_PREMIUM_PASSWORD | password
+----
+--
+
+Gradle wrapper::
++
+--
+项目需要使用 Gradle wrapper。可以通过 CUBA Studio 来添加：*Build > Create or update Gradle wrapper*。
+
+* 在 `$PROJECT_FOLDER` 创建 `system.properties` 文件，使用如下内容（示例是假设本地安装的 JDK 是 1.8.0_121 版本）：
++
+[source,plain]
+----
+java.runtime.version=1.8.0_121
+----
++
+* 检查确保这些文件不在 `.gitignore` 里：`Procfile`，`system.properties`，`gradlew`，`gradlew.bat` 和 `gradle`
+* 将这些文件添加到仓库并且提交
+
+[source,plain]
+----
+git add gradlew gradlew.bat gradle/* system.properties Procfile
+git commit -am "Added Gradle wrapper and Procfile"
+----
+--
+
+应用程序部署::
++
+--
+一旦提交并且推送了所有的改动到 GitHub，Heroku 会自动开始重新部署应用。
+
+[source,plain]
+----
+git push
+----
+构建的过程可以通过 Heroku dashboard 的 *Activity* 标签页看到，点击 *View build log* 监控构建日志。
+
+构建过程完成后，可以通过浏览器访问类似 `++https://space-sheep-02453.herokuapp.com++` 这样的 URL 来访问服务。可以通过 Heroku dashboard 的 *Open app* 按钮打开应用。
+--
+
+日志监控::
++
+--
+需要跟踪查看应用系统的日志，可以使用以下命令：
+
+[source,plain]
+----
+heroku logs --tail --app space-sheep-02453
+----
+
+Tomcat 日志也可以通过应用系统的 *Menu > Administration > Server Log* 查看。
+--
+

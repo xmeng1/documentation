@@ -1,0 +1,23 @@
+:sourcesdir: ../../../../source
+
+[[services]]
+==== 服务
+
+服务构成了应用程序的一层，在这一层定义了客户端<<app_tiers,层>>可用的一组中间层操作。换句话说，服务是中间层业务逻辑的入口点。在服务中，可以管理<<transactions,事务>>、检测用户<<permissions,权限>>、使用数据库或将操作委托给中间层的其它<<managed_beans, Spring Bean>>去执行。
+
+下图展示了服务层组件的类关系：
+
+image::MiddlewareServices.png[align="center"]
+
+服务接口位于 *global* 模块中，所以在中间层和客户端层都是可用的。在运行时，在客户端层会为服务接口创建代理。代理使用 Spring HTTP Invoker 机制提供服务 bean 方法的调用。
+
+服务实现 bean 位于 *core* 模块，仅在中间层可用。
+
+使用 Spring AOP 的任何服务方法都会自动调用 `ServiceInterceptor`。它检测当前线程中用户会话的可用性，并且会在从客户端层调用服务时执行转换和记录异常。
+
+include::services/service_creation.adoc[]
+
+include::services/service_import.adoc[]
+
+include::services/dataService.adoc[]
+

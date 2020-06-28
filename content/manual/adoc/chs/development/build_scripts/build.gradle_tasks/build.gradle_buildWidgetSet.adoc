@@ -1,0 +1,22 @@
+:sourcesdir: ../../../../../source
+
+[[build.gradle_buildWidgetSet]]
+===== 构建 WidgetSet
+
+`buildWidgetSet` - `CubaWidgetSetBuilding` 类型的任务，如果项目中有 `web-toolkit` 模块的话，可以用这个任务构建一个自定义的 GWT WidgetSet。这个模块可以用来开发<<own_components,自定义可视化组件>>。
+
+可用参数：
+
+* `style` - 脚本的输出样式：`OBF`，`PRETTY` 或者 `DETAILED`。默认是 `OBF`。
+
+* `logLevel` - 日志级别：`ERROR`，`WARN`，`INFO`，`TRACE`，`DEBUG`，`SPAM`, 或者 `ALL`。默认是 `INFO`。
+
+* `draft` - 使用最小优化进行快速编译。默认值 `false`。
+
+使用示例:
+
+[source, groovy]
+----
+include::{sourcesdir}/development/build_gradle_buildWidgetSet_1.groovy[]
+----
+

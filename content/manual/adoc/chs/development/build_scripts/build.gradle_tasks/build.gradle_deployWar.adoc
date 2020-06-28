@@ -1,0 +1,36 @@
+:sourcesdir: ../../../../../source
+
+[[build.gradle_deployWar]]
+===== 部署 War
+
+`deployWar` - `CubaJelasticDeploy` 类型的任务，部署 WAR 包到 Jelastic 服务器。
+
+示例:
+
+[source, groovy]
+----
+task deployWar(type: CubaJelasticDeploy, dependsOn: buildWar) {
+   email = '<your@email.address>'
+   password = '<your password>'
+   context = '<app contex>'
+   environment = '<environment name or ID>'
+   hostUrl = '<Host API url>'
+}
+----
+
+任务参数：
+
+* `appName` - web 应用程序的名称。默认是使用模块前缀，比如 `app`。
+
+* `email` - Jelastic 服务的登录名。
+
+* `password` - Jelastic 账号的密码
+
+* `context` - 应用程序上下文。默认值 `ROOT`。
+
+* `environment` - 部署 WAR 的环境（environment）。可以设置成环境的名称或者 ID。
+
+* `hostUrl` - API 服务的地址，典型值 `app.jelastic.<host name>`。
+
+* `srcDir` - WAR 包放置的目录。默认是 `"${project.buildDir}/distributions/war"`。
+

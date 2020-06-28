@@ -1,0 +1,167 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_TabSheet]]
+====== 标签页面板
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-tabsheet" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/TabSheet.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`TabSheet` 容器是一个标签页面板。该面板一次只显示一个标签页的内容。
+
+image::gui_tabsheet.png[align="center"]
+
+该组件的 XML 名称：`tabSheet`
+
+下面是一个标签页面板的 XML 描述示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/tabsheet_1.xml[]
+---- 
+
+tabSheet 的 <<gui_attr_description,description>> 属性定义了一个提示信息，当用户将光标悬停在标签页区域上或单击标签页区域时，提示信息会显示在弹出窗口中。
+
+image::gui_tabsheet_description.png[align="center"]
+
+`tabSheet` 组件应该包含 `tab` 元素来描述标签页。每个标签页都是一个具有类似于 <<gui_BoxLayout,vbox>> 的垂直组件布局的容器。
+
+`tab` 元素属性:
+
+[[gui_TabSheet_tab_id]]
+* `id` – 标签页标识符。请注意，标签页不是组件，它们的 ID 仅在 `TabSheet` 中使用，以便在控制器中引用标签页。
+
+* <<gui_attr_caption,caption>> – 标签页标题。
+
+* <<gui_attr_description,description>> - 提示文本，当用户将光标悬停在具体标签页上或单击具体标签页时，提示文本会在弹出窗口中显示。
++
+image::gui_tabsheet_tab_description.png[align="center"]
+
+[[gui_TabSheet_closable]]
+* `closable` - 定义是否显示用于关闭标签页的 *++x++* 按钮。默认值为 `false`。
+
+* <<gui_attr_icon,icon>> - 定义一个主题目录中的图标位置或<<icon_set,图标集>>中的图标名称。有关使用图标的详细信息，请参阅<<gui_icons>>。
+
+[[gui_TabSheet_tab_lazy]]
+* `lazy` – 设置标签页内容延迟加载。
++
+当界面打开时，延迟标签页不会加载其内容，这样可以减少内存中的组件数量。只有当用户选择某个标签页时，才会加载标签页中的组件。另外，如果延迟标签页包含使用<<gui_data_loaders,加载器>>的数据容器的可视化组件，加载器不会被触发。因此，界面会打开得更快，并且只有当用户通过选择标签页请求数据时才会加载其中的数据。
++
+[[gui_TabSheet_SelectedTabChangeListener]]
+请注意，当界面打开时，在延迟标签页上的组件是不存在的。因此，它们不能<<screen_controller_injection,注入>>到控制器中，并且不能通过调用控制器的 `init()` 方法中 `getComponent()` 方法来获得。只有在用户打开标签页后才能访问延迟标签页中的组件。可以使用 `TabSheet.SelectedTabChangeListener` 拦截这个操作，例如：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/tabsheet_2.java[]
+----
++
+<1> 在这里使用 `getComponentNN("comp_id")` 方法获取标签上的组件
+<2> 在这里使用 `getComponentNN("comp_id")` 方法获取标签上的组件
++
+默认情况下，标签页不是 `lazy` 延迟加载，在界面打开时就会加载所有内容。
++
+可以使用 <<gui_api_UserOriginated,isUserOriginated()>> 方法来跟踪 `SelectedTabChangeEvent` 事件的来源。
+
+标签页布局样式::
++
+--
+在具有 Halo-based 主题的 Web 客户端中，可以使用 XML 描述或界面控制器中的 `stylename` 属性为 `TabSheet` 容器设置预定义样式：
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/tabsheet_3.xml[]
+----
+
+当以编程方式设置样式时，请使用 `HaloTheme` 类中的以 `TABSHEET_` 为前缀的常量：
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/tabsheet_4.java[]
+----
+
+[[gui_tabsheet_centered-tabs]]
+* `centered-tabs` - 使得标签页在标签栏内居中。如果所有标签页完全适合标签栏（即没有标签栏滚动），效果最佳。
+
+[[gui_tabsheet_compact-tabbar]]
+* `compact-tabbar` - 减少标签栏中标签页周围的空白。
+
+[[gui_tabsheet_equal-width-tabs]]
+* `equal-width-tabs` - 为标签栏中的所有标签页提供相等的宽度（即所有标签页的展开比例都为 1）。如果标签页标题不适合标签页会被缩短。应用此样式时标签页滚动将会被禁用（所有标签页将同时显示）。
+
+[[gui_tabsheet_framed]]
+* `framed` - 在整个组件周围以及标签页栏中的各个标签页周围添加边框。
+
+[[gui_tabsheet_icons-on-top]]
+* `icons-on-top` - 在标签页标题上显示标签页图标（默认情况下，图标位于标题的左侧）。
+
+[[gui_tabsheet_only-selected-closeable]]
+* `only-selected-closeable` - 只有选中的标签页显示关闭按钮。不会阻止以编程方式关闭标签页，它仅仅是对用户隐藏了关闭按钮。
+
+[[gui_tabsheet_padded-tabbar]]
+* `padded-tabbar` - 为标签栏中的标签页周围添加少量内边距，以便它们不会紧挨着组件的外边缘。
+--
+
+`TabSheet` 的展示可以使用带 `$cuba-tabsheet-*` 前缀的 SCSS 变量进行自定义。可以在创建一个 <<web_theme_extension,主题扩展>> 或者一个 <<web_theme_creation,自定义主题>> 之后在可视化编辑器里修改这些变量的值。
+
+'''
+
+tabSheet 的属性::
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_id,id>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabCaptionsAsHtml,tabCaptionsAsHtml>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_attr_tabsVisible,tabsVisible>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+tab 的属性::
+<<gui_attr_caption,caption>> -
+<<gui_TabSheet_closable,closable>> -
+<<gui_attr_description,description>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expand,expand>> -
+<<gui_attr_margin,margin>> -
+<<gui_attr_icon,icon>> -
+<<gui_TabSheet_tab_id,id>> -
+<<gui_TabSheet_tab_lazy,lazy>> -
+<<gui_attr_spacing,spacing>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_visible,visible>>
+
+tabSheet 的预定义样式::
+<<gui_tabsheet_centered-tabs,centered-tabs>> -
+<<gui_tabsheet_compact-tabbar,compact-tabbar>> -
+<<gui_tabsheet_equal-width-tabs,equal-width-tabs>> -
+<<gui_tabsheet_framed,framed>> -
+<<gui_tabsheet_icons-on-top,icons-on-top>> -
+<<gui_tabsheet_only-selected-closeable,only-selected-closeable>> -
+<<gui_tabsheet_padded-tabbar,padded-tabbar>>
+
+API::
+<<gui_api_add,add>> -
+<<gui_TabSheet_SelectedTabChangeListener,addSelectedTabChangeListener>> -
+<<gui_api_getComponent,getComponent>> -
+<<gui_api_getComponentNN,getComponentNN>> -
+<<gui_api_getComponents,getComponents>> -
+<<gui_api_getOwnComponent,getOwnComponent>> -
+<<gui_api_getOwnComponents,getOwnComponents>> -
+<<gui_api_remove,remove>> -
+<<gui_api_removeAll,removeAll>>
+
+'''
+

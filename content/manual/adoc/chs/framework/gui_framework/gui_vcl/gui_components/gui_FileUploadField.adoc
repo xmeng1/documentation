@@ -1,0 +1,218 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_FileUploadField]]
+====== 文件上传控件
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/FileUploadField.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`FileUploadField` 允许用户上传文件到服务器。这个控件包含标题 、 已上传文件的链接 、 还有两个按钮：上传按钮和清除文件选择按钮。当点击上传按钮的时候，会弹出系统标准的文件选择器，用户可以在这里选择需要上传的文件。如果是要上传多个文件，可以用 <<gui_FileMultiUploadField,FileMultiUploadField>> 控件。
+
+image::gui_upload_7.0.png[align="center"]
+
+该控件对应的 XML 名称：`upload`
+
+////
+* `FileUploadField` 会自动在 <<gui_FieldGroup,FieldGroup>> 内作为 `FileDescriptor` 类型的属性关联组件使用。这个字段看上去就跟上面图片展示的是一样的，不需要更多额外的配置。上传的文件会被保存到 <<file_storage,file storage>>，对应的 `FileDescriptor` 会存储在数据库。
+
+* 也可以在 `FieldGroup` 之外使用这个控件，并且可以绑定一个数据源。比如，假设 `personDs` 数据源包含了具有 `photo` 属性的实体，而这个 `photo` 属性指向了 `FileDescriptor`。
+////
+
+对于 `FileDescriptor` 类型的实体属性，可以在 <<gui_FieldGroup,FieldGroup>> 内用 <<gui_attr_datasource,datasource>> 属性使用此控件，也可以在 <<gui_Form,Form>> 中通过 <<gui_attr_dataContainer,dataContainer>> 属性使用，或者也能单独使用。如果此控件绑定到任何数据组件，上传的文件会被立即保存到<<file_storage,文件存储>>，对应的 `FileDescriptor` 实例会保存到数据库。
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/upload_0.xml[]
+----
+
+还可以通过编程的方式控制文件和 `FileDescriptor` 的保存：
+
+* 在界面的 XML 描述中声明这个控件：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/upload_1.xml[]
+---- 
+
+* 在界面控制器中，需要注入该控件本身，还需要注入 <<file_upload,FileUploadingAPI>> 和 <<dataManager,DataManager>> 这两个接口。订阅 `InitEvent` 事件并且添加事件监听器，这样可以对文件上传成功或者出错做出相应的操作：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/upload_2.java[]
+---- 
+
+<1> 此时如果需要的话，可以取到保存在临时存储的文件。
+<2> 一般来说，文件需要保存到中间件的文件存储中。
+<3> 将文件保存至 FileStorage。
+<4> 将文件描述器保存到数据库。
+
+该控件将所有选择的文件上传到<<app_tiers,客户端层(client tier)>> 的临时存储（temporary storage）并且调用通过 `addFileUploadSucceedListener()` 添加的监听器。在这个监听器里面，从 uploadField 获取了一个 `FileDescriptor`。
+
+`com.haulmont.cuba.core.entity.FileDescriptor` (别跟 `java.io.FileDescriptor` 混淆了) 是一个持久化实体，唯一定义一个上传的文件，并且也用这个类从系统下载文件。
+
+`FileUploadingAPI.putFileIntoStorage()` 方法把文件从客户端层的临时存储移动到<<file_storage,文件存储>>。这个方法的参数是临时存储中文件的标识符和对应的 `FileDescriptor` 对象，这两个参数都是由 `FileUploadField` 提供的。
+
+当上传文件到 `FileStorage` 完成后，通过调用 `DataManager.commit()` 把 `FileDescriptor` 实例存到数据库。这个方法会返回保存的实体，可以用来赋值给其它实体里关联这个文件的属性。这里只是简单的把 `FileDescriptor` 存到了数据库。从 *Administration > External Files* 界面可以看到这个文件。
+
+通过 `addFileUploadErrorListener()` 方法添加的监听器会在从客户端上传文件到临时存储出错的时候被调用。
+
+下面列出能跟踪上传进度的监听器：
+
+[[gui_FileUploadField_AfterValueClearListener]]
+* `AfterValueClearListener`
+
+[[gui_FileUploadField_BeforeValueClearListener]]
+* `BeforeValueClearListener`
+
+[[gui_FileUploadField_FileUploadErrorListener]]
+* `FileUploadErrorListener`
+
+[[gui_FileUploadField_FileUploadFinishListener]]
+* `FileUploadFinishListener`
+
+[[gui_FileUploadField_FileUploadStartListener]]
+* `FileUploadStartListener`
+
+[[gui_FileUploadField_FileUploadSucceedListener]]
+* `FileUploadSucceedListener`
+
+* `ValueChangeListener`
+
+`fileUploadField` 的属性:
+
+[[gui_FileUploadField_fileStoragePutMode]]
+* `fileStoragePutMode` - 定义文件和相应的 `FileDescriptor` 怎么存储。
++
+--
+* `IMMEDIATE` 模式，在文件存到客户端层临时存储之后立即存储。
++
+* `MANUAL` 模式, 需要手动在 `FileUploadSucceedListener` 里面编码实现。
++
+当在 `FieldGroup` 里面使用 `FileUploadField` 的时候，默认模式是 `IMMEDIATE`，其它情况下，默认模式是 `MANUAL`。
+--
+
+[[gui_FileUploadField_uploadButtonCaption]]
+* `uploadButtonCaption` 、 `uploadButtonIcon` 和 `uploadButtonDescription` 这三个 XML 属性可以设置上传按钮的属性。
+
+[[gui_FileUploadField_showFileName]]
+* `showFileName` - 控制上传文件的名称是否要显示在上传按钮旁边，默认是 `false` 不显示。
+
+[[gui_FileUploadField_showClearButton]]
+* `showClearButton` - 控制是否要显示清空按钮，默认 `false` 不显示。
+
+[[gui_FileUploadField_clearButtonCaption]]
+* `clearButtonCaption` 、 `clearButtonIcon` 和 `clearButtonDescription` 这三个 XML 属性可以设置清空按钮的属性。
+
+[[gui_FileUploadField_accept]]
+* `accept` XML 属性 (或者相应的 `setAccept()` 方法) 用来设置文件选择对话框里面的文件类型掩码，但是用户还是可以选择“所有文件”来上传任意文件。
++
+这个属性的值需要是以英文逗号分隔的文件扩展名，比如： `++*.jpg,*.png++`。
+
+* 最大可上传的文件大小是由 <<cuba.maxUploadSizeMb,cuba.maxUploadSizeMb>> 应用程序属性定义的，默认是 20MB。如果用户选择了更大的文件的话，会有相应的提示信息，并且中断上传过程。
+
+[[gui_FileUploadField_fileSizeLimit]]
+* `fileSizeLimit` XML 属性 (或者相应的 `setFileSizeLimit()` 方法) 用来设置最大允许上传的文件大小，以字节为单位。
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/upload_3.xml[]
+----
+
+[[gui_FileUploadField_permittedExtensions]]
+* `permittedExtensions` XML 属性 (或者相应的 `setPermittedExtensions()` 方法) 设置允许的文件扩展名白名单。
++
+这个属性的值需要是字符串的集合，其中每个字符串是以 `.` 开头的允许的文件扩展名，比如：
++
+[source,java]
+----
+uploadField.setPermittedExtensions(Sets.newHashSet(".png", ".jpg"));
+----
+
+[[gui_FileUploadField_dropZone]]
+* `dropZone` - 允许设置一个特殊的 <<gui_BoxLayout,BoxLayout>> 用来作为从浏览器外部拖拽文件可以放置的目标容器区域。这个目标区域可以覆盖整个对话框的窗口。当文件被拖拽到这块区域的时候，这个容器会被高亮显示，否则目标区域不会显示。
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/dropZone.xml[]
+----
++
+image::gui_dropZone.png[align="center"]
++
+如果想要 dropZone 不变并且一直显示，需要给这个容器设置预定义的样式名称 `dropzone-container`。此时这个容器应该是空的，只包含一个 `label` 组件：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/dropzone_static.xml[]
+----
++
+image::gui_dropZone_static.png[align="center"]
+
+[[gui_FileUploadField_pasteZone]]
+* `pasteZone` 允许设置一个特殊的<<gui_layouts,容器>>用来处理粘贴（paste）的快捷键。此时需要这个容器内部的一个文字输入控件获得焦点（focused）。这个功能只支持基于 Chromium 的浏览器。
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/pasteZone.xml[]
+----
+
+参考 <<images_recipe>> 有更多复杂的使用上传文件的例子。
+
+'''
+
+upload 的属性::
+<<gui_FileUploadField_accept,accept>> -
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_FileUploadField_clearButtonCaption,clearButtonCaption>> -
+<<gui_FileUploadField_clearButtonCaption,clearButtonDescription>> -
+<<gui_FileUploadField_clearButtonCaption,clearButtonIcon>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_FileUploadField_dropZone,dropZone>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_FileUploadField_fileSizeLimit,fileSizeLimit>> -
+<<gui_FileUploadField_fileStoragePutMode,fileStoragePutMode>> -
+<<gui_attr_height,height>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_FileUploadField_pasteZone,pasteZone>> -
+<<gui_FileUploadField_permittedExtensions,permittedExtensions>> -
+<<gui_attr_property,property>> -
+<<gui_FileUploadField_showClearButton,showClearButton>> -
+<<gui_FileUploadField_showFileName,showFileName>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_FileUploadField_uploadButtonCaption,uploadButtonCaption>> -
+<<gui_FileUploadField_uploadButtonCaption,uploadButtonDescription>> -
+<<gui_FileUploadField_uploadButtonCaption,uploadButtonIcon>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+API::
+<<gui_api_addValueChangeListener,addValueChangeListener>> -
+<<gui_api_commit,commit>> -
+<<gui_api_discard,discard>> -
+<<gui_api_isModified,isModified>> -
+<<gui_api_contextHelp,setContextHelpIconClickHandler>>
+
+upload 监听器::
+<<gui_FileUploadField_AfterValueClearListener,AfterValueClearListener>> -
+<<gui_FileUploadField_BeforeValueClearListener,BeforeValueClearListener>> -
+<<gui_FileUploadField_FileUploadErrorListener,FileUploadErrorListener>> -
+<<gui_FileUploadField_FileUploadFinishListener,FileUploadFinishListener>> -
+<<gui_FileUploadField_FileUploadStartListener,FileUploadStartListener>> -
+<<gui_FileUploadField_FileUploadSucceedListener,FileUploadSucceedListener>>
+
+'''
+

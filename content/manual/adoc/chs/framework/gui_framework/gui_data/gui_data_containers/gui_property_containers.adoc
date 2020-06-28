@@ -1,0 +1,27 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_property_containers]]
+====== 属性容器
+
+`InstancePropertyContainer` 和 `CollectionPropertyContainer` 是设计用来处理实体实例和集合，这些实体实例和集合是其它实体的属性。比如，如果 `Order` 实体有 `orderLines` 属性，这个属性是 `OrderLine` 实体的集合，那么可以使用 `CollectionPropertyContainer` 来绑定 `orderLines` 到一个表格组件。
+
+属性容器实现了 `Nested` 接口，这个接口定义了获取主容器方法，以及获取此属性容器绑定的主容器的属性名称的方法。在 `Order` 和 `OrderLine` 实体的例子中，主容器是用来存储 `Order` 实例的容器。
+
+`InstancePropertyContainer` 可以直接跟主实体的属性交互。也就是说，如果调用 `setItem()` 方法，这个值会直接设置到相应主实体的属性，同时主实体的 `ItemPropertyChangeEvent` 监听器会被触发。
+
+`CollectionPropertyContainer` 包含主集合的拷贝，并且它的方法行为如下：
+
+* `getMutableItems()` 返回实体的可变列表，对列表的改动都会反映到底层的属性。也就是说，如果从列表中删除了一项，主实体的属性也会更改，主容器的 `ItemPropertyChangeEvent` 监听器会触发。
+
+* `getDisconnectedItems()` 返回实体的可变列表，但是这个列表内的改动不会反映到底层属性。也就是说如果从这个列表中删除了一项，主实体属性不变。
+
+* `setItems()` 为容器设置实体集合，同时也设置给了关联的主属性。因此，主容器的 `ItemPropertyChangeEvent` 监听器会被触发。
+
+* `setDisconnectedItems()` 为容器设置实体集合，但是底层关联的主属性不变。
+
+`getDisconnectedItems()` 和 `setDisconnectedItems()` 方法可以用来暂时改变集合在 UI 的展示，比如对表格做过滤：
+
+[source, java]
+----
+include::{sourcesdir}/gui/data_containers/property_1.java[]
+----

@@ -1,0 +1,40 @@
+:sourcesdir: ../../../source
+
+[[qs_run]]
+=== 运行应用程序
+
+现在我们看看真实的应用程序中刚才创建的界面都是什么样的。选择 *CUBA* > *Start application server* 或者直接点击 IDEA 工具栏的 "Run" 按钮。
+
+在登录窗口用默认的用户和密码登录。打开 *Shop* > *Customers* 菜单项：
+
+[[figure_customerBrowse]]
+.Customer 浏览界面
+image::quick_start/customer_browse.png[align="center"]
+
+点击 *Create* 创建一个新 customer：
+
+[[figure_customerEditScreen]]
+.Customer 编辑界面
+image::quick_start/customer_edit_2.png[align="center"]
+
+打开 *Shop* > *Orders* 菜单项：
+
+[[figure_orderBrowse]]
+.Orders 浏览界面
+image::quick_start/orders_browse.png[align="center"]
+
+点击 *Create* 创建一个新 order，在 *Customer* 字段选择新创建的 customer：
+
+[[figure_orderEdit]]
+.Order 编辑界面
+image::quick_start/order_edit.png[align="center"]
+
+现在在 customer 编辑界面显示新的 order：
+
+[[figure_customerEdit1]]
+.Customer 编辑界面
+image::quick_start/customer_edit_3.png[align="center"]
+
+:proj_business_logic: https://github.com/cuba-platform/sample-business-logic
+:proj_model: https://github.com/cuba-platform/sample-model
+

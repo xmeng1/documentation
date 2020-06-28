@@ -1,0 +1,41 @@
+:sourcesdir: ../../../source
+
+[[project_file_structure]]
+=== 项目文件结构
+
+以下是一个简单应用程序 *Sales* 的项目文件结构，由 *Middleware* 和 *Web Client* <<app_tiers,blocks>> 组成。
+
+.项目文件结构
+image::project_structure.png[align="center"]
+
+项目根目录包含构建脚本 `build.gradle` 和 `settings.gradle`。
+
+`modules` 目录包含项目的<<app_modules,模块>>子目录 - *global*，*core*，*web*。
+
+*global* 模块包含代码目录 `src`，里面有三个配置文件 - <<metadata.xml,metadata.xml>>，<<persistence.xml,persistence.xml>> 和 <<views.xml,views.xml>>。`com.sample.sales.service` 包里面有 *Middleware* 服务的接口代码；`com.sample.sales.entity` 包里面有<<data_model,实体>>类以及他们的<<message_packs,本地消息文件>>。
+
+.global 模块结构
+image::project_structure_global.png[align="center"]
+
+*core* 模块包含以下目录：
+
+* `db` – 包含数据库<<db_scripts,迁移脚本>>。
+
+* `src` – 源代码目录；这个目录的根目录包含了 *Middleware* block 的<<app_properties_files,应用程序属性>>文件和 <<spring.xml,spring.xml>> 配置文件。`com.samples.sales.core` 包包含了 *Middleware* 的类：<<services,services>> 的实现类，<<managed_beans,Spring beans>> 和 <<jmx_beans,JMX beans>>。
+
+* `test` - 中间件集成<<testing,测试>>源码目录。
+
+* `web` – 包含 *Middleware* block 构建的 web 应用程序的配置文件：<<context.xml,context.xml>> 和 <<web.xml,web.xml>>。
+
+.core 模块结构
+image::project_structure_core.png[align="center"]
+
+*web* 模块包含以下目录：
+
+* `src` – 源代码目录，包含 *Web Client* block 的<<app_properties_files,应用程序属性>>文件和其它配置文件 - <<menu.xml,web-menu.xml>>，<<permissions.xml,web-permissions.xml>>，<<screens.xml,web-screens.xml>> 和 <<spring.xml,web-spring.xml>>。`com.samples.sales.web` 包内有 *Web Client* block（从 `DefaultApp` 继承）的主要类定义和<<main_message_pack,主要本地化语言包>>。
+
+* `web` – 包含 *Web Client* block 构建的 web 应用程序的配置文件：<<context.xml,context.xml>> 和 <<web.xml,web.xml>>。
+
+.web 模块结构
+image::project_structure_web.png[align="center"]
+

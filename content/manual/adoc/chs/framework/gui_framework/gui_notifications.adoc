@@ -1,0 +1,48 @@
+:sourcesdir: ../../../../source
+
+[[gui_notifications]]
+==== 通知消息
+
+通知消息是显示在主应用程序窗口中间或者角落的弹窗。这些弹窗能自动消失，也可以在用户点击界面或按下 Esc 时消失。
+
+要显示通知消息，可以在界面控制器中注入 `Notifications` bean 然后使用其流式接口。在下面的例子中，点击按钮会显示通知消息：
+
+[source, java]
+----
+include::{sourcesdir}/gui/notifications/gui_notifications_1.java[]
+----
+
+一个通知消息可以有一条描述，描述使用更轻的字体展示在标题下面：
+
+[source, java]
+----
+include::{sourcesdir}/gui/notifications/gui_notifications_2.java[]
+----
+
+通知消息有以下类型：
+
+** `TRAY` - 显示在应用程序右下角的消息，会自动消失。
+
+** `HUMANIZED` – 显示在界面中间的标准消息，会自动消失。
+
+** `WARNING` – 警告消息。当用户点击界面时消失。
+
+** `ERROR`– 错误消息。当用户点击界面时消失。
+
+默认类型是 `HUMANIZED`。也可以在 `create()` 方法中使用其它类型：
+
+[source, java]
+----
+include::{sourcesdir}/gui/notifications/gui_notifications_3.java[]
+----
+
+可以在消息中使用 `\n` 来换行。如果需要显示 HTML，可以用 `withContentMode()` 方法：
+
+[source, java]
+----
+include::{sourcesdir}/gui/notifications/gui_notifications_4.java[]
+----
+
+当使用 HTML 时，别忘了对数据进行转义，以防恶意代码注入。
+
+其它诸如 `withHideDelayMs()`，`withPosition()` 和 `withStyleName()` 的方法可以用来自定义通知消息的外观和行为。

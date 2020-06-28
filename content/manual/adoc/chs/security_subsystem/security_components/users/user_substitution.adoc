@@ -1,0 +1,28 @@
+:sourcesdir: ../../../../../source
+
+[[user_substitution]]
+===== 用户替代
+
+系统管理员可以给用户 _substitute 替代_ 另一用户的能力。替代用户与被替代用户拥有相同的<<userSession,会话>>，但是不同的<<roles,角色>>，<<constraints,约束>>和<<session_attr,会话属性>>。
+
+[TIP]
+====
+建议在应用程序代码中使用 `UserSession.getCurrentOrSubstitutedUser()` 方法来获取当前用户，当有激活的替代发生时，这个方法会返回被替代的用户。平台监控机制（`createdBy` 和 `updatedBy` 属性，<<entity_log,实体修改历史>>和<<entity_snapshots,实体快照>>） 总是使用真正登录的用户。
+====
+
+当某个用户有可替代用户时，应用右上角会显示一个下拉列表，而不是纯文本：
+
+image::user_subst_select.png[align="center"]
+
+当在这个列表中选择另一用户时，所有已经打开的界面会关闭，替代激活。`UserSession.getUser()` 方法返回当前登录用户，但是 `UserSession.getSubstitutedUser()` 会返回被替代的用户。如果没有替代发生，`UserSession.getSubstitutedUser()` 返回 `null`。
+
+在用户编辑界面，通过 *Substituted Users - 被替代用户* 表格管理可被替代的用户。替代界面描述如下：
+
+image::user_subst_edit.png[align="center"]
+
+* *User* – 被编辑用户，该用户会替代其它用户。
+
+* *Substituted user* – 可以被替代的用户。
+
+* *Start date*, *End date* – 非必须属性，替代生效时间。该时间区域以外则不能替代。如果不知道时间区域，会一直生效，直到管理删除它。
+

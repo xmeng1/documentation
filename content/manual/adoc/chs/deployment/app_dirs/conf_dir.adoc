@@ -1,0 +1,19 @@
+:sourcesdir: ../../../../source
+
+[[conf_dir]]
+==== 配置文件目录
+
+配置文件目录包含一些资源，这些资源可以在应用程序部署之后对项目配置、用户界面或者业务逻辑进行补充或者重写。重写是由 <<resources,Resources>> 基础设施接口加载机制提供的，此机制先在配置文件目录进行搜索，然后才是 classpath，因此配置文件目录资源会比 JAR 文件和 classpath 里面同名资源的优先级要高。
+
+配置文件目录可能包含以下类型的资源：
+
+* 配置文件：<<metadata.xml,metadata.xml>>，<<persistence.xml,persistence.xml>>，<<views.xml,views.xml>>，<<remoting-spring.xml,remoting-spring.xml>>。
+
+* UI 界面的 <<screen_xml,XML 描述>>
+
+* Java 或者 Groovy 源代码形式的界面<<screen_controller,控制器>>。
+
+* Groovy 脚本、类，或者 Java 源代码 - 程序会通过 <<scripting,Scripting>> 接口使用
+
+配置文件目录通过 <<cuba.confDir,cuba.confDir>> 应用程序属性指定。默认情况下，配置目录在 <<app_home,应用程序主目录>> 内。
+

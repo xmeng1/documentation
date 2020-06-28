@@ -1,0 +1,67 @@
+:sourcesdir: ../../../../source
+
+[[entity_cache]]
+==== 实体以及查询语句缓存
+
+实体缓存::
++
+--
+实体缓存由 EclipseLink  <<orm,ORM>> 框架提供。它将内存中最近读取或写入的实体实例存储，从而最大限度地减少数据库访问并提高应用程序性能
+
+实体缓存仅在根据 ID 检索实体时使用，因此根据其它属性的查询仍在数据库上执行。但是，如果相关实体位于缓存中，则这些查询可以更简单、更快速。例如，如果查询与客户相关的订单并且不使用缓存，则 SQL 查询将包含客户表的 JOIN 关联。如果客户实体被缓存，则 SQL 查询将仅选择订单，并且将从缓存中检索相关客户。
+
+要启用实体缓存，请在 *core* 模块的 <<app_properties_files,app.properties>> 文件中设置以下属性：
+
+* `eclipselink.cache.shared.sales_Customer = true` - 启用 `sales_Customer` 实体的缓存。
+
+* `eclipselink.cache.size.sales_Customer = 500` - 将 `sales_Customer` 的缓存大小设置为 500 个实例。默认大小为 100。
++
+[TIP]
+====
+如果启用了实体缓存，则始终建议增加缓存大小的值。否则，如果查询返回的记录数超过 100，则将对查询结果的每条记录执行大量的获取操作。
+====
+
+实体是否被缓存会影响平台选择的用于加载实体关系图的<<views,获取模式>>。如果引用属性是可缓存的实体，则获取模式始终为 `UNDEFINED`，这允许 ORM 从缓存中检索引用，而不是使用 JOIN 执行查询或单独的批量查询。
+
+平台在<<cluster_mw_server,中间件集群>>中提供实体缓存协调机制。在一个群集节点上更新或删除缓存实体时，其它节点（如果有）上的相同缓存实例将失效，因此使用此实例的下一个操作将从数据库中读取新状态。
+--
+
+查询缓存::
++
+--
+查询缓存存储由 JPQL 查询返回的实体实例的标识符，因此它很自然地补充了实体缓存机制。
+
+例如，如果为实体启用了实体缓存（例如，`sales_Customer`），并且首次执行查询语句 `select c from sales_Customer c where c.grade = :grade`，则会发生以下情况：
+
+* ORM 在数据库上运行查询。
+
+* 已加载的 `Customer` 实例放置在实体缓存中。
+
+* 查询文本和返回实例的标识符列表参数的映射被放到查询缓存中。
+
+当第二次使用相同的参数执行相同的查询时，平台会在查询缓存中查找查询结果，并通过标识符从实体缓存中加载实体实例。不需要数据库操作。
+
+默认情况下不缓存查询。可以指定应用程序的不同层缓存查询：
+
+* 使用 <<entityManager,EntityManager>> 时，用 <<query,Query>> 接口的 `setCacheable()` 方法。
+
+* 使用<<dataManager,DataManager>>时，用 `LoadContext.Query` 接口的 `setCacheable()` 方法。
+
+* 使用<<gui_data_loaders,数据加载器>>时，用 `CollectionLoader` 接口的 `setCacheable()` 方法或 `cacheable` XML 属性
+
+[WARNING]
+====
+仅在为返回的实体启用实体缓存时才使用可缓存查询。否则，每个查询实体实例将通过其标识符逐个从数据库中获取。
+====
+
+当 <<orm,ORM>> 执行实体的实例的创建、更新或删除时，相应的查询缓存会自动失效，并且会在整个<<cluster_mw,中间件集群>>都失效。
+
+`app-core.cuba:type=QueryCacheSupport` JMX-bean 可用于监视缓存状态并手动释放缓存的查询。例如，如果已直接在数据库中修改了 `sales_Customer` 实体的实例，则应使用带有 `sales_Customer` 参数的 `evict()` 操作释放该实体的所有缓存的查询。
+
+以下应用程序属性会影响查询缓存：
+
+* <<cuba.queryCache.enabled,cuba.queryCache.enabled>>
+
+* <<cuba.queryCache.maxSize,cuba.queryCache.maxSize>>
+--
+

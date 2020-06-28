@@ -1,0 +1,37 @@
+:sourcesdir: ../../../../source
+
+[[queryRunner]]
+==== 使用 QueryRunner 执行 SQL
+
+`QueryRunner` 是一个用于执行 SQL 的类。在以下情况应该使用它来代替 JDBC：必须使用纯 SQL，并且不需要使用具有相同功能的<<nativeQuery,ORM 工具>>。
+
+平台的 QueryRunner 是 link:$$http://commons.apache.org/dbutils/apidocs/org/apache/commons/dbutils/QueryRunner.html$$[Apache DbUtils QueryRunner] 的一种变体，增加了对 Java 泛型的支持。
+
+用法示例：
+
+[source, java]
+----
+QueryRunner runner = new QueryRunner(persistence.getDataSource());
+try {
+  Set<String> scripts = runner.query("select SCRIPT_NAME from SYS_DB_CHANGELOG",
+          new ResultSetHandler<Set<String>>() {
+              public Set<String> handle(ResultSet rs) throws SQLException {
+                  Set<String> rows = new HashSet<String>();
+                  while (rs.next()) {
+                      rows.add(rs.getString(1));
+                  }
+                  return rows;
+              }
+          });
+  return scripts;
+} catch (SQLException e) {
+  throw new RuntimeException(e);
+}
+----
+
+有两种使用 `QueryRunner` 的方法：在当前事务或自动提交模式的单独事务中使用。
+
+* 要在当前事务中使用 `QueryRunner` 查询必须使用无参数构造函数创建 `QueryRunner` 的实例 。然后，应该使用 `EntityManager.getConnection()` 返回的 `Connection` 作为参数来调用 `query()` 或 `update()` 方法。在查询之后不需要关闭 `Connection`，因为连接会在提交事务时关闭。
+
+* 要在单独的事务中运行查询，必须调用带参数的构造函数创建 `QueryRunner` 实例，该构造函数使用 `Persistence.getDataSource()` 方法返回的 `DataSource` 作为参数。然后，调用 `query()` 或 `update()` 方法，不需要 `Connection` 参数。这时将从指定的 `DataSource` 创建连接，查询完成后这个连接会立即关闭。
+

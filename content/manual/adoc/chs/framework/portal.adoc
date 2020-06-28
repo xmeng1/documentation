@@ -1,0 +1,35 @@
+:sourcesdir: ../../../source
+
+[[portal]]
+=== Portal 组件
+
+在本手册中，_portal_ 是一个客户端 <<app_tiers,block>>，这个客户端主要用来：
+
+* 提供另一个可选的 web 页面，一般是为组织外部的用户使用；
+
+* 提供集成手机应用和第三方系统的接口。
+
+一个具体的应用程序可能因为不同的目的而设计几个不同的 portal 模块；比如，在一个出租车业务自动化的应用中，可能有一个对外部用户的公共 web 网站，还有一个手机应用中集成的模块用来预约出租车，以及一个给司机用的手机应用集成的界面，等等。
+
+*cuba* <<app_components,应用程序组件>>包含的 *portal* 模块，是一个用来在项目中创建 portal 的模板。提供了客户端 block 跟 Middleware 交互的基本功能。另外，全局 {rest_man_url}[REST API] 作为依赖被包含在 portal 模块中，并且默认开启。
+
+下面是平台 *portal* 模块提供的主要组件的简介。
+
+* `PortalAppContextLoader` – 用来加载 <<appContext,AppContext>>；必须在 `web.xml` 文件的 `listener` 元素中注册。
+
+* `PortalDispatcherServlet` – 分发请求到 Spring MVC 控制器的主要 servlet，包括分发 web 页面请求和 REST API 请求。Spring 上下文配置文件通过 <<cuba.dispatcherSpringContextConfig,cuba.dispatcherSpringContextConfig>> 应用程序属性定义。servlet 必须在 `web.xml` 注册并且映射到 web 应用的 URL 根节点。
+
+* `App` – 包含当前 HTTP 请求信息和 `Connection` 对象引用的对象。`App` 实例可以通过在应用程序代码中调用 `App.getInstance()` 静态方法来取得。
+
+* `Connection` – 允许用户登入/登出 Middleware。
+
+* `PortalSession` – portal 特定的<<userSession,用户会话>>对象。通过 <<userSessionSource,UserSessionSource>> 基础接口以及 `PortalSessionProvider.getUserSession()` 静态方法返回。
++
+它有一个额外的 `isAuthenticated()` 方法，如果会话属于一个非匿名用户，则会返回 `true`。比如，用户使用用户名密码登录的时候。
++
+当用户第一次访问 portal 的时候，`SecurityContextHandlerInterceptor` 会为此用户先创建一个匿名会话（或者绑定到已经存在的匿名会话），这个匿名会话是通过使用指定在 <<cuba.portal.anonymousUserLogin,cuba.portal.anonymousUserLogin>> 参数的匿名用户名在 Middleware 注册得到的。这个注册是通过 <<login, loginTrusted()>> 方法完成，所以也需要在 portal 设置 <<cuba.trustedClientPassword,cuba.trustedClientPassword>> 参数。因此 portal 的任何匿名用户可以使用 `cuba.portal.anonymousUserLogin` 用户权限跟 Middleware 交互。
++
+如果 portal 包含使用用户名和密码的用户注册界面，`SecurityContextHandlerInterceptor` 会在 `Connection.login()` 执行后，将这个注册用户的会话传递给执行业务逻辑的线程，从而使得接下来跟 Middleware 的交互是以此用户的名义发出的。
+
+* `PortalLogoutHandler` – 负责导航到登出页面。需要在 `portal-security-spring.xml` 项目文件中注册。
+

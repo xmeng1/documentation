@@ -1,0 +1,71 @@
+:sourcesdir: ../../../../../source
+
+[[application_folder]]
+===== 应用程序文件夹
+
+创建或编辑应用程序文件夹需要特殊的<<permissions,权限>> *Create/modify application folders* （`cuba.gui.appFolder.global`）。这种权限在<<roles,角色>>编辑界面的 **Specific - 特殊权限** 标签页设置。
+
+可以通过文件夹面板右键菜单创建一个简单的应用程序文件夹。这类文件夹不会链接到系统界面，只用于对文件夹树中的其它文件夹进行分组。
+
+打开带有<<gui_Filter,过滤器>>界面的文件夹可以按以下方式创建：
+
+* 打开界面并根据需要过滤记录。
+
+* 在 *Filter...* 按钮菜单中选择 *Save as application folder* 选项。
+
+* 在 *Add* 对话框中填写文件夹属性：
+
+** *Folder name*。
+
+** *Screen Caption* – 从文件夹中打开窗口时要添加到窗口标题的字符串。
+
+** *Parent folder* – 确定新文件夹在文件夹树中的位置。
+
+** *Visibility script* – 确定文件夹可见性的 Groovy 脚本，在用户会话建立时执行。
++
+该脚本应该返回一个 `Boolean` 值。如果未定义脚本或脚本执行结果为 `true` 或者 `null`，则文件夹可见。Groovy 脚本的示例：
++
+[source, groovy]
+----
+userSession.currentOrSubstitutedUser.login == 'admin'
+----
+
+** *Quantity script* – 一个用于定义文件夹上显示的记录数和样式的 Groovy 脚本。在用户会话建立时、计器调用时执行。
++
+该脚本会返回一个数值，其整数部分将用作记录数。如果未定义脚本或脚本执行返回 `null`，则不会显示记录数。除了返回值之外，该脚本还可以设置 `style` 变量，该变量将用作文件夹显示样式。Groovy 脚本的示例：
++
+[source, java]
+----
+def em = persistence.getEntityManager()
+def q = em.createQuery('select count(o) from sales_Order o')
+def count = q.getSingleResult()
+
+style = count > 0 ? 'emphasized' : null
+return count
+----
++
+要显示样式，应该在程序主题中定义 `cuba-folders-pane` 的 `v-tree-node` 元素样式，例如：
++
+[source, css]
+----
+.c-folders-pane .v-tree-node.emphasized {
+  font-weight: bold;
+}
+----
+
+** *Order No* – 文件夹的在树中的顺序。
+
+脚本可以使用 `groovy.lang.Binding` 上下文中定义的以下变量：
+
+* `folder` – 执行脚本的 `AppFolder` 实体的实例。
+
+* `persistence` – <<persistence,Persistence>>接口的实现。
+
+* `metadata` – <<metadata,Metadata>>接口的实现。
+
+在更新文件夹时，平台对所有脚本使用相同的 `groovy.lang.Binding` 实例。因此，可以在它们之间传递变量，这样可以消除重复的请求并能提高性能。
+
+脚本源代码可以存储在 `AppFolder` 实体的属性中，也可以存储在单独的文件中。如果要存储在单独文件中，属性值设置为扩展名为 ".groovy" 的文件路径，这是<<resources,Resources>>接口需要的。如果属性值是以".groovy"结尾的字符串，则将从相应的文件加载脚本；否则，将属性内容本身将用作脚本。
+
+应用程序文件夹是 `AppFolder` 实体的实例，存储在相关的 *SYS_FOLDER* 表和 *SYS_APP_FOLDER* 表中。
+

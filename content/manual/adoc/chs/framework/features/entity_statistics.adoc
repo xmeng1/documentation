@@ -1,0 +1,51 @@
+:sourcesdir: ../../../../source
+
+[[entity_statistics]]
+==== 实体统计
+
+实体统计机制提供了数据库中当前实体实例数量的信息。此数据用于自动为关联实体选择最佳查找策略，并限制 UI 界面中显示的搜索结果的数量。
+
+统计信息存储在 `SYS_ENTITY_STATISTICS` 表中，该表映射到 `EntityStatistics` 实体。可以使用<<persistenceManagerMBean,PersistenceManagerMBean>> JMX bean 的 `refreshStatistics()` 方法自动更新。如果将实体名称作为参数传递，则将收集给定实体的统计信息，否则为所有实体收集统计信息。如果要定期更新统计信息，可以创建调用此方法的<<scheduled_tasks_cuba,计划任务>>。请注意，收集数据过程将为每个实体执行 `select count(*)`，这样会增加对数据库的压力。
+
+可以通过中间层的 `PersistenceManagerAPI` 接口和客户端上的 `PersistenceManagerService` 来以编程方式访问实体统计信息。统计信息缓存在内存中，因此只有在服务器重启之后或在调用 `PersistenceManagerMBean.flushStatisticsCache()` 方法之后，对数据库中统计信息的直接更改才会生效。
+
+`EntityStatistics` 有如下属性：
+
+* `name` (`NAME` 列) – 实体<<metaClass,元类>>名称，例如 `sales_Customer`。
+
+* `instanceCount` (`INSTANCE_COUNT` 列) – 实体实例的近似数量。
+
+* `fetchUI` (`FETCH_UI` 列) – 界面上显示的所获取实体列表的数据量。
++
+例如，<<gui_Filter,Filter>>组件在 *Show N rows* 字段中使用此数值。
+
+* `maxFetchUI` ( `MAX_FETCH_UI` 列) – 允许获取并传递到客户端的实体实例的最大数量。
++
+在某些组件上显示实体列表时会应用此限制，这些组件包括 <<gui_LookupField,LookupField>>、<<gui_LookupPickerField,LookupPickerField>> 以及不带<<gui_Filter,过滤器>>的表格，表格没有通过 `CollectionLoader.setMaxResults()` 方法限制连接的<<gui_data_loaders,数据加载器>>。在这种情况下，数据源本身将获取实例的数量限制为 `maxFetchUI`。
+
+* `lookupScreenThreshold` ( `LOOKUP_SCREEN_THRESHOLD` 列) – 以实体数量衡量的阈值，确定何时应使用<<screen_lookup,查找界面>>而不是下拉列表查找实体。
++
+选择过滤器参数时，<<gui_Filter,过滤器>>组件会使用此参数。在达到阈值之前，系统使用<<gui_LookupField,LookupField>>组件，一旦超过阈值，就使用<<gui_PickerField,PickerField>>组件。因此，对于过滤器参数中的特定实体，如果想要使用查找界面，则可以将 `lookupScreenThreshold` 的值设置为低于 `instanceCount` 的值。
+
+`PersistenceManagerMBean` JMX bean 能够通过 `DefaultFetchUI` 、`DefaultMaxFetchUI`、  `DefaultLookupScreenThreshold` 属性为上面提到的所有参数设置默认值。当实体没有统计信息时，系统将使用相应的默认值，这是一种常见情况。
+
+此外，`PersistenceManagerMBean.enterStatistics()` 方法允许用户输入实体的统计数据。例如，将以下参数传递给该方法，用来将默认每页记录数设置为 1,000，并将加载到<<gui_LookupField,LookupField>>中最大实例数设置为 30,000：
+
+[source, json]
+----
+entityName: sales_Customer
+fetchUI: 1000
+maxFetchUI: 30000
+----
+
+另一个示例：假设 Customer 实体具有过滤条件，并且希望在条件参数中选择 Customer 时使用查找界面而不是下拉列表。可以使用以下参数调用 `enterStatistics()` 方法：
+
+[source, json]
+----
+entityName: sales_Customer
+instanceCount: 2
+lookupScreenThreshold: 1
+----
+
+这里忽略了数据库中的实际客户记录数，并手动指定始终超过阈值的数量。
+

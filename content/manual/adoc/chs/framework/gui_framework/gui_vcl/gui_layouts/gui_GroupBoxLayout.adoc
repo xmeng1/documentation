@@ -1,0 +1,147 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_GroupBoxLayout]]
+====== 分组框布局
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-groupbox" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/GroupBoxLayout.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`GroupBoxLayout` 是一个容器，可以将一组组件框在一个区域并为它们设置一个整体的标题。另外，这个区域还可以折叠起来。
+
+image::gui_groupBox.png[align="center"]
+
+该组件的 XML 名称：`groupBox`
+
+下面是一个分组框布局的 XML 描述示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/groupboxlayout_1.xml[]
+---- 
+
+`groupBox` 的属性:
+
+* `caption` – 分组标题。
+
+[[gui_GroupBox_orientation]]
+* `orientation` – 定义组件放置的方向 - 水平或垂直。默认值为 `vertical`（垂直）。
+
+[[gui_GroupBox_collapsable]]
+* `collapsable` – 如果该值设置为 `true`，可以使用 image:gui_groupBox_minus.png[]/image:gui_groupBox_plus.png[] 按钮将组件的内容隐藏。
+
+[[gui_GroupBox_collapsed]]
+* `collapsed` – 如果设置为 `true`，初始状态下组件内容会被折叠。`collapsed` 属性在 `collapsable="true"` 有效。
++
+下面是一个折叠的 `GroupBox` 的例子：
++
+image::gui_groupBox_collapsed.png[align="center"]
++
+[[gui_GroupBox_ExpandedStateChangeListener]]
+可以通过 `ExpandedStateChangeListener` 接口获取 `groupBox` 组件的展开状态改变事件。
+
+[[gui_GroupBox_outerMargin]]
+* `outerMargin` - 设置 `groupBox` 边框的外边距。如果设置为 `true`，组件的所有边都会添加外边距。要单独设置每一边的外边距，请为 `groupBox` 的每一边设置 `true` 或 `false`：
++
+[source, xml]
+----
+<groupBox outerMargin="true, false, true, false">
+----
++
+如果 `showAsPanel` 属性设置为 true，则忽略 `outerMargin` 属性。
+
+[[gui_GroupBox_panel]]
+* `showAsPanel` – 如果设置为 `true`，该组件看起来就会像 link:https://vaadin.com/docs/-/part/framework/layout/layout-panel.html[Vaadin Panel]。默认值为 `false`。
++
+image::gui_groupBox_Panel.png[align="center"]
+
+默认情况下，`groupBox` 容器的宽是 100％，类似于<<gui_BoxLayout,vbox>>。
+
+在基于 Halo 主题的 Web 客户端中，可以使用 XML 描述或界面控制器中的 `stylename` 属性为 `groupBox` 组件设置预定义样式。以编程方式设置样式时，选择一个以 `LAYOUT_` 或 `GROUPBOX_` 为前缀的 HaloTheme 类常量。`showAsPanel` 属性设置为 `true` 时可以与以下样式结合使用：
+
+[[gui_groupbox_borderless]]
+* `borderless` 样式删除 `groupBox` 的边框和背景颜色：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/groupboxlayout_3.java[]
+----
+
+[[gui_groupbox_card]]
+* `card` 样式会使布局看起来像卡片布局。
+
+[[gui_groupbox_well]]
+* `well` 样式会使容器具有下沉阴影效果：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/groupboxlayout_2.xml[]
+----
++
+image::gui_groupBox_Panel_2.png[align="center"]
+
+[[gui_GroupBox_addShortcutAction]]
+可以在 `Groupbox` 中使用快捷键。使用 `addShortcutAction()` 方法设置快捷方式和要执行的操作：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/groupboxlayout.java[]
+----
+
+'''
+
+groupBox 的属性::
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_GroupBox_collapsable,collapsable>> -
+<<gui_GroupBox_collapsed,collapsed>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_expand,expand>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_id,id>> -
+<<gui_GroupBox_orientation,orientation>> -
+<<gui_GroupBox_outerMargin,outerMargin>> -
+<<gui_attr_settingsEnabled,settingsEnabled>> -
+<<gui_GroupBox_panel,showAsPanel>> -
+<<gui_attr_spacing,spacing>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_width,width>>
+
+groupBox 的预定义样式::
+<<gui_groupbox_borderless,borderless>> -
+<<gui_groupbox_card,card>> -
+<<gui_groupbox_well,well>>
+
+API::
+<<gui_api_add,add>> -
+<<gui_api_expanded,addExpandedStateChangeListener>> -
+<<gui_api_shortcut,addShortcutAction>> -
+<<gui_api_settings,applySettings>> -
+<<gui_api_getComponent,getComponent>> -
+<<gui_api_getComponentNN,getComponentNN>> -
+<<gui_api_getComponents,getComponents>> -
+<<gui_api_getOwnComponent,getOwnComponent>> -
+<<gui_api_getOwnComponents,getOwnComponents>> -
+<<gui_api_indexOf,indexOf>> -
+<<gui_api_remove,remove>> -
+<<gui_api_removeAll,removeAll>> -
+<<gui_api_settings,saveSettings>> -
+<<gui_api_outerMargin,setOuterMargin>> -
+<<gui_api_spacing,setSpacing>>
+
+'''
+

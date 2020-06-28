@@ -1,0 +1,101 @@
+:sourcesdir: ../../../../source
+
+[[access_to_repo]]
+==== 配置仓库连接
+
+主仓库::
++
+--
+当创建项目的时候，需要选择包含 CUBA 工件的主仓库。默认情况下有两种选择（如果配置了<<private_repo,私仓>>的话就有更多选择）：
+
+* `++https://repo.cuba-platform.com/content/groups/work++` - Haulmont 服务器提供的仓库。需要在构建脚本中指定通用的密钥：(`cuba` / `cuba123`)。
+
+* `++https://dl.bintray.com/cuba-platform/main++` - https://bintray.com[JFrog Bintray]提供的仓库，支持匿名访问。
+
+这两个仓库有相同的最新平台版本的工件内容，但是 Bintray 不包含版本快照（snapshots）。对于全球访问来说，Bintray 应当更加可靠。
+
+使用 Bintray 的情况下，新项目的构建脚本会配置成分别使用 Maven Central，JCenter 和 Vaadin 插件仓库。
+--
+
+[[access_to_premium_repo]]
+使用 CUBA Premium 插件::
++
+--
+
+[TIP]
+====
+从 7.0 开始，BPM，Charts，全文检索（Full-Text Search）和 Reports 扩展插件将会免费和开源。这些扩展插件目前在上面提到的主仓库，所以只需要为使用其它 premium 插件配置 premium 仓库，比如，WebDAV。
+====
+
+如果项目使用了 CUBA Premium 插件，在 build.gradle 添加一个仓库：
+
+* 如果主仓库是 `repo.cuba-platform.com`，则需要添加 `++https://repo.cuba-platform.com/content/groups/premium++`
+
+* 如果主仓库是 Bintray，则需要添加 `++https://cuba-platform.bintray.com/premium++`
+
+添加 `++https://repo.cuba-platform.com/content/groups/premium++` 仓库的示例：
+
+[source, groovy]
+----
+include::{sourcesdir}/development/access_to_repo_01.groovy[]
+----
+
+添加 `++https://cuba-platform.bintray.com/premium++` 仓库的示例：
+
+[source, groovy]
+----
+include::{sourcesdir}/development/access_to_repo_02.groovy[]
+----
+
+[TIP]
+====
+上面提到的两个 Premium 插件仓库都需要使用提供给每个开发者的用户名和密码。授权码短横前的前半部分是仓库用户名，后半部分是密码。比如，如果授权码是 `111111222222-abcdefabcdef`，那么用户名是 `111111222222`，密码是 `abcdefabcdef`。如果是使用 Bintray 仓库，用户名需要添加 `@cuba-platform`。
+====
+
+可以按照以下方法之一来提供用户凭证。
+
+* 推荐的方法是在用户主目录创建 `~/.gradle/gradle.properties` 文件，然后在文件内设置属性：
+** 为 `++https://repo.cuba-platform.com/content/groups/premium++` 仓库设置凭证的示例：
++
+.~/.gradle/gradle.properties
+[source]
+----
+premiumRepoUser=111111222222
+premiumRepoPass=abcdefabcdef
+----
+
+** 为 `++https://cuba-platform.bintray.com/premium++` 仓库设置凭证的示例：
++
+.~/.gradle/gradle.properties
+[source]
+----
+bintrayPremiumRepoUser=111111222222@cuba-platform
+premiumRepoPass=abcdefabcdef
+----
+
+* 另外一个方法是在操作系统中设置以下环境变量：
+
+** `CUBA_PREMIUM_USER` - 如果 `premiumRepoUser` 没有设置，则会使用这个环境变量。
+
+** `CUBA_PREMIUM_PASSWORD` - 如果 `premiumRepoPass` 没有设置，则会使用这个环境变量。
+
+当从命令行执行 Gradle 任务的时候，也可以通过 `-P` 开头的命令行参数传递这些属性，示例：
+
+[source]
+----
+gradlew assemble -PpremiumRepoUser=111111222222 -PpremiumRepoPass=abcdefabcdef
+----
+--
+
+[[custom_repositories]]
+自定义仓库::
++
+--
+项目可以包含任意数量的自定义仓库，这些仓库可以包含<<app_components,应用程序组件>>。需要在 `build.gradle` 里手动将这些仓库添加到主仓库 *之后* 的位置，示例：
+
+[source,groovy]
+----
+include::{sourcesdir}/development/access_to_repo_1.groovy[]
+----
+--
+

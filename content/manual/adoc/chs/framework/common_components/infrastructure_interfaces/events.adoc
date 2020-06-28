@@ -1,0 +1,101 @@
+:sourcesdir: ../../../../../source
+
+[[events]]
+===== Events
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/global/Events.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`Events` bean 封装了应用程序范围内的事件发布功能。应用程序事件可用于在松耦合的组件之间交换信息。`Events` bean 是 Spring Framework 的 `ApplicationEventPublisher` 的简单外观设计模式实现。
+
+[source, java]
+----
+include::{sourcesdir}/common/events.java[]
+----
+
+此接口只有接收一个事件对象作为参数的 `publish()` 方法。`Events.publish()` 会通知所有应用程序内注册的匹配的监听器。可以使用 `PayloadApplicationEvent` 将任何对象发布为事件。
+
+另请参阅 https://spring.io/blog/2015/02/11/better-application-events-in-spring-framework-4-2[Spring 框架入门]
+
+[[bean_events]]
+bean 中的事件处理::
++
+--
+
+首先，创建一个新的事件类，继承 `ApplicationEvent` 类。事件类可以包含任何其它数据。例如：
+[source, java]
+----
+include::{sourcesdir}/common/events_DemoEvent.java[]
+----
+
+Bean 对象可以使用 `Events` bean 发布事件：
+[source, java]
+----
+include::{sourcesdir}/common/events_DemoBean.java[]
+----
+
+默认情况下，所有事件都是同步处理的。
+
+处理事件有两种方法：
+
+- 实现 `ApplicationListener` 接口。
+- 方法使用 `@EventListener` 注解。
+
+在第一种情况下，必须创建一个实现 `ApplicationListener` 接口的 bean，以需要事件类型作为泛型参数：
+[source, java]
+----
+include::{sourcesdir}/common/events_DemoEventListener.java[]
+----
+
+第二种方法可用于隐藏实现接口的细节并在单个 bean 中监听多个事件：
+[source, java]
+----
+include::{sourcesdir}/common/events_MultipleEventListener.java[]
+----
+
+[WARNING]
+====
+使用 `@EventListener` 注解的方法不适用于 <<services,services>>，<<jmx_beans,JMX beans>> 以及其它带有接口的 bean。如果使用此方法，将在应用程序启动时看到以下错误：
+----
+BeanInitializationException: Failed to process @EventListener annotation on bean. Need to invoke method declared on target class, but not found in any interface(s) of the exposed proxy type. Either pull the method up to an interface or switch to CGLIB proxies by enforcing proxy-target-class mode in your configuration.
+----
+如果确实需要在带有接口的 bean 中监听事件，可以通过实现 `ApplicationListener` 接口来代替。
+====
+
+可以使用 Spring 框架的 `Ordered` 接口和 `@Order` 注解来对事件处理方法排序。框架中所有 bean 和事件处理方法使用的是 100 到 1000 之间的 `order` 值，因此可以在框架的 order 值之前或之后添加自定义的处理顺序。如果要在平台 bean 之前添加 bean 或事件处理程序，可使用小于 100 的值。
+
+另请参阅<<login_events,登录事件>>.
+--
+
+[[ui_events]]
+UI 界面中的事件处理::
++
+--
+通常，`Events` 将事件的发布委托给 `ApplicationContext` 执行。在 Web 层，可以为事件类使用特殊的接口 - `UiEvent`。这是一个事件的标记接口，实现这个接口的事件被发送到当前 UI 实例中的 UI 界面（当前 Web 浏览器标签页）。请注意，`UiEvent` 实例不会发送到 Spring bean。
+
+示例事件类：
+[source, java]
+----
+include::{sourcesdir}/common/events_UserRemovedEvent.java[]
+----
+
+可以在窗口的控制器中使用 `Events` bean 触发事件，使用方式和在 bean 中一样：
+[source, java]
+----
+include::{sourcesdir}/common/events_publish.java[]
+----
+
+为了处理事件，必须在 UI 界面中使用注解 `@EventListener` 定义方法（不支持 `ApplicationListener` 接口）：
+[source, java]
+----
+include::{sourcesdir}/common/events_EventListener.java[]
+----
+
+可以使用 `@Order` 注解为事件监听器设定执行顺序。
+
+如果一个事件是 `UiEvent` 并使用来自 UI 线程的 `Events` bean 触发，那么带有 `@EventListener` 方法的打开的窗口或 frame 将接收到该事件。事件处理是同步的。只有用户打开的当前 Web 浏览器标签页中 UI 界面才会收到该事件。
+--
+

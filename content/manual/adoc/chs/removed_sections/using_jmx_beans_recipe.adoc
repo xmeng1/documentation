@@ -1,0 +1,4 @@
+[[using_jmx_beans_recipe]]
+=== 使用 JMX Beans
+
+示例请参阅 <<jmx_beans_creation>> 部分。

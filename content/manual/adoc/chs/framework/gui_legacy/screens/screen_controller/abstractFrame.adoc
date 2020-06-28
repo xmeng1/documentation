@@ -1,0 +1,108 @@
+:sourcesdir: ../../../../../../source
+
+[[abstractFrame]]
+====== AbstractFrame
+
+[WARNING]
+====
+这是旧版本的 API。对于从 7.0 开始的新 API，请参阅 <<screen_controllers>>。
+====
+
+`AbstractFrame` 是控制器类结构的根节点基类。以下是其主要方法的介绍：
+
+[[abstractFrame_init]]
+* `init()` 在创建了 XML 描述中的所有组件之后，但是在界面显示之前会被调用。
++
+--
+`init()` 接受一组以 map 类型传递的参数，可以用在控制器里面。这些参数可以通过调用界面的方法传递（使用 `openWindow()`, `openLookup()` 或者 `openEditor()` 方法），或者在界面注册文件 <<screens.xml,screens.xml>> 里面定义。
+
+如果需要初始化界面组件，必须实现 `init()` 方法，示例：
+
+[source, java]
+----
+include::{sourcesdir}/gui/abstractframe_1.java[]
+---- 
+--
+
+[[abstractFrame_getMessage]]
+* `getMessage()`, `formatMessage()` – 用来从<<message_packs,语言包>>获取本地化翻译消息的方法，在 XML 描述中定义，是调用相应<<messages,消息>>接口的捷径。
+
+[[abstractFrame_openFrame]]
+* `openFrame()` – 根据在 <<screens.xml,screens.xml>> 文件中注册的标识符加载一个子界面框架。如果调用者给这个方法传递了一个容器组件的参数，子界面框架会在这个容器内打开。此方法返回子框架控制器。示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstractframe_3.java[]
+---- 
++
+但这并不是说非要在 `openFrame()` 方法中带入容器参数，其实也可以先加载子界面框架然后再添加到所需的容器中：
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstractframe_4.java[]
+---- 
+
+[[abstractFrame_openWindow]]
+* `openWindow()`, `openLookup()`, `openEditor()` – 分别用来打开简单界面、查找界面、以及编辑界面。方法会返回这些界面的控制器。
++
+对于对话框模式，`openWindow()` 方法可以带参数调用，示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstractframe_7.java[]
+----
+这些参数只有在不与窗口更高优先级的参数冲突的时候才会生效。这些高优先级的参数可以通过界面控制器的 <<dialogOptions,getDialogOptions()>> 方法设置，或者在界面的 <<screen_xml,XML 描述>>中定义：
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstractframe_8.xml[]
+----
++
+如果需要在界面关闭之后做一些操作，可以添加 `CloseListener`，示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstractframe_5.java[]
+---- 
++
+只有在打开的窗口通过 `Window.COMMIT_ACTION_ID` 名称的操作（比如 *OK* 按钮）关闭的时候才需要使用 `CloseWithCommitListener` 来处理关闭事件：
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstractframe_5_1.java[]
+----
+
+[[abstractFrame_showMessageDialog]]
+* `showMessageDialog()` – 显示消息对话框。
+
+[[abstractFrame_showOptionDialog]]
+* `showOptionDialog()` – 显示带消息的对话框，并且为用户提供一些功能操作。操作通过 <<gui_Action,Action>> 的数组定义，这些操作会作为按钮显示。
++
+推荐使用 `DialogAction` 对象来显示标准按钮，比如 *OK*，*Cancel* 或者其它按钮，示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstractframe_6.java[]
+---- 
+
+[[abstractFrame_showNotification]]
+* `showNotification()` – 显示弹出消息。
+
+[[abstractFrame_showWebPage]]
+* `showWebPage()` – 在浏览器打开特定网页。
+
+'''
+
+API::
+<<abstractFrame_getMessage,formatMessage()>> -
+<<abstractFrame_getMessage,getMessage()>> -
+<<abstractFrame_init,init()>> -
+<<abstractFrame_openFrame,openFrame()>> -
+<<abstractFrame_openWindow,openEditor()>> -
+<<abstractFrame_openWindow,openLookup()>> -
+<<abstractFrame_openWindow,openWindow()>> -
+<<abstractFrame_showMessageDialog,showMessageDialog()>> -
+<<abstractFrame_showNotification,showNotification()>> -
+<<abstractFrame_showOptionDialog,showOptionDialog()>> -
+<<abstractFrame_showWebPage,showWebPage()>>
+

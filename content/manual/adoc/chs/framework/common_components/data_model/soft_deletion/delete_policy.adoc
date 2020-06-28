@@ -1,0 +1,103 @@
+:sourcesdir: ../../../../../../source
+
+[[delete_policy]]
+====== 关联实体处理策略
+
+对于<<soft_deletion,软删除>>实体，平台提供了一种在删除时管理关联实体的机制，很大程度上类似于数据库外键的 *ON DELETE* 规则。此机制在中间<<app_tiers,层>>有效，并且需要在实体属性上使用 <<onDelete_annotation,@OnDelete>>，<<onDeleteInverse_annotation,@OnDeleteInverse>> 注解。
+
+使用 `@OnDelete` 注解的实体被删除时会处理此注解，而不是此注解指向的实体（这是与数据库级别级联删除的主要区别）。
+
+`@OnDeleteInverse` 注解指向的实体被删除时处理此注解（类似于数据库中外键级别的级联删除）。当被删除的对象没有可以在删除之前检查的属性时，此注解很有用。典型情况下，被检查的对象具有要删除的对象引用，并且此属性应该使用 `@OnDeleteInverse` 注解。
+
+注解值可以是：
+
+* `DeletePolicy.DENY` – 如果带注解的属性不是 `null` 或不是空集合，则禁止删除实体。
+
+* `DeletePolicy.CASCADE` – 级联删除带注解的属性。
+
+* `DeletePolicy.UNLINK` – 与注解属性断开链接。仅在关联关系拥有方（在实体类中具有 `@JoinColumn` 注解的实体）断开链接是合理的。
+
+例如:
+
+. 禁止删除被引用的实体：如果尝试删除被至少一个 `Order` 引用的 `Customer` 实例，则将抛出 `DeletePolicyException`。
++
+`Order.java`
++
+[source, java]
+----
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "CUSTOMER_ID")
+@OnDeleteInverse(DeletePolicy.DENY)
+protected Customer customer;
+----
++
+`Customer.java`
++
+[source, java]
+----
+@OneToMany(mappedBy = "customer")
+protected List<Order> orders;
+----
++
+--
+异常窗口中的消息可以在<<main_message_pack,主消息包>>中进行本地化。使用以下键值：
+
+* `deletePolicy.caption` - 通知标题。
+
+* `deletePolicy.references.message` - 通知消息。
+
+* `deletePolicy.caption.sales_Customer` - 具体实体的通知标题。
+
+* `deletePolicy.references.message.sales_Customer` - 具体实体的通知消息。
+--
+
+. 关联集合元素的级联删除：删除 `Role` 实例也会导致所有 `Permission` 实例被删除。
++
+`Role.java`
++
+[source, java]
+----
+@OneToMany(mappedBy = "role")
+@OnDelete(DeletePolicy.CASCADE)
+protected Set<Permission> permissions;
+----
++
+`Permission.java`
++
+[source, java]
+----
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "ROLE_ID")
+protected Role role;
+----
+
+. 断开与关联集合元素的连接：删除 `Role` 实例会导致对集合中包含的所有 `Permission` 实例的 `Role` 属性设置为空引用。
++
+`Role.java`
++
+[source, java]
+----
+@OneToMany(mappedBy = "role")
+protected Set<Permission> permissions;
+----
++
+`Permission.java`
++
+[source, java]
+----
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "ROLE_ID")
+@OnDeleteInverse(DeletePolicy.UNLINK)
+protected Role role;
+----
+
+实现说明：
+
+. 当保存实现了 `SoftDelete` 接口的实体到数据库时，会在中间件上处理关联实体策略。
+
+. 将 `@OnDeleteInverse` 与 `CASCADE` 和 `UNLINK` 策略一起使用时要注意。在此过程中，将从数据库中提取关联对象的所有实例，进行修改然后保存。
++
+例如，如果 `@OnDeleteInverse(CASCADE)` 策略设置在 `Customer` – `Job` 关联内的 `Job.customer` 属性上，代表一个 customer 有多个 job，删除 Customer 实例时将获取和修改所有 Job。这可能会导致应用程序服务器或数据库超负荷。
++
+另一方面，使用 `@OnDeleteInverse(DENY)` 是安全的，因为它只涉及统计关联对象的数量。如果数量大于 `0`，则抛出异常。这使得 `@OnDeleteInverse(DENY)` 适用于 `Job.customer` 属性。
+

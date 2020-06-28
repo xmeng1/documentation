@@ -1,0 +1,27 @@
+:sourcesdir: ../../../source
+
+[[qs_app_details]]
+=== 示例应用程序详情
+
+此应用主要用来维护客户（customer）信息以及客户订单（order）信息。
+
+customer 有如下属性：
+
+* Name
+* Email
+
+order 属性：
+
+* 指向 customer 的引用
+* Date
+* Amount
+
+image::quick_start_1.png[align="center"]
+
+应用程序界面需要包含：
+
+* Customers 浏览界面；
+* Customer 编辑界面，也包含 customer 的 orders 列表；
+* General orders 浏览界面；
+* Order 编辑界面。
+

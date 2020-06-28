@@ -1,0 +1,31 @@
+:sourcesdir: ../../../../../../source
+
+[[datatype_ui_format]]
+====== 用户界面中数据格式化示例
+
+这里以如何在 Orders 表格中显示 `Order.date` 属性为例。
+
+`order-browse.xml`
+[source, xml]
+----
+include::{sourcesdir}/common/dateformat_1.xml[]
+----
+
+`Order` 类的 `date` 属性是用 "date" 类型来定义的：
+
+[source, java]
+----
+@Column(name = "DATE_", nullable = false)
+@Temporal(TemporalType.DATE)
+private Date date;
+----
+
+如果当前用户使用俄语 locale 登录，会从<<main_message_pack,主语言消息包>>获取下面的字符串：
+
+[source, properties]
+----
+dateFormat=dd.MM.yyyy
+----
+
+结果是 "2012-08-06" 日期会被转换为 "06.08.2012" 字符串显示在表格的单元格中。
+

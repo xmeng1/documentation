@@ -1,0 +1,15 @@
+:sourcesdir: ../../../../../source
+
+[[dbTypeConverter]]
+===== DbTypeConverter
+
+该接口包含了在<<data_model,数据模型>>属性值和 JDBC 查询的参数/结果之间的进行转换的方法。通过<<persistence,Persistence.getDbTypeConverter()>>方法可以获得此接口的实例对象。
+
+`DbTypeConverter` 接口有以下方法：
+
+* `getJavaObject()` – 将 JDBC 查询的结果转换成为适合分配给实体属性的类型。
+
+* `getSqlObject()` – 将实体属性的值转换为适合分配给 JDBC 查询参数的类型。
+
+* `getSqlType()` – 返回与传递的实体属性类型相应的 `java.sql.Types` 常量
+

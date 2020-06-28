@@ -1,0 +1,43 @@
+:sourcesdir: ../../../../../source
+
+[[resources]]
+===== Resources
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/global/Resources.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`Resources` 接口根据以下规则管理资源的加载：
+
+. 如果提供的位置是 URL，则通过该 URL 下载资源;
+
+. 如果提供的位置以 `classpath:` 前缀开头，则从类路径(classpath)加载资源;
+
+. 如果该位置不是 URL 并且它不以 `classpath:` 开头，那么：
+
+.. 使用提供的位置作为相对路径，在应用程序的 <<conf_dir,配置文件目录>> 中搜索该文件。如果找到该文件，则从中下载资源;
+
+.. 如果在前面的步骤中找不到资源，则从类路径(classpath)下载。
+
+实际上，很少使用显式的 URL 标识或 `classpath:` 前缀，因此通常可以通过<<conf_dir,配置文件目录>>或类路径下载资源。配置文件目录中的资源会覆盖类路径下相同名称的资源，即配置文件目录下的资源的优先级更高。
+
+`Resources` 接口的方法:
+
+* `getResourceAsStream()` – 返回指定资源的 `InputStream`，如果找不到资源则返回 `null`。应该在使用后关闭流，例如：
++
+[source, java]
+----
+include::{sourcesdir}/common/resources_1.java[]
+----
++
+也可以使用 "try with resources" 的编码方式:
++
+[source, java]
+----
+include::{sourcesdir}/common/resources_2.java[]
+----
+
+* `getResourceAsString()` – 则以字符串形式返回所指定的资源内容，如果没有找到资源，返回 `null`。
+

@@ -1,0 +1,28 @@
+:sourcesdir: ../../../../source
+
+[[qs_create_order_screens]]
+==== Order 界面
+
+`Order` 实体有一点不同的地方，由于 `Order.customer` 属性是引用属性，需要定义一个<<views,视图>>包含这个属性（因为标准的 `++_local++` 视图不包含引用属性）。
+
+在 CUBA 项目树的 *Data Model* 部分右键点击 `Order` 实体，在菜单中点击 *New* > *View*。然后在视图设计界面，输入 `order-with-customer` 作为视图的名称，在右边的面板点击 `customer` 属性然后选择 `Customer` 实体的 `++_minimal++` 视图。
+
+image::quick_start/new_view.png[align="center"]
+
+点击 *OK*。
+
+之后，选择 `Order` 然后在右键菜单点击 *New* > *Screen*。
+
+选择 *Entity browser and editor screens* 模板。
+
+在 *View* 字段为浏览和编辑模板界面选择 `order-with-customer` 作为视图，然后点击 *Next*，下个界面点击 *Finish*。
+
+image::quick_start/order_screens.png[align="center"]
+
+界面文件会显示在 *Generic UI* 部分的 *Screens* ：
+
+* `order-browse.xml` - 浏览界面描述文件
+* `OrderBrowse` - 浏览界面控制器
+* `order-edit.xml` - 编辑界面描述文件
+* `OrderEdit` - 编辑界面控制器
+

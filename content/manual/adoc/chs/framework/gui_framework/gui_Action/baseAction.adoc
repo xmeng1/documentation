@@ -1,0 +1,65 @@
+:sourcesdir: ../../../../../source
+
+[[baseAction]]
+===== 基础操作
+
+`BaseAction` 是所有<<gui_Action,操作>>实现的基类。当<<declarative_actions,声明式创建操作>>不能满足需求时，建议从这个类派生自定义操作。
+
+在创建自定义操作类时，应该实现 `actionPerform()` 方法并将操作标识符传递给 `BaseAction` 构造函数。可以重写任何属性的 getter 方法： `getCaption()` 、 `getDescription()` 、 `getIcon()` 、 `getShortcut()` 、 `isEnabled()` 、 `isVisible()` 、 `isPrimary()`。除了 `getCaption()` 方法之外，这些方法的标准实现返回由 setter 方法设置的值。如果操作名称未通过 `setCaption()` 方法显式设置，则它使用操作标识符作为键从与操作类包对应的<<message_packs,本地化消息包>>中检索消息。如果没有带有这种键的消息，则返回键本身，即操作标识符。
+
+或者，可以使用流式 API 设置属性并提供 lambda 表达式来处理操作：请参阅 `withXYZ()` 方法。
+
+`BaseAction` 可以根据用户<<permissions,权限>>和当前上下文更改其 `enabled` 和 `visible` 属性。
+
+如果满足以下条件，则 `BaseAction` 是可见的：
+
+* `setVisible(false)` 方法没有被调用；
+
+* 此操作没有 `*hide*` UI 权限；
+
+如果满足以下条件，则该操作被启用：
+
+* `setEnabled(false)` 方法没有被调用；
+
+* 此操作没有 `*hide*` 或只读 UI 权限；
+
+* `isPermitted()` 方法返回 true。
+
+* `isApplicable()` 方法返回 true。
+
+用法示例：
+
+* <<gui_Button,Button>> 操作：
++
+[source, java]
+----
+include::{sourcesdir}/gui/baseAction_1.java[]
+----
++
+在这个例子中，`helloBtn` 按钮标题将被设置为位于消息包中的带有 `hello` 键的字符串。可以重写 `getCaption()` 操作方法以不同的方式初始化按钮名称。
+
+* 以编程方式创建<<gui_PickerField,PickerField>>的操作：
++
+[source, java]
+----
+include::{sourcesdir}/gui/baseAction_2.java[]
+----
++
+在此示例中，匿名 `BaseAction` 派生类用于设置选择器字段按钮的操作。不显示按钮标题，而是在光标悬停在按钮时弹出的带有描述的图标。
+
+* <<gui_Table,Table>>操作：
++
+[source, java]
+----
+include::{sourcesdir}/gui/baseAction_3.java[]
+----
++
+在此示例中，声明了 `HelloAction` 类，它的实例被添加到表格的操作列表中。对具有 `*myapp.allow-greeting*` 安全权限的用户启用该操作且仅在只选择了表格中的一行时启用。后面这个选中一行启用能有效，是因为 BaseAction 的 `target` 属性会在操作添加到 `ListComponent` 的继承者（`Table` 或者 `Tree`）时被自动设置。
+
+* 如果需要一个在选择一行或多行时启用的操作，请使用 BaseAction 的子类 - `ItemTrackingAction`，它添加了 `isApplicable()` 方法的默认实现：
++
+[source, java]
+----
+include::{sourcesdir}/gui/baseAction_4.java[]
+---- 
+

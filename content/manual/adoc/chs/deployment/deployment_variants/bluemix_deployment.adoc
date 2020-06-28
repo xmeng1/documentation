@@ -1,0 +1,118 @@
+:sourcesdir: ../../../../source
+
+[[bluemix_deployment]]
+==== 部署至 Bluemix Cloud
+
+CUBA Studio 通过几个简单步骤支持 IBM® Bluemix® 云部署。
+
+[TIP]
+====
+Bluemix 云部署目前只支持使用 PostgreSQL 数据库的项目。HSQLDB 只支持 _in-process_ 的情况，也就是说，每次应用程序重启时，会重建数据库，之前的用户数据会丢失。
+====
+
+. 创建一个 Bluemix 账号。下载并且安装：
+.. Bluemix CLI: http://clis.ng.bluemix.net/ui/home.html
+.. Cloud Foundry CLI: https://github.com/cloudfoundry/cli/releases
+.. 确保 `bluemix` 和 `cf` 命令在命令行窗口有效。如果不行的话，添加 Bluemix 的 bin 目录，比如 `\IBM\Bluemix\bin` 到 `PATH` 环境变量。
+
+. 在 Bluemix 创建一个空间（Space），需要的话，可以在一个空间里面使用几个应用程序。
+
+. 在空间中创建一个应用服务：*Create App* -> *CloudFoundry Apps* -> *Tomcat*。
+
+. 给应用指定一个名称。名称需要是唯一的，因为这个名称会作为应用程序 URL 的一部分。
+
+. 创建一个数据库服务，点击空间 dashboard 中的 *Create service* 然后选择 *ElephantSQL*。
+
+. 打开应用管理并且将数据库服务连接至应用程序。点击 *Connect Existing*。要使改动生效，系统需要重新加载（restaging/updating）应用程序。目前暂时不需要做这一步，因为应用程序会重新部署。
+
+. 数据库服务连接上之后，数据库的用户密码可以通过点击 *View Credentials* 看到。数据库的属性存在程序运行时的 `VCAP_SERVICES` 环境变量里面，可以通过 `cf&#160;env` 命令看到。创建的数据库也可以从空间外面访问到，因此可以从开发环境连接线上的数据库。
+
+. 设置 CUBA 项目运行在 PostgreSQL 数据库上（跟 Bluemix 类似的数据库环境）
+
+. 生成数据库脚本然后启动本地 Tomcat 服务。确保应用程序启动没问题。
+
+. 生成 WAR 文件用来部署到 Tomcat。
+.. 在 CUBA 项目视图的 *Project* 部分点击 *Deployment > WAR Settings* 。
+.. 勾选全部的复选框启用所有的功能，因为正确的部署是 *Single WAR* 带有 JDBC 驱动和 `context.xml`。
++
+image::bluemix_war_settings.png[align="center"]
+
+.. 点击 *Custom context.XML field* 旁边的 *Generate* 按钮。在弹出的对话框中填写 Bluemix 里面创建的数据库的用户密码信息。
++
+从 DB 服务拿到的 `uri` 里面包含数据库的用户密码信息，按照下面这个示例使用：
++
+[source, json]
+----
+include::{sourcesdir}/deployment/bluemix_credentials.json[]
+----
++
+*Database user*: `ixbtsvsq`
++
+*Database password*: `F_KyeQjpEdpQfd4n0KpEFCYyzKAbN1W9`
++
+*Database URL*: `qdjjtnkv.db.elephantsql.com:5432`
++
+*Database name*: `ixbtsvsq`
+
+.. 点击 *Generate* 按钮生成单一 WAR 需要的自定义 `web.xml` 文件。
+
+.. 保存设置。使用 Studio 的 `buildWar` Gradle 任务或者命令行生成 WAR 包。
++
+image::bluemix_buildWar.png[align="center"]
++
+成功的话，会在项目的 `build/distributions/war/` 目录生成 `app.war`。
+
+. 在项目的根目录手动创建 `manifest.yml` 文件。文件内容需要包含下列信息：
++
+[source, yml]
+----
+include::{sourcesdir}/deployment/bluemix_manifest.yml[]
+----
++
+这里的参数：
++
+* `path` - WAR 包文件的相对路径。
+* `memory` - 默认的内存限制是 1G。可以根据应用的具体情况增加或者减少，也可以通过 Bluemix 的 web 页面调整。需要注意内存大小直接影响运行费用。
+* `name` - 上面在云服务里创建的 Tomcat 应用的名称（取决于项目地址，参考 `App URL`，比如 `\https://myluckycuba.eu-gb.mybluemix.net/`）。
+* `host` - 跟名称一样。
+* `env` - 设置 Tomcat 版本和 Java 版本的环境变量。
+
+. 在命令行切换到 CUBA 项目的根目录。
++
+[source, yml]
+----
+cd your_project_directory
+----
+
+. 连接到 Bluemix（再次检查域名）
++
+[source, yml]
+----
+cf api https://api.eu-gb.bluemix.net
+----
+
+. 登录 Bluemix 账号。
++
+[source, yml]
+----
+cf login -u your_bluemix_id -o your_bluemix_ORG
+----
+
+. 部署 WAR 到 Tomcat
++
+[source, yml]
+----
+cf push
+----
++
+`push` 命令从 `manifest.yml` 文件中读取所有需要的参数信息。
+
+. 可以通过 Bluemix 的 web 页面 dashboard 的 *Log* 标签页查看 Tomcat 服务的日志，也可以在命令行通过以下命令查看：
++
+[source, yml]
+----
+cf logs cuba-app --recent
+----
+
+. 部署过程完成后，可以在浏览器通过 `host.domain` URL 来访问。这个 URL 会显示在 *Cloud Foundry Apps* 表格的 *ROUTE* 字段。
+

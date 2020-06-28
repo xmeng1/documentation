@@ -1,0 +1,31 @@
+:sourcesdir: ../../../../../source
+
+[[securityContext]]
+===== 安全上下文
+
+`SecurityContext` 类实例存储关于当前执行线程的用户会话信息。它在以下情况下被创建并传递给 `AppContext.setSecurityContext()` 方法：
+
+* 对于 Web 客户端 block 和 Web 门户 block - 在开始处理用户浏览器的每个 HTTP 请求时。
+* 对于中间件 block - 在开始处理来自客户端层和 <<scheduled_tasks_cuba>> 的每个请求时。
+
+在前两种情况下，当请求执行完成时，将从执行线程中删除 `SecurityContext`。
+
+如果通过应用程序代码创建一个新的执行线程，需要将当前的 `SecurityContext` 实例传递给它，示例如下：
+
+[source, java]
+----
+include::{sourcesdir}/common/securitycontext_1.java[]
+----
+
+使用 `SecurityContextAwareRunnable` 或 `SecurityContextAwareCallable` 封装类可以完成同样的操作，例如：
+
+[source, java]
+----
+include::{sourcesdir}/common/securitycontext_2.java[]
+----
+
+[source, java]
+----
+include::{sourcesdir}/common/securitycontext_3.java[]
+----
+

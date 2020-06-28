@@ -1,0 +1,79 @@
+:sourcesdir: ../../../../../source
+
+[[scripting]]
+===== Scripting
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/global/Scripting.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`Scripting` 接口用于动态地编译和加载 Java 和 Groovy 类（在运行时），以及执行 Groovy 脚本和表达式。
+
+`Scripting` 接口的方法:
+
+* `evaluateGroovy()` – 执行 Groovy 表达式并返回执行结果。
++
+<<cuba.groovyEvaluatorImport,cuba.groovyEvaluatorImport>> 应用程序属性用于定义插入到每个被执行表达式中的导入类的公共集合。默认情况下，所有标准应用程序 block 都导入 <<persistenceHelper,PersistenceHelper>> 类。
++
+已编译的表达式会被缓存，这大大加快了重复执行的速度。
++
+例如:
++
+[source, java]
+----
+include::{sourcesdir}/common/scripting_1.java[]
+----
+
+[[scripting.runGroovyScript]]
+* `runGroovyScript()` – 执行 Groovy 脚本并返回执行结果。
++
+该脚本应位于应用程序 <<conf_dir,配置文件夹>>或类路径(classpath)中（当前的 `Scripting` 实现仅支持 JAR 文件中的类路径资源）。配置文件夹中的脚本将覆盖类路径中相同名称的脚本。
++
+脚本的路径是使用分隔符 `/` 构造的，路径的开头不需要分隔符。
++
+例如:
++
+[source, java]
+----
+include::{sourcesdir}/common/scripting_2.java[]
+----
+
+* `loadClass()` – 使用以下步骤加载 Java 或 Groovy 类：
++
+--
+. 如果类已加载，则返回该类。
+
+. 在配置文件夹中搜索 Groovy 源代码（ `*.groovy` 文件）。如果找到 Groovy 文件，它将被编译并返回 class 文件。
+
+. 在配置文件夹中搜索 Java 源代码（ `*.java` 文件）。如果找到它，它将被编译并返回 class 文件。
+
+. 在类路径中搜索已编译的 class 文件。如果找到，它将被加载并返回。
+
+. 如果找不到任何内容，将返回 `null`。
+--
++
+--
+可以在运行时修改配置文件夹中的包含 Java 和 Groovy 源代码的文件。在下一次调用 `loadClass()` 时，将重新编译相应的类，并返回新的类，这个机制有以下限制：
+
+* 源代码的类型不能从 Groovy 更改为 Java;
+
+* Groovy 源代码一旦编译，删除这个源代码文件不会导类重新加载，而是仍然返回之前编译好的类。
+--
++
+--
+例如:
+
+[source, java]
+----
+include::{sourcesdir}/common/scripting_3.java[]
+----
+--
+
+* `getClassLoader()` – 返回一个 `类加载器(ClassLoader)`，它能够按照上述 `loadClass()` 方法的规则加载类。
+
+可以使用<<cachingFacadeMBean,CachingFacadeMBean>> JMX bean 在运行时清理编译的类的缓存。
+
+另请参阅 <<scriptingManagerMBean>>。
+

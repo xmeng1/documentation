@@ -1,0 +1,23 @@
+:sourcesdir: ../../../../../../source
+
+[[soft_deletion_unique_constr]]
+====== 数据库级别的唯一约束
+
+为了在软删除模式中对特定值应用唯一约束，也就是说在数据库中可以存在至少一个具有该值的未删除记录和任意数量的具有相同值的已删除记录。
+
+此逻辑可以针对每种数据库服务类型以特定方式实现：
+
+* 如果数据库服务支持部分索引（例如 *PostgreSQL*），则可以按如下方式实现唯一约束：
++
+[source, sql]
+----
+create unique index IDX_SEC_USER_UNIQ_LOGIN on SEC_USER (LOGIN_LC) where DELETE_TS is null
+----
+
+* 如果数据库服务不支持部分索引（例如 *Microsoft SQL Server 2005*），则 *DELETE_TS* 字段可以包含在唯一索引中：
++
+[source, sql]
+----
+create unique index IDX_SEC_USER_UNIQ_LOGIN on SEC_USER (LOGIN_LC, DELETE_TS)
+----
+

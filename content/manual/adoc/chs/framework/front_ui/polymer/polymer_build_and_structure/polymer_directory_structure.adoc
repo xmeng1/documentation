@@ -1,0 +1,40 @@
+:sourcesdir: ../../../../../../source
+
+[[polymer_directory_structure]]
+====== 目录结构
+
+----
+front/
+|-- src/
+|   |-- app-shell.html
+|   |-- shared-styles.html
+|-- images
+|   |-- app-icon/
+|   |-- favicon.ico
+|-- .gitignore
+|-- bower.json
+|-- index.html
+|-- manifest.json
+|-- package.json
+|-- polymer.json
+|-- service-worker.js
+|-- sw-precache-config.js
+----
+
+src:: 放置前端组件的目录。
+
+package.json:: Node.js 的依赖列表，用在构建阶段。
+
+bower.json:: web 类库依赖列表（主要是 web 组件），运行时使用。
+
+polymer.json:: Polymer https://polymer-library.polymer-project.org/2.0/docs/tools/polymer-cli#build[构建配置].
+
+index.html:: 应用程序入口。包含加载 polyfills 的逻辑以及导入 <appname>-shell.html。
+
+manifest.json:: Web app 的装箱清单。包含当应用被添加到设备主界面时所需的信息。
+参考了解更多： https://developer.mozilla.org/en-US/docs/Web/Manifest
+
+service-worker.js:: Service worker 脚手架代码。
+
+sw-precache-config.js:: https://github.com/GoogleChrome/sw-precache[sw-precache] 类库使用的配置文件，用来在构建时（默认关闭）生成 Service worker。参考 <<polymer_offline>>。
+

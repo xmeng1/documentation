@@ -1,0 +1,18 @@
+:sourcesdir: ../../../source
+
+[[app_components_recipes]]
+=== 使用应用程序组件
+
+任何 CUBA 应用程序都可以用作另一个应用程序的<<app_components,组件>>。应用程序组件是一个提供所有<<app_tiers,层>>功能的全栈库 - 从数据库架构到业务逻辑和 UI。
+
+在 https://www.cuba-platform.com/marketplace[CUBA 市场] 上发布的应用程序组件被称为扩展组件（add-on），因为它们扩展了框架的功能，并且可以在任何基于 CUBA 的应用程序中使用。
+
+include::app_components_recipes/app_components_usage.adoc[]
+
+include::app_components_recipes/app_components_dev.adoc[]
+
+include::app_components_recipes/app_components_sample.adoc[]
+
+include::app_components_recipes/app_components_additional_ds.adoc[]
+
+include::app_components_recipes/servlet_registration_sample.adoc[]

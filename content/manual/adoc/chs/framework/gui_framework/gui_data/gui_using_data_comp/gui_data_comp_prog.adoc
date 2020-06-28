@@ -1,0 +1,25 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_data_comp_prog]]
+====== 编程式创建数据组件
+
+可以使用编程的方式在可视化组件中创建和使用数据组件。
+
+下面的例子中，创建了跟<<gui_data_comp_decl,前一章>>一样的编辑界面，使用了相同的数据和可视化组件，只不过是用纯 Java 实现的。
+
+[source, java]
+----
+include::{sourcesdir}/gui/data_comp/data_comp_3.java[]
+----
+
+<1> `DataComponents` 是创建数据组件的工厂。
+<2> `DataContext` 实例在界面注册，以便标准的提交动作能正常工作。
+<3> `orderDl` 加载器会加载数据到 `orderDc` 容器。
+<4> `orderDl` 加载器会合并加载的实体到数据上下文以便跟踪改动。
+<5> `linesDc` 创建为属性容器。
+<6> 给 `customersDl` 加载器指定了一个查询语句。
+<7> `ContainerValueSource` 用来绑定单一字段到容器。
+<8> `ContainerOptions` 用来为查找控件提供选项。
+<9> `ContainerTableItems` 用来绑定表格到容器。
+<10> `getEditedEntityContainer()` 被重写了，用来指定容器，替代了 `@EditedEntityContainer` 注解。
+<11> 在界面展示前加载数据。平台会自动设置编辑实体的 id 到 `orderDl`。

@@ -1,0 +1,15 @@
+:sourcesdir: ../../../../../source
+
+[[uuidSource]]
+===== UuidSource
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/global/UuidSource.html" class="api-docs-btn" target="_blank">API DOCS</a>
+</div>
+++++
+
+该接口用于获取 `UUID` 值，包括用于实体标识符的值。建议不要在应用程序代码中使用 `UUID.randomUUID()`。
+
+要从静态上下文调用，可以使用 `UuidProvider` 类，它还有一个额外的 `fromString()` 方法，它比标准的 `UUID.fromString()` 方法更快。
+

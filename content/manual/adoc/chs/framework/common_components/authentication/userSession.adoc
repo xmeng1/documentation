@@ -1,0 +1,22 @@
+:sourcesdir: ../../../../../source
+
+[[userSession]]
+===== 用户会话
+
+用户会话信息是 CUBA 应用程序访问控制机制的主要元素。它由 `UserSession` 对象表示，该对象与当前已通过身份验证的用户关联，并包含了用户的权限信息。在任何应用程序 <<app_tiers,block>> 中都可以使用 <<userSessionSource,UserSessionSource>> 基础接口获取 `UserSession` 对象。
+
+在使用用户名和密码对用户进行身份验证后，会执行 `AuthenticationManager.login()` 方法，此方法执行时会在中间件上创建 `UserSession` 对象。然后将对象缓存在中间件 block 中并返回到客户端层。在集群中运行时，会话对象将复制到所有集群成员。客户端层也会在接收会话对象之后将其存储下来，并以某种方式将其与活动用户相关联（例如，将其存储在 HTTP 会话中）。后续，此用户的所有中间件方法调用都会带上会话标识符（ `UUID` 类型）。此过程不需要在应用程序代码中提供任何特殊处理，会话标识符会自动传递，与调用的方法的签名无关（即会话信息不通过方法参数传递）。中间件在处理客户端调用时，首先通过获得的标识符从缓存中检索会话，然后会话被与请求(http request)的执行线程关联。调用 `AuthenticationManager.logout()` 方法时或 <<cuba.userSessionExpirationTimeoutSec,cuba.userSessionExpirationTimeoutSec>> 应用程序属性定义的超时时间到期时，会从缓存中删除会话对象。
+
+这样，在用户登录系统时创建的会话标识符用于在每次中间件调用期间进行用户验证。
+
+`UserSession` 对象还包含当前用户_验证相关_的方法 - 验证对系统对象的访问权限： `isScreenPermitted()`、`isEntityOpPermitted()`、`isEntityAttrPermitted()` 和 `isSpecificPermitted()`。但是，建议使用 <<security,Security>> 基础接口以编程的方式进行权限验证。
+
+
+`UserSession` 对象可以包含任意可序列化类型的命名属性。属性由 `setAttribute()` 方法设置，并由 `getAttribute()` 方法获取。后者也能够像属性一样返回以下会话参数：
+
+* `userId` – 当前注册的或代替的用户的 ID;
+* `userLogin` – 当前注册的或代替的用户登录名的小写形式。
+
+会话属性与其它用户会话数据一样在中间件集群中被复制分发。
+
+

@@ -1,0 +1,104 @@
+:sourcesdir: ../../../../../source
+
+[[screen_xml]]
+===== 界面 XML 描述
+
+[WARNING]
+====
+这是历史版本 API。对于 v.7.0 的新 API，请参阅<<screen_descriptors>>。
+====
+
+XML 描述是一个 XML 格式的文件，用来描述<<datasources,数据源>>和界面布局。
+
+XML schema： {xsd_url}/window.xsd 。
+
+描述文件有如下结构：
+
+`window` − 根节点元素
+
+`window` 的属性：
+
+* `class` − <<screen_controller,界面控制器>>类名。
+
+* `messagesPack` − 界面默认的<<message_packs,消息语言包>>。在控制器中可以通过 `getMessage()` 方法或者在 XML 描述中使用消息键值来获取语言包里面的本地化消息语言，使用消息键值的时候，不需要指定包名。
+
+* `caption` − 窗口标题，可以包含指向上面提到的语言包的一个 <<messageTools.loadString,消息键值链接>>，比如：
++
+[source, properties]
+----
+caption="msg://credits"
+----
+
+* `focusComponent` − 一个组件的标识符，当界面展示的时候会默认聚焦到这个组件。
+
+* `lookupComponent` – <<screen_lookup,查找界面>>的必须属性；定义一个可视化组件的标识符，通过这个组件选取实体实例。支持以下类型的组件（及其它们的子类）：
+
+** `Table - 表格`
+
+** `Tree - 树形组件`
+
+** `LookupField - 下拉框控件`
+
+** `PickerField - 选取器控件`
+
+** `OptionsGroup - 选项组控件`
+
+* `datasource` – <<screen_edit,编辑界面>>的必须属性，用来定义包含需要编辑的实体的<<datasources,数据源>>标识符。
+
+`window` 的元素：
+
+* `metadataContext` − 这个元素用来初始化界面需要的<<views,视图>>。建议在同一个 <<views.xml,views.xml>> 文件里定义所有的视图，因为所有的视图描述都部署在同一个仓库（repository）中，所以如果视图描述散落在很多个文件中，很难保证视图名称的唯一性。
+
+* `dsContext` − 定义界面的<<datasources,数据源>>。
+
+* `dialogMode` - 在界面通过对话框的方式打开时，定义窗口的几何属性以及行为。
++
+--
+`dialogMode` 的属性：
+
+** `closeable` - 定义对话框是否带有关闭按钮。可选值：`true`，`false`。
+
+** `closeOnClickOutside` - 当窗口通过模态窗（modal）模式打开时，定义对话框是否可以通过点击窗口之外的区域关闭。可选值：`true`，`false`。
+
+** `forceDialog` - 设定界面始终需要通过对话框的方式打开，不论调用方代码怎么选取的 `WindowManager.OpenType` 值。可选值：`true`，`false`。
+
+** `height` - 设置对话框的高度。
+
+** `maximized` - 如果设置为 `true`，对话框会按照界面大小最大化打开。可选值：`true`，`false`。
+
+** `modal` - 设定是否按照模态框方式弹出窗口。可选值：`true`，`false`。
+
+** `positionX` - 设定弹出窗口的左上角位置的 `x` 坐标。
+
+** `positionY` - 设定弹出窗口的左上角位置的 `y` 坐标。
+
+** `resizable` - 设定用户是否可以改变对话框的大小。可选值：`true`，`false`。
+
+** `width` - 设置对话框的宽度。
+
+示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui/dialogs_4.xml[]
+----
+--
+
+* `actions` – 定义界面的<<gui_Action,操作>>列表。
+
+* `timers` – 定义界面的定时器列表。
+
+* `companions` – 定义界面控制器的 <<companions,companion - 友>>类列表。
++
+--
+`companions` 的元素：
+
+** `web` – 定义 *web* 模块的友类实现。
+
+** `desktop` – 定义 *desktop* 模块的友类实现。
+
+这两个元素都有一个 `class` 属性，用来定义友类。
+--
+
+* <<gui_layout,layout>> − 界面布局的根节点元素，是一个具有组件纵向布局的容器。
+

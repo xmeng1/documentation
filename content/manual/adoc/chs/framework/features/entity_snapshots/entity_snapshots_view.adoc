@@ -1,0 +1,27 @@
+:sourcesdir: ../../../../../source
+
+[[entity_snapshots_view]]
+===== 查看快照
+
+使用 `com/haulmont/cuba/gui/app/core/entitydiff/diff-view.xml` 子框架可以查看任意实体的快照。例如:
+
+[source, xml]
+----
+<frame id="diffFrame"
+      src="/com/haulmont/cuba/gui/app/core/entitydiff/diff-view.xml"
+      width="100%"
+      height="100%"/>
+----
+
+快照应该通过编辑界面控制器加载到框架中：
+
+[source, java]
+----
+include::{sourcesdir}/features/entity_snapshots_view.java[]
+----
+
+`diff-view.xml` 子框架显示给定实体的快照列表，并能够对它们进行比较。每一个快照视图包含用户、日期和时间。当从列表中选中一个快照，将显示与上一个快照相比的变化。第一个快照的所有属性被标记为已更改。选择两个快照在表格中展示比较的结果。
+
+比较结果表展示属性名称及其新值。当一行被选中，将显示两个快照上属性更改的详细信息。引用字段则会显示相应实体的<<namePattern_annotation,实例名>>。
+当比较集合时，新元素和删除的元素分别以高亮的绿色和红色显示。只有属性发生更改的集合元素不会高亮显示。不记录元素位置的改变。
+

@@ -1,0 +1,33 @@
+:sourcesdir: ../../../../../source
+
+[[db_scripts_groovy]]
+===== Groovy 脚本的结构
+
+Groovy 更新脚本的结构如下：
+
+* __主要(main)__ 部分，包含要在<<appContext,应用程序上下文>>启动之前执行的代码。在这一部分，可以使用任何 Java、Groovy 和 Middleware 应用程序块(block)中的类。但要注意，这时尚未实例化 bean、基础设施接口和其它应用程序对象，所以无法使用它们。
++
+这部分主要用于更新数据库 schema，通常使用普通的 SQL 脚本。
+
+* __PostUpdate__ 部分 - 一组闭包（Groovy 中的概念），将在应用程序上下文启动后和更新过程完成后执行。在这些闭包中，可以使用任何中间件对象。
++
+在脚本的这一部分中，可以比较方便地执行数据导入，因为可以使用<<persistence,Persistence>>接口和数据模型对象。
+
+执行机制将以下变量传递给 Groovy 脚本：
+
+* `ds` – 用于应用程序数据库的 `javax.sql.DataSource` 实例;
+* `log` – `org.apache.commons.logging.Log` 实例，用于在服务端日志中输出信息;
+* `postUpdate` – 包含 `add(Closure closure)` 方法的对象，用于添加上述 PostUpdate 闭包。
+
+[WARNING]
+====
+Groovy 脚本仅由<<db_update_server,执行数据库脚本的服务端机制>>执行。
+====
+
+Groovy 更新脚本的示例:
+
+[source, java]
+----
+include::{sourcesdir}/dbms/groovyupdate_1.groovy[]
+----
+

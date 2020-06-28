@@ -1,0 +1,24 @@
+:sourcesdir: ../../../../source
+
+[[app_tiers]]
+==== 应用程序层和块
+
+框架支持使用多种客户端、中间层、数据库层构建多层应用程序。后续将主要介绍中间层和客户端层，因此，后面看到的“所有层”仅指这两个层。
+
+应用程序的每个层都可以创建一个或多个应用程序 _块(block)_。每一个块都是独立可执行程序，可与应用程序中的其它块(block)交互。通常，一个块就是在 JVM 上运行的一个 web 应用程序。
+
+.应用程序层(tier)和块(block)
+image::AppTiers.svg[align="center"]
+
+Middleware - 中间件:: 中间件层包含应用程序的核心业务逻辑，并提供对数据库的访问功能。由运行在 Java servlet 容器上的单独 Web 应用程序表示。参阅<<middleware>>。
+
+Web Client - Web 客户端:: 是客户端层的主要块（block)。包含主要为内部用户（即管理系统用户）设计的界面。由运行在 Java servlet 容器上的单独 Web 应用程序表示。用户界面基于 *Vaadin* 框架实现。参阅<<gui_framework>>。
+
+Web Portal - Web 门户:: 客户端层的附加块（block）。可以包含外部用户的界面以及作为与移动设备和第三方应用程序集成的入口点。由运行在 Java servlet 容器上的单独 Web 应用程序表示。用户界面基于 *Spring MVC* 框架实现。参阅<<portal>>。
+
+Frontend UI - 前端 UI:: 为外部用户设计的可选客户端，使用纯 JavaScript 编写。基于 https://www.polymer-project.org[Google Polymer] 或者 *React* 框架实现，并通过在 Web Client 或 web Portal 块中运行的 {rest_man_url}[REST API] 与中间件进行通信。参阅 <<front_ui>>。
+
+Middleware 是任何应用程序都需要的 block。用户界面可以由一个或多个 block 实现，例如 Web Client 和 Web Portal。
+
+所有基于 Java 的客户端 block 都通过 HTTP 协议统一与中间层交互，从而可以任意部署中间层，即使在防火墙内也可以。在最简单的情况下，当中间层和 Web 客户端部署在同一服务器上时，它们之间的本地交互可以绕过网络栈以获得更好的性能。
+

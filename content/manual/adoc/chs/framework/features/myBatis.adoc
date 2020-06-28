@@ -1,0 +1,61 @@
+:sourcesdir: ../../../../source
+
+[[myBatis]]
+==== MyBatis 集成
+
+MyBatis 框架，与 ORM <<nativeQuery,本地查询>>或<<queryRunner,QueryRunner>>相比，提供了更广泛的执行 SQL 和将查询结果映射到对象的功能。
+
+按照下面的步骤在 CUBA 项目中集成 MyBatis。
+
+. 在 *core* 模块的根 java 包创建处理 UUID 类型的类。
++
+[source, java]
+----
+include::{sourcesdir}/features/MyBatis.java[]
+----
+
+. 在 *core* 模块的 <<spring.xml,spring.xml>> 文件所在目录创建 `mybatis.xml` 配置文件，在文件内正确引用 `UUIDTypeHandler`：
++
+[source, xml]
+----
+include::{sourcesdir}/features/MyBatis_2.xml[]
+----
+
+. 将下面的 bean 都添加到 `spring.xml` 文件以便在项目中使用 MyBatis：
++
+--
+[source, xml]
+----
+include::{sourcesdir}/features/MyBatis.xml[]
+----
+
+`sqlSessionFactory` bean 包含了指向 `mybatis.xml` 的引用。
+
+`MapperLocations` 参数定义了 `mapperLocations` 映射文件的路径（根据 Spring 中 `ResourceLoader` 接口的资源解析规则）。
+--
+
+. 最后，在 <<build.gradle,build.gradle>> 中的 `core` 模块添加 MyBatis 的依赖：
++
+[source, groovy]
+----
+compile('org.mybatis:mybatis:3.2.8')
+compile('org.mybatis:mybatis-spring:1.2.5')
+----
+
+下面是一个映射文件的示例，用于加载 `订单(Order)` 的实例以及相关的 `客户(Customer)` 和 `订单商品(order item)` 集合：
+
+[source, xml]
+----
+include::{sourcesdir}/features/mapper.xml[]
+----
+
+以下代码可用于获取上面示例中的查询结果：
+
+[source, java]
+----
+try (Transaction tx = persistence.createTransaction()) {
+    SqlSession sqlSession = AppBeans.get("sqlSession");
+    Order order = (Order) sqlSession.selectOne("com.sample.sales.selectOrder", orderId);
+    tx.commit();
+----
+

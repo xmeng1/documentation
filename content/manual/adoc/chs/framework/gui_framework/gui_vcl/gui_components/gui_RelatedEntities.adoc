@@ -1,0 +1,105 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_RelatedEntities]]
+====== 关联实体组件
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-relatedentities" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/RelatedEntities.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+`RelatedEntities` 组件是一个弹窗按钮，其中包含了与表格中显示的实体相关的实体类的下拉列表。当用户选择了所需的实体类，就会打开一个新的浏览界面，其中包含与初始表格中选择的实体实例关联的实体实例。
+
+image::gui_relatedEntities.png[align="center"]
+
+该组件的 XML 名称： `relatedEntities`
+
+选中的关联实体受用户的实体、实体属性和界面权限机制的控制。
+
+默认情况下，下拉列表中所选类的浏览界面使用约定的格式( `{entity_name}.browse` 、 `{entity_name}.lookup`)定义。当然，也可以在组件中显式自定义浏览界面。
+
+在新的浏览界面中会动态创建过滤器，这个过滤器只选择与选中实体相关的记录。
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/relatedentities_1.xml[]
+---- 
+
+[[gui_RelatedEntities_for]]
+`for` 属性是必须的。使用这个属性指定要查看其关联实体的表格的标识符。
+
+`openType="NEW_TAB"` 属性将查找窗口的打开模式设置为新标签页。默认情况下，实体浏览界面在当前标签页中打开。
+
+`property` 元素允许显式定义显示在下拉列表中的相关实体。
+
+`property` 元素的属性：
+
+[[gui_RelatedEntities_property_name]]
+* `name` – 当前实体的属性名称，这个属性是一个引用类型的属性，引用了关联实体。
+
+[[gui_RelatedEntities_property_screen]]
+* `screen` – 要使用的浏览界面的标识符。
+
+[[gui_RelatedEntities_property_filterCaption]]
+* `filterCaption` – 动态生成的过滤器的标题。
+
+[[gui_RelatedEntities_exclude]]
+可以使用 `exclude` 属性从下拉列表中排除一些关联实体。该属性的值是匹配要排除的引用属性的正则表达。
+
+image::gui_relatedEntitiesTable.png[align="center"]
+
+平台提供了一个不使用 `RelatedEntities` 组件就可以打开关联实体界面的 API：`RelatedEntitiesAPI` 接口及其实现 `RelatedEntitiesBean` 。逻辑是在 `openRelatedScreen()` 方法定义的，该方法可接受三个参数：关系一侧的实体集合、该集合中单个实体的 `MetaClass` 、要查找其关联实体的字段。
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/relatedentities_2.xml[]
+----
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/relatedentities_3.java[]
+----
+
+默认情况下，将打开标准实体浏览界面。可以使用 `RelatedScreenDescriptor` 参数使该方法打开另一个界面或使用其它参数打开界面。`RelatedScreenDescriptor` 是一个 POJO，可以存储界面标识符（`String`）、打开类型（`WindowManager.OpenType`）、过滤器标题（`String`）和界面参数（`Map <String，Object>`）。
+
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/relatedentities_4.java[]
+----
+
+'''
+
+relatedEntities 的属性::
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_css,css>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_enable,enable>> -
+<<gui_RelatedEntities_exclude,exclude>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_RelatedEntities_for,for>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_attr_openType,openType>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+property 的属性::
+<<gui_attr_caption,caption>> -
+<<gui_RelatedEntities_property_filterCaption,filterCaption>> -
+<<gui_RelatedEntities_property_name,name>> -
+<<gui_RelatedEntities_property_screen,screen>>
+
+'''
+

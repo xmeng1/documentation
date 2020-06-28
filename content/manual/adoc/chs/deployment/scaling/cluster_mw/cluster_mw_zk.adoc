@@ -1,0 +1,9 @@
+:sourcesdir: ../../../../../source
+
+[[cluster_mw_zk]]
+===== 使用 ZooKeeper 来协调集群
+
+为了能让中间件服务之间互相通信，并且帮助客户端请求中间件服务，有个<<app_components,应用程序组件>>可以启用动态发现中间件服务。这个组件是基于集成 https://zookeeper.apache.org[Apache ZooKeeper] 完成的，ZooKeeper 是个中心化的服务，用来维护配置信息。当项目引入这个组件之后，运行应用程序 block 的时候只需要指定一个 ZooKeeper 的静态地址。Middleware 服务将会通过在 ZooKeeper 目录发布它们的地址的方式进行广播，然后发现机制会向 ZooKeeper 请求能用的服务器的地址。如果一个中间件服务宕机了，这个服务会被马上从目录自动移除或者等到超时再被移除。
+
+这个应用程序组件的源代码可以在 https://github.com/cuba-platform/cuba-zk[GitHub] 找到，构建的工件在标准 CUBA 仓库发布。参考 https://github.com/cuba-platform/cuba-zk[README] 了解引入和配置这个组件的信息。
+

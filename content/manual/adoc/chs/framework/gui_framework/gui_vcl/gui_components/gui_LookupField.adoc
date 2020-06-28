@@ -1,0 +1,290 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_LookupField]]
+====== 下拉框
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-lookupfield" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/LookupField.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+该控件支持从下拉列表中选择值。下拉列表提供基于用户的输入对数据进行过滤的功能，也支持分页显示数据。
+
+image::gui_lookupField.png[align="center"]
+
+该组件的 XML 名称是： `lookupField`
+
+* 使用 `LookupField` 下拉框最简单的例子是从实体属性中选择枚举值。比如，`Role` 角色实体中有 `type` 属性，为枚举类型。用户可以通过 `LookupField` 下拉框控件编辑该属性：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/lookupfield_1.xml[]
+---- 
++
+在上面的例子中，使用 `roleDc` <<gui_data_containers,数据容器>>选择 `Role` 实体数据。`lookupField` 下拉框组件中，数据容器的连接通过 <<gui_attr_dataContainer,dataContainer>> 属性定义，实体属性的名称定义在 <<gui_attr_property,property>> 属性中。此时，这个属性为枚举类型，控件的下拉列表中会显示所有枚举值的<<enum_localization,本地化名称>>。
+
+* 类似的，`LookupField` 下拉框也可以用来选择实体实例。<<gui_attr_optionsContainer,选项容器>>属性可以用来创建一系列选项：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/lookupfield_2.xml[]
+---- 
++
+这种时候，`colorsDc` 数据容器中的 `Color` 实体的<<namePattern_annotation,实例名称>>会显示在下拉列表中，被选择的值会被设置到 `carDc` 数据容器中 `Car` 实体的 `color` 属性中。
++
+<<gui_attr_captionProperty,captionProperty>>定义显示到下拉框的实体属性值，而非实例名称，这样可以设置下拉列表的文字值。
+
+[[gui_LookupField_setOptionCaptionProvider]]
+* 使用 `setOptionCaptionProvider()` 方法可以为 `LookupField` 组件显示的字符串选项名定义标题：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gui_lookupField_OptionCaptionProvider.java[]
+----
+
+* 选项列表还可以通过 `setOptionsList()`，`setOptionsMap()` 和 `setOptionsEnum()` 设置，也可以在 XML 描述中通过 `optionsContainer` 或者 `optionsDatasource` 属性设置。
++
+--
+[[gui_LookupField_setOptionsList]]
+* `setOptionsList()` - 通过代码指定选项列表。首先在 XML 描述中声明组件：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/lookupfield_3.xml[]
+---- 
++
+然后将组件注入界面控制器，在 `onInit()` 方法中设置选项列表：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/lookupfield_4.java[]
+---- 
++
+组件的下拉列表中会显示 2, 4, 5 和 7。被选择的值会设置到 `modelDc` 数据容器中的  `numberOfSeats` 属性上。
+
+[[gui_LookupField_setOptionsMap]]
+* `setOptionsMap()` 可以提供选项 map。比如为 XML 描述中声明的 `numberOfSeatsField` 组件指定选项 map（在 `onInit()` 方法中）:
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/lookupfield_5.java[]
+---- 
++
+组件下拉框会显示 `*two*`，`*four*`，`*five*`，`*seven*` 文本。但是组件的值则是与文本对应的数字值。数字值会被设置到 `modelDc` 数据容器中的  `numberOfSeats` 属性上。
+
+[[gui_LookupField_setOptionsEnum]]
+* `setOptionsEnum()` 需要枚举类做为参数。下拉列表会显示枚举值的本地化名称，组件的值则为枚举值。
+--
+
+[[gui_LookupField_PopupWidth]]
+
+* `setPopupWidth()` 可以设置下拉列表的宽度，宽度用字符串格式传递给该方法。使用相对单位（比如，`"50%"`）可以设置下拉列表的宽度是针对于 `LookupField` 本身的相对值。默认情况下，该宽度设置为 `null`，下拉列表的宽度为了适应显示内容的宽度而可以大于组件的宽度。通过设置该值为 `"100%"`，可以使得下拉列表的宽度等于 `LookupField` 的宽度。
+
+[[gui_LookupField_OptionsStyleProvider]]
+* 通过 `setOptionStyleProvider()` 可以为组件显示的不同的选项设置分别的 style name：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/lookupField_10.java[]
+----
+
+[[gui_LookupField_iconProvider]]
+* 下拉列表中的组件可以在左边设置对应的图标。在界面控制器中使用 `setOptionIconProvider()` 方法设置：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/lookupfield_8.java[]
+----
++
+image::gui_lookupField_2.png[align="center"]
++
+[TIP]
+====
+如果使用 SVG 图标, 显式设置图标大小以避免图标覆盖。
+====
++
+[source, xml]
+----
+<svg version="1.1"
+     id="Capa_1"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     xml:space="preserve"
+
+     style="enable-background:new 0 0 55 55;"
+     viewBox="0 0 55 55"
+
+     height="25px"
+     width="25px">
+----
+
+[[gui_LookupField_setOptionImageProvider]]
+* `setOptionImageProvider()` 方法可以定义 `LookupField` 组件显示的选项图片。该方法设置一个接收<<gui_Image_ResourceType,资源类型>>参数的函数。
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/gui_lookupField_OptionImageProvider.java[]
+----
+
+* 如果 `LookupField` 下拉框组件非<<gui_attr_required,required>>，并且对应的实体属性也非必须，下拉选项会包含一个空行。如果选择了空行，组件值为 `null`. 使用 <<gui_attr_nullName,nullName>> 属性设置在“空行”上显示的文本。以下为一个示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/lookupfield_6.xml[]
+---- 
++
+这样，下拉框中的“空行”上会显示 `(none)` 文本。如果用户选择了该行，对应的实体属性值会设置为 `null`。
++
+如果在代码中通过 `setOptionsList()` 设置了选项, 可以用 `setNullOption()` 方法设置空行文本，这样，如果用户选择了该行，组件值则为 `null`。
+
+LookupField 过滤器：::
++
+--
+[[gui_LookupField_filterMode]]
+* `filterMode` 属性设置基于用户输入的过滤模式：
++
+** `NO` − 不过滤。
++
+** `STARTS_WITH` − 选项文本以用户输入开头。
++
+** `CONTAINS` − 选项文本包含用户输入（默认模式）。
+
+[[gui_LookupField_setFilterPredicate]]
+* `setFilterPredicate()` 方法用来设置过滤方法，该方法判断元素是否跟查找文字匹配。比如：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/lookupfield_11.java[]
+----
++
+`FilterPredicate` 的 `test` 方法可以用来客户化过滤逻辑，比如处理方言/特殊字符：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/lookupfield_12.java[]
+----
+--
+
+[[gui_LookupField_newOptionHandler]]
+* `LookupField` 组件在没有合适选项的时候可以处理用户的输入，通过 `setNewOptionHandler()` 来处理，示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/lookupfield_7.java[]
+---- 
++
+当用户输入不匹配任何选项的值并且按下回车键时，会触发调用新选项处理器。这时，上述代码会创建一个新的 `Color` 实例，`name` 属性值为用户输入，并且这个实例会加到下拉选项数据容器中，做为该控件当前被选中值。
++
+除了使用 `setNewOptionHandler()` 方法来处理用户输入，还可以在 XML 描述中通过 `newOptionHandler` 属性来指定控制器处理的方法。这个方法需要两个参数，一个是 `LookupField` 类型，指向组件实例，另一个是 `String` 类型，指向用户输入。`newOptionAllowed` 属性也可以用来开启是否允许输入新值。
+
+[[gui_LookupField_nullOptionVisible]]
+* `nullOptionVisible` XML 属性设置是否在下拉列表显示空值。可以配置 `LookupField` 下拉框非 <<gui_attr_required,required>>但是不提供空值选项。
+
+[[gui_LookupField_textInputAllowed]]
+* `textInputAllowed` 属性可以禁止过滤器功能及键盘输入。对短列表来说很方便。默认值为 `true`。
+
+[[gui_LookupField_pageLength]]
+* `pageLength` 属性重新设置下拉列表中一页选项的个数，默认值在<<cuba.gui.lookupFieldPageLength,cuba.gui.lookupFieldPageLength>>应用程序属性中定义。
+
+* 在基于 Halo 主题的 Web 客户端，可以自定义样式，通过 XML `stylename` 属性或在界面控制器中通过代码设置：
++
+--
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/lookupfield_8.xml[]
+----
+
+通过代码设置时，从 `HaloTheme` 类中选择 `LOOKUPFIELD_` 开头的常量样式：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/lookupfield_9.java[]
+----
+
+LookupField 下拉框样式有:
+
+[[gui_LookupField_align-center]]
+*  `align-center` - 文本居中对齐。
+
+[[gui_LookupField_align-right]]
+* `align-right` - 文本靠右对齐。
+
+[[gui_LookupField_borderless]]
+* `borderless` - 文本不要边框和背景。
+
+--
+
+'''
+
+LookupField 下拉框属性列表:: 
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_captionProperty,captionProperty>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_LookupField_filterMode,filterMode>> -
+<<gui_attr_height,height>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_attr_inputPrompt,inputPrompt>> -
+<<gui_LookupField_newOptionHandler,newOptionAllowed>> -
+<<gui_LookupField_newOptionHandler,newOptionHandler>> -
+<<gui_attr_nullName,nullName>> -
+<<gui_LookupField_nullOptionVisible,nullOptionVisible>> -
+<<gui_attr_optionsDatasource,optionsDatasource>> -
+<<gui_attr_optionsEnum,optionsEnum>> -
+<<gui_LookupField_pageLength,pageLength>> -
+<<gui_attr_property,property>> -
+<<gui_attr_required,required>> -
+<<gui_attr_requiredMessage,requiredMessage>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_LookupField_textInputAllowed,textInputAllowed>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+LookupField 下拉框元素::
+<<gui_validator,validator>>
+
+LookupField 下拉框样式::
+<<gui_LookupField_align-right,align-right>> -
+<<gui_LookupField_align-center,align-center>> -
+<<gui_LookupField_borderless,borderless>> -
+<<gui_attr_stylename_huge,huge>> -
+<<gui_attr_stylename_large,large>> -
+<<gui_attr_stylename_small,small>> -
+<<gui_attr_stylename_tiny,tiny>>
+
+API::
+<<gui_api_addValueChangeListener,addValueChangeListener>> -
+<<gui_api_commit,commit>> -
+<<gui_api_discard,discard>> -
+<<gui_api_isModified,isModified>> -
+<<gui_api_contextHelp,setContextHelpIconClickHandler>> -
+<<gui_LookupField_setFilterPredicate,setFilterPredicate>> -
+<<gui_LookupField_setOptionCaptionProvider,setOptionCaptionProvider>> -
+<<gui_LookupField_setOptionImageProvider, setOptionImageProvider>> -
+<<gui_LookupField_setOptionsEnum,setOptionsEnum>> -
+<<gui_LookupField_setOptionsList,setOptionsList>> -
+<<gui_LookupField_setOptionsMap,setOptionsMap>> -
+<<gui_LookupField_OptionsStyleProvider,setOptionsStyleProvider>> -
+<<gui_LookupField_PopupWidth,setPopupWidth>>
+
+'''
+

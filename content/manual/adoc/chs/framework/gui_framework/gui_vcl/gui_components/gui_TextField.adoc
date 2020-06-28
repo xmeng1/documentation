@@ -1,0 +1,271 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_TextField]]
+====== 文本控件
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-textfield" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/TextField.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`TextField` 是用于文本编辑的控件。它可以用于处理实体属性，也可用于输入/显示任何文本信息。
+
+该组件对应的 XML 名称：`textField`
+
+* 从本地消息包中获取标题(caption)的文本控件示例：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/textfield_1.xml[]
+---- 
++
+下图展示了一个简单文本控件示例：
++
+image::gui_textField_data.png[align="center"]
+
+* Web Client 使用 Halo-based 主题时，在 XML 描述或者界面控制器中可以使用 `stylename` 属性给文本框组件设置预定义的样式 :
++
+--
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/textfield_7.xml[]
+----
+
+如果使用编程的方式设置样式，可以选择一个前缀为 `TEXTFIELD_` 的 `HaloTheme` class 常量。
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/textfield_8.java[]
+----
+
+TextField 样式:
+
+[[gui_textfield_align-center]]
+*  `align-center` - 使文本在文本框中居中显示。
+
+[[gui_textfield_align-right]]
+* `align-right` - 使文本在文本框中居右显示。
+
+[[gui_textfield_borderless]]
+* `borderless` - 移除文本框的边框和背景。
+
+[[gui_textfield_inline-icon]]
+* `inline-icon` - 使标题图标显示在文本框里面。
+
+[[gui_TextField_caseConversion]]
+文本框支持自动大小写转换。 `caseConvertion` 属性包含下列取值：
+
+* `UPPER` - 转换为大写，
+
+* `LOWER` - 转换为小写，
+
+* `NONE` - 不转换(默认值)。用这个选项来支持在输入法连续输入（比如，在输入中文、日文、韩文的时候）
+--
+
+* 要创建连接数据的文本框，使用<<gui_attr_dataContainer,数据容器>>和 <<gui_attr_property,property>> 属性。
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/textfield_2.xml[]
+---- 
++
+如上所示，界面描述中为实体 `Customer` 定义了<<gui_data_containers,数据容器>>  `customerDc` ，并且 `Customer` 实体有一个  `name` 属性。文本控件通过 <<gui_attr_dataContainer,dataContainer>> 属性连接到数据容器；<<gui_attr_property,property>> 属性设置为要显示在控件中的实体属性的名称。
+
+[[gui_TextField_datatype]]
+* 如果文本控件没有连接到任何实体属性 (即，未设置数据容器和属性名称)，可以使用 `datatype` 属性设置数据类型，数据类型用来格式化控件值。`datatype` 属性值可以是应用程序元数据中注册的任何数据类型 – 见 <<datatype>>。通常，`TextField` 使用下面的数据类型：
++
+--
+* `decimal`
+
+* `double`
+
+* `int`
+
+* `long`
+--
++
+如果该字段有 `datatype` 属性，并且用户输入了一个错误的值，则会显示默认的转换错误消息。
++
+下面是一个数据类型是 `Integer` 的文本控件示例。
+
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/textfield_3.xml[]
+----
++
+如果用户输入的字符不能解析为整数，当该控件失去焦点时，应用程序将显示错误消息。
++
+
+image::gui_datatype_default_message.png[align="center"]
++
+默认的消息是在<<main_message_pack,主语言包>>中定义的，有这样的模板：`databinding.conversion.error.<type>`，比如：
++
+[source, properties]
+----
+databinding.conversion.error.int = Must be Integer
+----
+
+[[gui_TextField_conversionErrorMessage]]
+* 可以在界面 XML 描述中声明式的定义自己的类型转换错误消息，使用 `conversionErrorMessage` 属性：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/textfield_11.xml[]
+----
+或者在界面控制器中通过便层的方式创建：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/textfield_12.java[]
+----
+
+* 可以为文本控件分配一个验证器 - 实现了 `Field.Validator`  接口的类。在 `datatype` 对输入的字符格式进行验证后，验证器进行进一步的验证。例如，要创建一个正整数输入控件，需要创建一个验证器类：
+
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/textfield_4.java[]
+---- 
++
+同时设置它为数据类型是 `int` 的文本控件的验证器：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/textfield_5.xml[]
+---- 
++
+与数据类型的输入时检查不同，验证不是在控件失去焦点时执行，而是在调用控件的 `validate()` 方法之后执行。这意味着控件（和连接的实体属性）可能暂时包含不满足验证条件的值（上例中的非正数）。这应该不是问题，因为要验证的控件通常用在<<screen_edit,编辑界面>>中，它会在提交之前自动调用所有控件的验证。如果该控件不在编辑界面中，则应在控制器中显式调用该控件的 `validate()` 方法。
+
+[[gui_TextField_TextChangeListener]]
+* `TextField` 支持其实现的 `TextInputField` 接口中定义的 `TextChangeListener`。为了不阻塞用户输入，文本变化事件的处理是异步进行的。
++
+--
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/textfield_9.java[]
+----
+
+image::gui_textfield_2.png[align="center"]
+--
+* The `TextChangeEventMode` 定义文本的变化被发送到服务器并触发服务端事件的方式。有 3 种预定义的事件模式：
++
+--
+* `LAZY` （默认） - 文件输入暂停时触发事件。暂停时间可以通过 `setInputEventTimeout()` 修改。即使用户在输入文本时没有发生暂停，也会在可能发生的 `ValueChangeEvent` 之前强制触发文本更改事件。
+
+* `TIMEOUT` - 超时后触发事件。如果在超时周期内进行了多次更改，则将周期内自最后一次更改后发生的更改发送到服务端。可以使用 `setInputEventTimeout()` 设置超时时长。
++
+如果在超时期限之前发生 `ValueChangeEvent`，则在它之前触发 `TextChangeEvent`，条件是文本内容自上一个 `TextChangeEvent` 以来已经发生改变。
+
+* `EAGER` - 对于文本内容的每次更改，都会立即触发 `TextChangeEvent` 事件，通常是由按键触发。请求是独立且一个接一个地顺序处理。文本变化事件以异步方式与服务器交互，因此可以在处理事件请求的同时继续输入。
+--
+
+[[gui_TextField_EnterPressListener]]
+* `EnterPressListener` 允许定义一个在 Enter 键按下时被执行的<<gui_Action,操作>>：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/textfield_10.java[]
+----
+
+[[gui_TextField_ValueChangeListener]]
+* `ValueChangeListener` 当用户完成文本输入时，即在按下 Enter 键或组件失去焦点时，将触发 `ValueChangeListener`。`ValueChangeEvent` 类型的事件对象被传递给监听器，它有以下方法：
++
+** `getPrevValue()` 返回组件之前的值。
++
+** `getValue()` 返回组件的当前值。
++
+[source, java]
+----
+textField.addValueChangeListener(stringValueChangeEvent ->
+        notifications.create()
+                .withCaption("Before: " + stringValueChangeEvent.getPrevValue() +
+                        ". After: " + stringValueChangeEvent.getValue())
+                .show());
+----
++
+可以使用 <<gui_api_UserOriginated,isUserOriginated()>> 方法跟踪 `ValueChangeEvent` 的来源。
+
+* 如果文本控件连接到实体属性（通过 `datasource` 和 `property`），并且实体属性具有定义在 `@Column` JPA 注解中的 `length` 参数，那么 `TextField` 将相应地限制输入文本的最大长度。
++
+[[gui_TextField_maxLength]]
+如果文本控件未链接到属性，或者属性未定义 `length` 值，或者需要覆盖此值，则可以使用 `maxLength` 属性限制输入文本的最大长度。值 "-1" 表示没有限制。
+例如:
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/textfield_6.xml[]
+----
+
+[[gui_TextField_trim]]
+* 默认情况下，文本控件截去字符串的前后空格。即，如果用户输入 " aaa bbb "，则 `getValue()` 方法返回并保存到连接实体属性的控件值将为 "aaa bbb"。可以通过将 `trim` 属性设置为 `false` 来禁用空格去除。
++
+应该注意的是，去除空格仅在用户输入新值时起作用。如果连接属性的值中已包含空格，则将显示空格，直到用户编辑该值。
+
+* 文本控件始终返回 `null` 而不是输入的空字符串。因此，启用 `trim` 属性后，任何只包含空格的字符串都将转换为 `null`。
+
+* `setCursorPosition()` 方法可使控件获得焦点并将光标位置设置为指定索引，索引基于 0。
+
+'''
+
+textField 的属性 ::
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_TextField_caseConversion,caseConversion>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_TextField_conversionErrorMessage,conversionErrorMessage>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_TextField_datatype,datatype>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_attr_inputPrompt,inputPrompt>> -
+<<gui_TextField_maxLength,maxLength>> -
+<<gui_attr_property,property>> -
+<<gui_attr_required,required>> -
+<<gui_attr_requiredMessage,requiredMessage>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_TextField_trim,trim>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+textField 的元素 ::
+<<gui_validator,validator>>
+
+textField 的预定义样式 ::
+<<gui_textfield_align-center,align-center>> -
+<<gui_textfield_align-right,align-right>> -
+<<gui_textfield_borderless,borderless>> -
+<<gui_attr_stylename_huge,huge>> -
+<<gui_textfield_inline-icon,inline-icon>> -
+<<gui_attr_stylename_large,large>> -
+<<gui_attr_stylename_small,small>> -
+<<gui_attr_stylename_tiny,tiny>>
+
+API::
+<<gui_TextField_EnterPressListener,addEnterPressListener>> -
+<<gui_TextField_TextChangeListener,addTextChangeListener>> -
+<<gui_api_addValueChangeListener,addValueChangeListener>> -
+<<gui_api_commit,commit>> -
+<<gui_api_discard,discard>> -
+<<gui_api_isModified,isModified>> -
+<<gui_api_contextHelp,setContextHelpIconClickHandler>>
+
+'''
+

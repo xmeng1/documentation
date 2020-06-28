@@ -1,0 +1,102 @@
+:sourcesdir: ../../../../../source
+
+[[screen_mixins]]
+===== 界面 Mixins
+
+通过 Mixin 可以创建能在多个UI界面中重复使用的功能，而且不需要从公共基类继承界面。Mixin 通过 Java 接口实现，使用了接口的默认方法。
+
+Mixin 有如下特性：
+
+* 一个界面可以有多个 Mixin。
+
+* Mixin 接口可以订阅 <<screen_controller_events,界面事件>>。
+
+* Mixin 可以在界面中保存一些状态，如果需要的话。
+
+* Mixin 也可以获取界面组件和基础架构 bean，比如 <<gui_dialogs,Dialogs>>，<<gui_notifications,Notifications>> 等。
+
+* 如果需要参数化 mixin 的行为，mixin 可以依赖界面的注解或者引入抽象方法交由界面实现。
+
+使用 mixin 与在界面控制器中实现特定的接口一样简单。下面的示例中，`CustomerEditor` 界面使用了由 `HasComments`，`HasHistory`，`HasAttachments` 接口实现的 mixin 功能：
+
+[source, java]
+----
+include::{sourcesdir}/gui/screens/mixin_usage_1.java[]
+----
+
+Mixin 可以使用以下类来处理界面和界面基础架构：
+
+* `com.haulmont.cuba.gui.screen.Extensions` 提供静态方法，用来保存和获取 mixin 使用的界面状态，还能访问 `BeanLocator`，这可以用来获取任何 Spring bean。
+
+* `UiControllerUtils` 提供对界面UI和数据组件的访问。
+
+下面是展示如何创建和使用 mixin 的示例。
+
+[[screen_mixin_banner]]
+Banner mixin::
++
+--
+这个是非常简单的例子，用来在界面顶端展示一个标签。
+
+[source, java]
+----
+include::{sourcesdir}/gui/screens/mixin_banner_1.java[]
+----
+<1> - 获取 `BeanLocator`。
+<2> - 获取 UI 组件的工厂。
+<3> - 创建 `Label` 并设置其属性。
+<4> - 将标签添加到界面的根 UI 组件中。
+
+在界面中可以这样使用该 mixin：
+
+[source, java]
+----
+include::{sourcesdir}/gui/screens/mixin_banner_2.java[]
+----
+--
+
+[[screen_mixin_declarative_loader_params]]
+DeclarativeLoaderParameters mixin::
++
+--
+下面这个 mixin 可以帮助在数据容器之间创建主从关系。通常的做法，是需要订阅主容器的 `ItemChangeEvent` 事件，将改动的主容器内容设置为从容器的数据加载器参数，如<<gui_data_comp_dep>>所述。但是如果参数是指向主容器的特殊名称，mixin 能自动完成此功能。
+
+Mixin 会使用状态对象在事件处理器之间传递信息。这里为了演示，我们将逻辑分散开，但实际上所有的逻辑都可以在一个 `BeforeShowEvent` 处理器中完成。
+
+首先，为共享状态创建一个类。包含单一字段，用来保存将在 `BeforeShowEvent` 处理器中触发的一组数据加载器：
+
+[source, java]
+----
+include::{sourcesdir}/gui/screens/mixin_DeclarativeLoaderParameters_1.java[]
+----
+
+接下来，创建 mixin 接口：
+
+[source, java]
+----
+include::{sourcesdir}/gui/screens/mixin_DeclarativeLoaderParameters_2.java[]
+----
+<1> - 订阅 <<screen_InitEvent,InitEvent>>。
+<2> - 获取 `ScreenData` 对象，其中注册了 XML 中定义的所有数据容器和加载器。
+<3> - 检查加载器的参数是否符合 `:container$masterContainerId` 模式的定义。
+<4> - 从参数名中抽取主容器id，然后为该容器注册一个 `ItemChangeEvent` 监听器。
+<5> - 使用新的主实体重新加载从实体数据加载器。
+<6> - 将主加载器添加到集合中，以便之后在 `BeforeShowEvent` 处理器中能触发。
+<7> - 创建共享状态对象，使用 `Extensions` 工具类将该对象保存在界面中。
+<8> - 订阅 <<screen_BeforeShowEvent,BeforeShowEvent>> 事件。
+<9> - 触发在 `InitEvent` 处理器中找到的所有主加载器。
+
+在界面 XML 描述中定义主从容器以及数据加载器。从加载器需要带有一个参数，其名称类似 `:container$masterContainerId`：
+
+[source, xml]
+----
+include::{sourcesdir}/gui/screens/mixin_DeclarativeLoaderParameters_3.xml[]
+----
+
+在界面控制器中，只需要添加 mixin 接口，然后就能自动触发加载器了：
+
+[source, java]
+----
+include::{sourcesdir}/gui/screens/mixin_DeclarativeLoaderParameters_4.java[]
+----
+--

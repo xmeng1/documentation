@@ -1,0 +1,162 @@
+:sourcesdir: ../../../../source
+
+[[uberjar_deployment]]
+==== UberJAR 部署
+
+这是在生产环境运行 CUBA 应用程序最简单的方法。可以通过 <<build.gradle_buildUberJar,buildUberJar>> Gradle 任务来构建一个包含所有依赖的 JAR 文件（可以参考 Studio 的 **Deployment > UberJAR setting* 界面），然后可以在命令行使用 `java` 来运行应用程序：
+
+[source,plain]
+----
+java -jar app.jar
+----
+
+所以应用程序的参数都是在构建时候定义的，但是可以在运行时覆盖这些参数（参阅以下）。web 应用程序默认的端口是 `8080`，地址是 `++http://host:8080/app++`。如果项目中有 Polymer UI，默认的 Polymer 客户端地址是 `++http://host:8080/app-front++`。
+
+如果为 Middleware 和 Web 客户款各自构建了单独的 JAR 包，可以用相同的方式运行：
+
+[source,plain]
+----
+java -jar app-core.jar
+
+java -jar app.jar
+----
+
+web 客户端的默认端口是 `8080`，它会尝试连接中间件的默认地址 `localhost:8079`。所以如果在两个单独的窗口中运行了上面的两行命令，可以通过 `++http://localhost:8080/app++` 地址访问 web 客户端。
+
+可以通过 Java 系统参数的方式提供应用程序属性来更改构建时候设置的应用程序默认参数。而且，端口号、上下文名称和 Jetty 配置文件的路径都可以通过命令行参数修改。
+
+命令行参数::
++
+--
+* `port` - 定义嵌入的 HTTP 服务的端口，示例：
++
+[source,plain]
+----
+java -jar app.jar -port 9090
+----
++
+需要注意的是，如果客户端和 core 模块分别构建了单独的 JAR 包，且为 core 模块指定了端口，那么要为客户端模块提供带有相应 block 地址的 <<cuba.connectionUrlList,cuba.connectionUrlList>> 应用程序属性，示例：
++
+[source,plain]
+----
+java -jar app-core.jar -port 7070
+
+java -Dcuba.connectionUrlList=http://localhost:7070/app-core -jar app.jar
+----
+
+* `contextName` - 应用程序 block 的 web 上下文名称。比如，如果需要在 `++http://localhost:8080/sales++` 地址访问 web 客户端，运行如下命令：
++
+[source,plain]
+----
+java -jar app.jar -contextName sales
+----
+
+* `frontContextName` - Polymer UI web 上下文名称（对单一 JAR，web JAR 或者 portal JAR 都有效）。
+
+* `portalContextName` - 单一 JAR 里面配置 portal 上下文名称。
+
+* `jettyEnvPath` - Jetty 环境配置文件的路径。用来重写构建时候指定的 `coreJettyEnvPath` 参数的值。这个新值可以设定为绝对路径或者工作目录的相对路径。
+
+* `jettyConfPath` - Jetty 服务配置文件的路径。用来重写构建时候指定的 `webJettyConfPath/coreJettyConfPath/portalJettyConfPath` 参数的值。这个新值可以设定为绝对路径或者工作目录的相对路径。
+--
+
+应用程序主目录::
++
+--
+默认情况下，<<app_home,应用程序主目录>>就是程序工作的目录。也就是说<<app_dirs,应用程序子目录>>会在运行应用程序的目录里面创建。主目录可以通过 Java 系统参数 `app.home` 来重新指定。比如，如果想设置应用程序主目录为 `/opt/app_home`，可以在命令行添加如下参数：
+
+[source,plain]
+----
+java -Dapp.home=/opt/app_home -jar app.jar
+----
+--
+
+日志::
++
+--
+如果需要更改内嵌的日志设置，可以通过 Java 系统参数 `logback.configurationFile` 来提供一个指向新配置文件的 URL，示例：
+
+[source,plain]
+----
+java -Dlogback.configurationFile=file:./logback.xml -jar app.jar
+----
+
+这里假设 `logback.xml` 文件是在启动服务的目录下。
+
+如果需要正确的设定<<log_dir,日志输出目录>>，需要确保 `logback.xml` 文件里的 `logDir` 属性指定了应用程序主目录的 `logs` 子目录。
+
+[source, xml]
+----
+include::{sourcesdir}/deployment/log_dir_1.xml[]
+----
+--
+
+设置部署时应用程序属性::
++
+--
+可以在部署环境设置应用程序属性，设置一些在应用程序构建时无法提供的属性设置（比如处于安全考虑）。
+
+可以使用 `local.app.properties` 文件来配置，操作系统环境变量或者 Java 系统属性通过命令行参数来提供。
+
+`local.app.properties` 文件必须放置在应用程序主目录。如果未指定 `-Dapp.home=some_path` 命令行参数，则该目录为当前目录。示例：
+
+.local.app.properties
+[source,properties]
+----
+cuba.web.loginDialogDefaultUser = <disabled>
+cuba.web.loginDialogDefaultPassword = <disabled>
+----
+
+对于操作系统环境变量，可以使用应用程序属性名称的全大写，点替换成下划线：
+
+[source,shell]
+----
+export CUBA_WEB_LOGINDIALOGDEFAULTUSER="<disabled>"
+export CUBA_WEB_LOGINDIALOGDEFAULTPASSWORD="<disabled>"
+----
+
+Java 系统参数需要在命令行指定（注意，如果用 `ps` 命令查看进程会显示这些参数）：
+
+[source,plain]
+----
+java -Dcuba.web.loginDialogDefaultUser=<disabled> -Dcuba.web.loginDialogDefaultPassword=<disabled> -jar app.jar
+----
+
+系统环境变量会覆盖 `app.properties` 文件设置的值，Java 系统参数会覆盖前两种。
+--
+
+停止应用程序::
++
+--
+可以通过下面几种方式平和的停掉应用程序服务：
+
+* 在应用程序运行的终端窗口按下 *Ctrl+C*
+
+* 在类 Unix 系统执行 `kill <PID>`
+
+* 发送停止键值（比如，特定字符序列）到应用程序的特定端口，这个端口是在启动应用程序的时候通过命令行指定的。有以下命令行参数：
+
+** `stopPort` - 监听停止键值或者发送停止键值的端口。
+** `stopKey` - 停止键值。默认值 `SHUTDOWN`。
+** `stop` - 通过发送停止键值停掉其它进程。
+
+示例：
+
+[source,plain]
+----
+# 启动应用 1 并且在 9090 监听 SHUTDOWN
+java -jar app.jar -stopPort 9090
+
+# 启动应用 2 并且在 9090 监听 MYKEY
+java -jar app.jar -stopPort 9090 -stopKey MYKEY
+
+# 关停应用 1
+java -jar app.jar -stop -stopPort 9090
+
+# 关停应用 2
+java -jar app.jar -stop -stopPort 9090 -stopKey MYKEY
+----
+--
+
+include::uberjar_deployment/uberjar_https.adoc[]
+

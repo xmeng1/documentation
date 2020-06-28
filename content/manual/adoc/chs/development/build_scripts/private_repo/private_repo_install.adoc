@@ -1,0 +1,57 @@
+:sourcesdir: ../../../../../source
+
+[[private_repo_install]]
+===== 安装仓库管理软件
+
+这里使用 Sonatype Nexus OSS 仓库管理软件作为示例。
+
+在微软 Windows 操作系统::
++
+--
+- link:http://www.sonatype.org/downloads/nexus-latest-bundle.zip[下载] Sonatype Nexus OSS 版本 2.x (2.14.3 测试通过)
+- 解压压缩包至 `c:\nexus-2.14.3-02`
+- 修改配置文件内容 `c:\nexus-2.14.3-02\conf\nexus.properties`:
++
+** 可以配置服务器端口，默认是 8081
++
+** 配置仓库数据目录：
++
+替换掉
++
+[source]
+----
+nexus-work=${bundleBasedir}/../sonatype-work/nexus
+----
++
+使用方便缓存数据的目录，比如
++
+[source]
+----
+nexus-work=${bundleBasedir}/nexus/sonatype-work/content
+----
+- 切换到目录 `c:\nexus-2.14.3-02\bin`
+- 安装 wrapper（以管理员身份运行），用来以服务的方式启动和停止 Nexus：
++
+[source]
+----
+nexus.bat install
+----
+
+- 启动 *nexus* 服务
+- 在浏览器打开 `++http://localhost:8081/nexus++`，用默认的管理员账号登录：用户名 `admin`，密码 `admin123`。
+--
+
+使用 Docker::
++
+--
+另外，我们也可以用 Docker 来简化本地使用的安装步骤。也可以在 link:https://hub.docker.com/r/sonatype/nexus[Docker Hub] 找到介绍。
+
+- 运行 `docker pull sonatype/nexus:oss` 下载最新稳定的 OSS 镜像
+- 使用 `docker run -d -p 8081:8081 --name nexus sonatype/nexus:oss` 命令构建容器
+- Docker 容器会在几分钟内运行 nexus。用以下任意方法测试：
++
+** `curl ++http://localhost:8081/nexus/service/local/status++`
++
+** 浏览器访问 `++http://localhost:8081/nexus++`。
+- 密钥是一样的：用户名：`admin`，密码：`admin123`。
+--

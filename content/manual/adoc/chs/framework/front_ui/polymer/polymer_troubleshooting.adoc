@@ -1,0 +1,38 @@
+:sourcesdir: ../../../../../source
+
+[[polymer_troubleshooting]]
+===== 问题分析
+Proxy - 代理::
+如果在一个有代理服务器的环境工作，需要配置按照要求配置 bower 和 npm。为了使得 bower 和 npm 能在代理服务器环境工作，需要在 `modules/front/` 目录创建以下文件：
+
+ .bowerrc
+[source,json]
+----
+{
+    "proxy":"http://<user>:<password>@<host>:<port>",
+    "https-proxy":"http://<user>:<password>@<host>:<port>"
+}
+----
+
+ .npmrc
+[source]
+----
+proxy=http://<user>:<password>@<host>:<port>
+https-proxy=http://<user>:<password>@<host>:<port>
+----
+
+NPM install 失败::
+Windows 环境的 `npm install` 有个 https://github.com/npm/npm/issues/19934[已知问题]。
+
+有可能在构建过程遇到下列错误：
+----
+npm ERR! code EPERM
+npm ERR! errno -4048
+npm ERR! syscall rename
+npm ERR! Error: EPERM: operation not permitted,
+----
+
+作为暂时方案（workaround），可以禁用 Windows 防火墙（Defender）或者其它的反病毒软件，确保没在任何 IDE 打开项目，然后再次运行构建过程。
+
+可以关注这个 https://youtrack.cuba-platform.com/issue/STUDIO-4504[问题] 了解将来可能的解决方案。
+

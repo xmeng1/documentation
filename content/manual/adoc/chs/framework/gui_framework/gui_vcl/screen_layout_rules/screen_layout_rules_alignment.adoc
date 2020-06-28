@@ -1,0 +1,32 @@
+:sourcesdir: ../../../../../../source
+
+[[screen_layout_rules_alignment]]
+====== 对齐
+
+[[screen_layout_rules_align]]
+容器内的组件对齐::
++
+--
+使用 <<gui_attr_align,align>> 属性来对齐容器内的组件。
+
+比如，下面的示例中标签(label)位于容器的中心：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/screen_layout_rules_align.xml[]
+----
+
+image::cookbook/screen_layout_rules_15.png[align="center"]
+
+指定了对齐方式的组件在对齐方向上不应设置 100％的大小。容器会提供比组件所需空间更多的空间。组件将在此空间内对齐。
+
+在可用空间内的对齐示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/screen_layout_rules_align_2.xml[]
+----
+
+image::cookbook/screen_layout_rules_16.png[align="center"]
+--
+

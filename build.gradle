@@ -42,9 +42,19 @@ task buildManualEn(type: Asciidoc2Html) {
     docLang = 'en'
 }
 
+task buildManualChs(type: Asciidoc2Html) {
+    docName = 'manual'
+    docLang = 'chs'
+}
+
 task buildManualEnPdf(type: Asciidoc2Pdf) {
     docName = 'manual'
     docLang = 'en'
+}
+
+task buildManualChsPdf(type: Asciidoc2PdfCjk) {
+    docName = 'manual'
+    docLang = 'chs'
 }
 
 task buildManualRu(type: Asciidoc2Html) {

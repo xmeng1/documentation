@@ -1,0 +1,4 @@
+[[business_logic_recipes]]
+=== 组织业务逻辑
+
+参阅 https://www.cuba-platform.com/guides/create-business-logic-in-cuba[在 CUBA 中创建业务逻辑] 向导。

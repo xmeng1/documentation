@@ -1,0 +1,23 @@
+:sourcesdir: ../../../../source
+
+[[metadata_framework]]
+==== 元数据框架
+
+元数据框架用于在 CUBA 应用程序中高效处理<<data_model,数据模型>>。此框架：
+
+* 提供 API 以获取有关<<entity,实体>>、实体属性和实体之间关系的信息，还能用来遍历对象关系图；
+
+* 作为 Java 反射 API 更专用和更方便的替代品；
+
+* 控制允许的数据类型以及实体之间的关系；
+
+* 允许实现通用的数据操作机制；
+
+include::metadata_framework/metadata_interfaces.adoc[]
+
+include::metadata_framework/metadata_building.adoc[]
+
+include::metadata_framework/datatype.adoc[]
+
+include::metadata_framework/meta_annotations.adoc[]
+

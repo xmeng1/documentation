@@ -1,0 +1,31 @@
+:sourcesdir: ../../../../../source
+
+[[transactions_decl]]
+===== 声明式事务管理
+
+中间件<<managed_beans, Spring bean>>的任何方法都可以使用 `@org.springframework.transaction.annotation.Transactional` 进行注解，这将在调用方法时自动创建事务。因此这种方法不需要调用 `Persistence.createTransaction()`，可以直接获取 `EntityManager` 进行使用。
+
+`@Transactional` 注解支持多个参数，包括：
+
+* `propagation` - 事务创建模式。`REQUIRED` 值对应于 `getTransaction()`，`REQUIRES_NEW` 值对应于 `createTransaction()`。默认值为 `REQUIRED`。
++
+[source, java]
+----
+@Transactional(propagation = Propagation.REQUIRES_NEW)
+public void doSomething() {
+}
+----
+
+* `value` - <<data_store,数据存储>>名称。如果省略，则使用主数据存储。例如：
++
+[source, java]
+----
+@Transactional("db1")
+public void doSomething() {
+}
+----
+
+声明式事务管理可以减少 https://en.wikipedia.org/wiki/Boilerplate_code[脚手架代码] 的数量，但它有以下缺点：事务在应用程序代码之外提交，这通常会使调试变得复杂，因为它不会暴露将更改发送到数据库和实体变为<<entity_states,Detached>>的时刻。另外，需要注意，声明性标记仅在容器调用方法时才有效，即从同一对象的另一个方法调用事务方法不会启动事务。
+
+考虑到这一点，我们建议仅对简单的情况使用声明式事务管理，例如<<services,服务方法>>方法读取某个对象并将其返回给客户端。
+

@@ -1,0 +1,8 @@
+:sourcesdir: ../../../source
+
+[[sso]]
+=== CUBA 应用程序单点登录
+
+CUBA 应用程序单点登录（SSO）允许用户只在浏览器的一个会话输入一次用户名和密码登录之后就可以访问多个运行的应用。
+
+IDP 插件设计用来简化 CUBA 应用程序中的单点登录设置。参阅插件 https://github.com/cuba-platform/idp-addon/wiki[文档] 了解更多细节。

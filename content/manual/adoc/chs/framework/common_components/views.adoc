@@ -1,0 +1,86 @@
+:sourcesdir: ../../../../source
+
+[[views]]
+==== 视图
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/global/View.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+从数据库中检索实体时，我们经常面临一个问题：如何确保将关联实体加载到所需的深度？
+
+例如，需要在 Order 浏览界面中显示日期、金额以及客户名称，这意味着需要获取相关的 Customer 实例。还有，在 Order 编辑界面，需要获取 Item 集合，此外每个 Item 应包含一个相关的 Product 实例以显示其名称。
+
+<<lazy_loading,延迟加载>>在大多数情况下都无济于事，因为数据处理通常不是在加载实体的事务中执行，而是在像 UI 这样的客户端<<app_tiers,层>>执行。同样，使用<<entity_annotations,实体注解>>来应用<<eager_fetching,贪婪加载>>也是不可行的，因为这样做会导致总是查询对象关系图中所有的关联实体，这可能是非常大的数据。
+
+另一个类似的问题是需要限制加载对象图中的<<local_attribute,本地>>属性的集合：例如，某个实体可以有 50 个属性，包括 BLOB，但是只需要在界面上显示 10 个属性。此时，对于不需要的 40 个额外属性，为什么要从数据库加载然后将它们序列化并传输到客户端？
+
+_视图_ 机制通过从数据库中检索并向客户端传输有深度和属性限制的实体关系图来解决这些问题。特定 UI 界面或数据处理操作所需的对象图通过 _视图_ 来描述。
+
+视图处理过程按以下方式执行：
+
+* 数据模型中的所有关系都使用延迟加载属性声明（`fetch = FetchType.LAZY`。请参阅<<entity_annotations>>）。
+
+* 在数据加载过程中，调用方提供所需的视图以及 <<jpql,JPQL>> 查询语句或实体标识符。
+
+* 所谓的 _FetchGroup_ 是在视图的基础上产生的 - 这是 EclipseLink 框架基础<<orm,ORM>>层的一个特殊功能。FetchGroup 在两方面影响对数据库的 SQL 查询语句的生成：返回的字段列表以及与包含关联实体的其它表的连接。
+
+[TIP]
+====
+无论视图中的属性如何定义，始终会加载以下属性：
+
+* `id` – 实体标识符。
+* `version` – 用于版本化( `Versioned` ) 实体的乐观锁。
+* `deleteTs` 、 `deletedBy` – 用于实现了<<soft_deletion,软删除>>的实体。
+====
+
+[WARNING]
+====
+尝试获取或设置未加载属性的值（未包含在视图中）会引发异常。您可以使用 `EntityStates.isLoaded()` 方法检查属性是否已加载。
+====
+
+参考<<views_creation,下一>>章节了解如何定义视图。
+
+下面解释一些视图机制的内部原理。
+
+.View 类
+image::View.png[align="center"]
+
+视图由 `View` 类的实例确定，其中：
+
+* `entityClass` – 定义视图的实体类。换句话说，它是加载的实体树的“根”。
+
+* `name` – 视图名称。可以是“null”或实体的所有视图中的唯一名称。
+
+* `properties` – 对应需要加载的实体属性的 `ViewProperty` 实例的集合。
+
+* `includeSystemProperties` – 如果设置，则视图将包含系统属性（由持久化实体的<<entity_base_classes,基础接口>>定义，如 `BaseEntity` 和 `Updatable`）。
+
+[[view_loadPartialEntities]]
+* `loadPartialEntities` - 指定视图是否影响本地（立即加载）属性的加载。如果为 false，则仅影响引用属性，并且会始终加载本地属性，而无论它们是否存在于视图中。
++
+此属性在某种程度上由平台数据加载机制控制，请参阅有关在 <<dm_partial_entities,DataManager>> 和 <<em_partial_entities,EntityManager>> 中加载部分实体的章节。
+
+`ViewProperty` 类具有以下属性：
+
+* `name` – 实体属性名。
+
+* `view` – 对于引用属性，指定将用于加载关联实体的视图。
+
+* `fetch` - 对于引用属性，指定如何从数据库中获取关联实体。其值对应于 `FetchMode` 枚举类型：
++
+--
+** `AUTO` - 平台将根据关系类型选择最佳模式。
+
+** `UNDEFINED` - 将根据 JPA 规则执行提取，这实际上意味着通过单独的 select 进行加载。
+
+** `JOIN` - 通过关联引用的表来在同一个 select 查询中获取。
+
+** `BATCH` - 相关对象的查询将通过分批的方式进行优化。参阅：link:$$http://java-persistence-performance.blogspot.ru/2010/08/batch-fetching-optimizing-object-graph.html$$[这里]。
+--
++
+如果未指定 `fetch` 属性，则应用 `AUTO` 模式。如果引用是一个<<entity_cache,可缓存的>>实体，则无论视图中指定的什么值，都将使用 `UNDEFINED`。
+
+include::views/views_creation.adoc[]

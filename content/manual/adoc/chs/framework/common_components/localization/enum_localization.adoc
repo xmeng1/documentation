@@ -1,0 +1,32 @@
+:sourcesdir: ../../../../../source
+
+[[enum_localization]]
+===== 枚举名称本地化
+
+
+要本地化枚举的名称（names）和值(values)，将具有以下键的消息添加到枚举类所在 Java 包的本地化消息包中：
+
+* 枚举名称键 – 简单的类名（不带包名）；
+
+* 值健 – 简单类名，后面跟上以点分隔的值名称。
+
+
+例如，对于枚举
+
+[source, java]
+----
+include::{sourcesdir}/common/enumlocale_1.java[]
+----
+
+
+默认的英文本地化文件 `/com/abc/sales/messages.properties` 应包含以下行：
+
+[source, properties]
+----
+CustomerGrade=Customer Grade
+CustomerGrade.PREMIUM=Premium
+CustomerGrade.HIGH=High
+CustomerGrade.STANDARD=Standard
+----
+
+本地化的枚举值可被不同的可视化组件自动利用，例如 <<gui_LookupField,LookupField>>。也可以通过编程方式获取本地化的枚举值：使用 <<messages,Messages>> 接口的 `getMessage()` 方法并简单地将 `enum` 实例传递给它。

@@ -1,0 +1,39 @@
+:sourcesdir: ../../../source
+
+[[app-component.xml]]
+=== app-component.xml
+
+需要把当前应用程序作为别的应用程序的<<app_components,组件>>时，需要使用 `app-component.xml` 配置文件。此文件定义了对于其它组件的依赖、描述了目前存在的<<app_modules,应用程序模块>>，生成的<<artifact,工件>>以及暴露的<<app_properties,应用程序属性>>。
+
+`app-component.xml` 文件应该被放在一个包内，通过 *global* 模块 JAR 包组装清单文件（manifest）的 `App-Component-Id` 记录来指定。这个组装文件的记录使得构建系统能从构建 classpath 中查找需要的项目的组件。因此，如果需要在项目中使用某些组件，只需要在 <<build.gradle,build.gradle>> 文件中的 `dependencies/appComponent` 条目定义组件的 global 工件即可。
+
+按照惯例，`app-component.xml` 在项目的包名根路径（root package）（定义在 <<metadata.xml,metadata.xml>>），这个根路径跟 <<build.gradle,build.gradle>> 中定义的项目工件的组名称一样：
+
+[source, plain]
+----
+App-Component-Id == root-package == cuba.artifact.group == e.g. 'com.company.sample'
+----
+
+使用 CUBA Studio 来自动生成 `app-component.xml` 文件和当前项目的组装清单记录。
+
+用第三方依赖作为 appJars： ::
++
+--
+如果需要被引入组件的第三方依赖跟应用程序的工件（`app-comp-core` 或者 `app-comp-web`）一起部署到 `tomcat/webapps/app[-core]/WEB-INF/lib/` 目录，需要将这些第三方依赖作为 *appJar* 类库添加：
+
+[source, xml]
+----
+include::{sourcesdir}/config_files/appJar.xml[]
+----
+
+[TIP]
+====
+如果不希望将项目作为 app 组件使用，需要在 `build.gradle` 的 <<build.gradle_deploy,deploy>> 任务中将这些依赖作为 *appJars* 添加：
+
+[source, groovy]
+----
+include::{sourcesdir}/config_files/appJar.groovy[]
+----
+====
+--
+

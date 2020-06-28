@@ -1,0 +1,58 @@
+:sourcesdir: ../../../../../../source
+
+[[custom_theme_facebook]]
+====== 创建 Facebook 主题
+
+以下是创建基于 Halo 的 Facebook 主题的示例，该主题风格类似流行的社交网络界面。
+
+. 在 CUBA Studio 中，点击 *CUBA > Advanced > Manage themes > Create custom theme*。设置主题名称 - `facebook`，选择 `halo` 作为基础主题，然后单击 *Create*。在项目中将创建新的主题目录：
++
+[source, plain]
+----
+include::{sourcesdir}/gui/themes/themes_25.scss[]
+----
++
+`styles.scss` 文件包含主题列表：
++
+[source, css]
+----
+include::{sourcesdir}/gui/themes/themes_7.scss[]
+----
++
+`facebook.scss` 文件:
++
+[source, css]
+----
+include::{sourcesdir}/gui/themes/themes_8.scss[]
+----
++
+`com.haulmont.cuba` 中的 `app-component.scss` 文件：
++
+[source, css]
+----
+include::{sourcesdir}/gui/themes/themes_24.scss[]
+----
+
+. 修改 `facebook-defaults.scss` 中的主题变量。可以通过在 Studio 中单击 *Manage themes > Edit Facebook theme variables* 或在 IDE 中执行此操作：
++
+[source, css]
+----
+include::{sourcesdir}/gui/themes/themes_9.scss[]
+----
+
+. *web* 模块的 `src` 目录中的 `facebook-theme.properties` 文件可用于覆盖服务端使用的平台的 `halo-theme.properties` 文件中的主题变量。
+
+. 新主题已被自动添加到 `web-app.properties` 文件中：
++
+[source, properties]
+----
+cuba.web.theme = facebook
+cuba.themeConfig = com/haulmont/cuba/halo-theme.properties /com/company/application/web/facebook-theme.properties
+----
++
+<<cuba.themeConfig,cuba.themeConfig>> 属性定义了应用程序的 *Settings* 菜单中可供用户使用的主题。
+
+重新构建应用程序并启动服务。现在，用户将在首次登录时看到使用 Facebook 主题的应用程序，并且可以在 *Help* > *Settings* 菜单中选择 Facebook、Halo 和 Havana 主题。
+
+image::cookbook/facebook-theme.png[align="center"]
+

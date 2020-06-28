@@ -1,0 +1,62 @@
+:sourcesdir: ../../../../../source
+
+[[entityManager]]
+===== EntityManager
+
+`EntityManager` - 用于处理<<data_model,持久化实体>>的主要 ORM 接口。
+
+[TIP]
+====
+有关 EntityManager 和 <<dataManager,DataManager>> 之间差异的信息，请参阅 <<dm_vs_em>>。
+====
+
+可以通过调用 <<persistence,Persistence>> 接口的 `getEntityManager()` 方法获取 `EntityManager` 的引用。获取到的 `EntityManager` 实例绑定到当前<<transactions,事务>>，在一个事务中对  `getEntityManager()` 方法的所有调用都将返回同一个 `EntityManager` 实例。在事务结束后便不能再使用此事务的 `EntityManager` 实例。
+
+`EntityManager` 的实例包含 _持久化上下文_ ，持久化上下文存储了从数据库加载的或新创建的一组实体实例。持久化上下文是处于事务中的数据缓存。`EntityManager` 会自动将持久化上下文中所做的所有更改在事务提交时或者调用 `EntityManager.flush()` 方法时更新到数据库。
+
+CUBA 应用程序中使用的 `EntityManager` 接口主要复制标准 link:http://docs.oracle.com/javaee/7/api/javax/persistence/EntityManager.html[javax.persistence.EntityManager] 接口。下面是它的主要方法：
+
+* `persist()` – 将实体的<<entity_states,新实例>>添加到持久化上下文中。提交事务时，会使用 `INSERT` SQL 语句在 DB 中创建相应的记录。
+
+* `merge()` – 通过以下方式将<<entity_states,游离实例>>的状态复制到持久化上下文：从 DB 中加载相同标识符的实例，并将传递的游离实例的状态复制到这个加载的实例，然后返回加载的托管实例。之后，应该使用返回的托管实例。在事务提交时，会使用 `UPDATE` SQL 语句将该实体的状态存储到 DB 中。
+
+* `remove()` – 从数据库中删除对象，或者，如果启用了<<soft_deletion,软删除>>模式，则只设置 `deleteTs` 和 `deletedBy` 属性。
++
+如果传递的实例处于游离状态，则首先执行 `merge()` 方法。
+
+* `find()` – 通过标识符加载实体实例。
++
+--
+当向数据库发送请求时，系统会将传递的<<views,视图>>作为参数传递给该方法。因此，持久化上下文将包含加载了所有视图属性的对象图。如果没有传递视图，则默认使用 `_local` 视图。
+--
+
+* `createQuery()` – 创建一个 `Query` 或 `TypedQuery` 对象来执行<<query,JPQL 查询>>。
+
+* `createNativeQuery()` – 创建一个 `Query` 对象来执行<<nativeQuery,SQL 查询>>。
+
+* `reload()` – 使用提供的<<views,视图>>重新加载实体实例。
+
+* `isSoftDeletion()` – 检查 `EntityManager` 是否处于<<soft_deletion,软删除>>模式。
+
+* `setSoftDeletion()` – 为 `EntityManager` 设置<<soft_deletion,软删除>>模式。
+
+* `getConnection()` – 返回当前事务对应的连接。这种连接不需要主动关闭，它会在事务完成时自动关闭。
+
+* `getDelegate()` – 返回 ORM 实现提供的 `javax.persistence.EntityManager`。
+
+在<<services,服务>>中使用 `EntityManager` 的示例：
+
+[source, java]
+----
+include::{sourcesdir}/middleware/entityManager_1.java[]
+----
+
+[[em_partial_entities]]
+部分实体::
++
+--
+默认情况下，在 EntityManager 中，视图仅影响引用属性，本地属性会被全部加载。
+
+如果将视图的<<view_loadPartialEntities,loadPartialEntities>>属性设置为 true，则可以强制 EntityManager 加载 _部分(partial)_ 实体（像<<dataManager,DataManager>>所做的一样）。但是，如果加载的实体是<<entity_cache,缓存的（cached）>>，则忽略此视图属性，仍将加载实体的所有本地属性。
+--
+

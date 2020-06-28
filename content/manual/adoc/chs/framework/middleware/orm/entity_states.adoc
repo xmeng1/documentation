@@ -1,0 +1,29 @@
+:sourcesdir: ../../../../../source
+
+[[entity_states]]
+===== 实体状态
+
+New（新建状态）::
++
+--
+刚在内存中创建的实例： `Car car = new Car()`。
+
+可以将新实例传递给 `EntityManager.persist()` 以存储到数据库，在这种情况下，会将其状态更改为 Managed。
+--
+
+Managed（托管状态）::
++
+--
+从数据库加载的实例，或传递给 `EntityManager.persist()` 的新实例。这个实例属于 `EntityManager` 实例，即包含在其持久化上下文中。
+
+当提交 `EntityManager` 所属的事务时，托管实例的任何更改都将保存到数据库中。
+--
+
+Detached（游离状态）::
++
+--
+从数据库加载并与其持久化上下文分离的实例（事务结束或实体实例通过序列化产生）。
+
+只有通 `EntityManager.merge()` 方法将此实例变成托管状态时，应用到游离实例的更改才能保存到数据库中。
+--
+

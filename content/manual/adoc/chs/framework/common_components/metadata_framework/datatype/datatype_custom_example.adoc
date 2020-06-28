@@ -1,0 +1,44 @@
+:sourcesdir: ../../../../../../source
+
+[[datatype_custom_example]]
+====== 自定义数据类型示例
+
+假设应用程序中实体的某些属性用来存储日期的年份，用整数数字表示。用户能查看和编辑年份，并且如果用户只是输入两个数字，应用程序会将其转换为 2000 至 2100 之间的一个年份，否则，将整个输入的数字作为年份。
+
+首先，在 *global* 模块创建下面的类：
+
+[source, java]
+----
+include::{sourcesdir}/common/datatype_1.java[]
+----
+
+然后在项目的 <<metadata.xml,metadata.xml>> 文件中添加 `datatypes` 元素：
+
+[source, xml]
+----
+include::{sourcesdir}/common/datatype_2.xml[]
+----
+
+在 `datatype` 元素中，还可以指定 `sqlType` 属性来包含一个数据库的 SQL 类型，这个 SQL 类型适合在数据库保存这个新类型。SQL 类型会在 CUBA Studio 生成数据库脚本的时候使用。Studio 可以为下面这些 Java 类型自动确定 SQL 类型：
+
+* `java.lang.Boolean`
+* `java.lang.Integer`
+* `java.lang.Long`
+* `java.math.BigDecimal`
+* `java.lang.Double`
+* `java.lang.String`
+* `java.util.Date`
+* `java.util.UUID`
+* `byte[]`
+
+在上面的例子中，年份应该绑定 `Integer` 类型（这个类型通过 `@JavaClass` 注解的 `Integer.class` 值指定），所以 `sqlType` 可以省去。
+
+最终，为实体属性设置新的数据类型（编程的方式或者通过 Studio 的帮助）：
+
+[source, java]
+----
+@MetaProperty(datatype = "year")
+@Column(name = "ISSUE_YEAR")
+private Integer issueYear;
+----
+

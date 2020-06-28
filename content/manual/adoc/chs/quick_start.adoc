@@ -1,0 +1,29 @@
+[[quick_start]]
+== 快速开始
+
+本章节介绍使用 *CUBA Studio* 创建应用程序的过程。
+
+////
+也有视频介绍类似的信息：link:$$https://www.cuba-platform.com/quickstart$$[www.cuba-platform.com/quickstart]
+////
+
+确保必要的软件已经安装并且配置好了，参考 <<setup>>。
+
+开发应用程序的关键步骤：
+
+. 开发数据模型 - 包括创建描述应用程序领域模型的<<data_model,实体>>以及相对应的数据库表。
+
+. 开发用户界面 - 用来创建，查看，更改和删除数据模型实体。
+
+include::quick_start/qs_app_details.adoc[]
+
+include::quick_start/qs_create_project.adoc[]
+
+include::quick_start/qs_create_entities.adoc[]
+
+include::quick_start/qs_create_db_tables.adoc[]
+
+include::quick_start/qs_create_ui.adoc[]
+
+include::quick_start/qs_run.adoc[]
+

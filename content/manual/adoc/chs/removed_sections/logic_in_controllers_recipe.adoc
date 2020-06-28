@@ -1,0 +1,4 @@
+[[logic_in_controllers_recipe]]
+=== 控制器中的业务逻辑
+
+参阅 https://www.cuba-platform.com/guides/create-business-logic-in-cuba[在 CUBA 中创建业务逻辑] 向导。

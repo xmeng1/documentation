@@ -1,0 +1,88 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_ButtonsPanel]]
+====== 按钮面板
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=table-buttonspanel" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/ButtonsPanel.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`ButtonsPanel` 是一个容器，它简化了表格上用于数据管理的组件(通常是按钮）的使用和排列。
+
+image::gui_buttonsPanel.png[align="center"]
+
+该组件的 XML 名称：`buttonsPanel`
+
+界面 XML 描述中定义 `ButtonsPanel` 的示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/buttonspanel_1.xml[]
+---- 
+
+`buttonsPanel` 元素可以位于 `table` 内，也可以位于界面的其它任何位置。
+
+如果 `buttonsPanel` 位于 `table` 中，则它会与表格的 <<gui_Table_rowsCount,rowsCount>> 组件组合，从而可以在垂直方向上节省空间。此外，如果使用 `Frame.openLookup()` 方法打开查找界面（例如，从 <<gui_PickerField,PickerField>> 组件），这时按钮面板会变为隐藏状态。
+
+
+[[gui_ButtonsPanel_alwaysVisible]]
+使用 `Frame.openLookup()` 打开查找界面时，可以利用 `alwaysVisible` 属性禁止隐藏按钮面板。如果属性值为 `true`，则不会隐藏按钮面板。默认情况下，属性值为 `false`。
+
+默认情况下，`buttonsPanel` 中的按钮是水平的放置并带有换行。如果一行中没有足够的空间，放不下的按钮会被放置在下一行。
+
+可以修改这个默认的行为，将 `buttonsPanel` 内的按钮显示在一行：
+
+. 创建 <<web_theme_extension,主题扩展>> 或者 <<web_theme_creation,自定义主题>>。
+. 定义 SCSS 变量 `$cuba-buttonspanel-flow`：
++
+[source, code]
+----
+$cuba-buttonspanel-flow: false
+----
+
+[[gui_ButtonsPanel_LayoutClickListener]]
+可以使用 `LayoutClickListener` 接口拦截对 `buttonsPanel` 区域的点击。
+
+[[gui_ButtonsPanel_addShortcutAction]]
+可以在 `ButtonsPanel` 中使用键盘快捷键。使用 `addShortcutAction()` 方法设置快捷方式和要执行的操作：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/buttonspanel.java[]
+----
+
+'''
+
+buttonsPanel 的属性::
+<<gui_attr_align,align>> -
+<<gui_ButtonsPanel_alwaysVisible,alwaysVisible>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_id,id>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+API::
+<<gui_api_addLayoutClickListener,addLayoutClickListener>> -
+<<gui_api_shortcut,addShortcutAction>> -
+<<gui_api_spacing,setSpacing>>
+
+'''
+

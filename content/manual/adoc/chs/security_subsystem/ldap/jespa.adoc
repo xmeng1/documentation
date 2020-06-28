@@ -1,0 +1,11 @@
+:sourcesdir: ../../../../source
+
+[[jespa]]
+==== 使用 Jespa 集成活动目录
+
+Jespa 是用来集成活动目录和 Java 应用程序的 Java 类库，Jespa 使用 link:$$https://en.wikipedia.org/wiki/NTLMv2#NTLMv2$$[NTLMv2]。参考 link:$$http://www.ioplex.com$$[http://www.ioplex.com] 了解更多细节。
+
+include::jespa/jespa_lib.adoc[]
+
+include::jespa/jespa_conf.adoc[]
+

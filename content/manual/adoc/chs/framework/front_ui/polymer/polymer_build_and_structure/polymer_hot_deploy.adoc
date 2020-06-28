@@ -1,0 +1,17 @@
+:sourcesdir: ../../../../../../source
+
+[[polymer_hot_deploy]]
+====== 热部署
+
+当使用 CUBA Studio 或者 Gradle 运行或者部署应用程序时，构建系统会按照 `polymer.json` 文件的配置对界面组件进行打包。默认情况下，整个应用程序会被打包成一个 `app-shell.html` 文件。当对某些应用组件进行更改的时候，Studio 会将改动热部署至 Tomcat。还有，会使用未打包的版本来替换打包的 `app-shell.html` 文件，以便更改能生效，如果直接在 `tomcat/webapps` 部署生产环境的话，需要注意这一点。
+
+[WARNING]
+====
+如果使用 `es5-bundled` preset 编译设置，热部署不会生效，因为 Studio 不会在过程中做任何 JavaScript 翻译。
+====
+
+[WARNING]
+====
+如果使用基于 TypeScript 的客户端，需要手动运行 `npm run watch` 命令对组件类的改动做热部署。
+====
+

@@ -1,0 +1,116 @@
+:sourcesdir: ../../../../../source
+
+[[bean_validation_running]]
+===== 运行时验证
+
+[[bean_validation_in_ui]]
+在 UI 中验证::
++
+--
+
+连接到数据源的通用 UI 组件获取 `BeanValidator` 实例来检查字段的值。验证器是从可视化组件实现的 `Component.Validatable.validate()` 方法调用的。如果验证不通过，会抛出 `CompositeValidationException` 异常，这个异常实例中包含了一组违规信息的集合。
+
+可以移除标准的验证器，也可以使用不同的<<bean_validation_constraint_groups,约束组>>初始化标准验证器：
+
+[source, java]
+----
+include::{sourcesdir}/common/bean_validation_12.java[]
+----
+<1> 从 UI 组件中完全删除 bean 验证。
+<2> 这里，验证器将仅检查显式设置了 UiComponentChecks 组的约束，因为没有传递默认组。
+
+默认情况下，`BeanValidator` 具有 `Default` 和 `UiComponentChecks` 分组。
+
+如果实体属性带有 `@NotNull` 注解且没有定义约束组，则在元数据中这个属性会被标记为强制的(mandatory)，并且通过数据源使用此属性的 UI 组件将具有 `required = true` 属性。
+
+<<gui_DateField,DateField>>和<<gui_DatePicker,DatePicker>>组件使用 `@Past`、`@PastOrPresent`、`@Future`、`@FutureOrPresent` 注解自动设置其 `rangeStart` 和 `rangeEnd` 属性，不过这里忽略了时间部分。
+
+如果约束包含 `UiCrossFieldChecks` 组并且所有属性级别的检查都通过了，<<abstractEditor,编辑>>界面将在提交时做类级别约束的验证。可以在 XML 描述或界面控制器使用 `crossFieldValidate` 属性关闭此验证：
+
+[source,xml]
+----
+include::{sourcesdir}/common/bean_validation_13.xml[]
+----
+
+[source, java]
+----
+include::{sourcesdir}/common/bean_validation_14.java[]
+----
+--
+
+[[bean_validation_in_DataManager]]
+DataManager中的验证::
++
+--
+<<dataManager,DataManager>> 可以对保存的实体实例进行验证。以下参数会影响验证：
+
+* <<cuba.dataManagerBeanValidation,cuba.dataManagerBeanValidation>> 应用程序属性设置设置是否进行验证的全局默认值。
+
+* 也可以覆盖上面的全局默认值，在 UI 界面保存数据的时候，可以在使用 `DataManager.commit()` 或者 `DataContext.PreCommitEvent` 里为 `CommitContext` 设置 `CommitContext.ValidationMode`
+
+* 也可以提供一个 <<bean_validation_constraint_groups,验证组>> 的列表给 `CommitContext` 或者 `DataContext.PreCommitEvent`，这样可以只应用定义的约束的一部分。
+--
+
+[[bean_validation_in_services]]
+中间件服务验证::
++
+--
+
+如果服务接口中的方法带有 `@Validated` 注解，则中间件<<services,服务>>会对方法的参数和返回结果执行验证。例如:
+
+[source, java]
+----
+include::{sourcesdir}/common/bean_validation_15.java[]
+----
+
+`@Validated`  注解可以指定<<bean_validation_constraint_groups,约束组>>以使验证应用到某组约束上，如果没有指定任何组，默认使用以下约束组:
+
+* `Default` 和 `ServiceParametersChecks` - 进行方法参数验证时
+
+* `Default` 和 `ServiceResultChecks` - 进行方法返回值验证时
+
+在验证错误时会抛出 `MethodParametersValidationException` 和 `MethodResultValidationException` 异常。
+
+如果要在服务中以编程的方式执行某些自定义验证，请使用 `CustomValidationException` 来通知客户端有关验证的错误信息，这样可以与标准 bean 验证错误信息保持相同的格式。此异常也可以跟 REST API 客户端有特定的关联。
+--
+
+[[bean_validation_in_rest]]
+在 REST API 中验证::
++
+--
+
+对于创建和更新操作, 通常 {rest_man_url}[REST API] 会自动执行 bean 验证。验证错误会以如下方式返回给客户端:
+
+
+* `MethodResultValidationException` 和 `ValidationException` 导致 `500 Server error` HTTP 状态
+
+* `MethodParametersValidationException` 、 `ConstraintViolationException` 和 `CustomValidationException` 导致 `400 Bad request` HTTP 状态
+
+* 格式为 `Content-Type: application/json` 的响应体将包含一个对象列表，每个对象都包含属性  `message` 、 `messageTemplate` 、 `path` 和 `invalidValue` 属，例如:
++
+[source, json]
+----
+include::{sourcesdir}/common/bean_validation_16.json[]
+----
+
+** `path` -  表示被验证对象的无效属性在对象关系图中的路径。
+
+** `messageTemplate` - 消息模板字符串，这个模板字符串是在 `message` 注解属性中定义。
+
+** `message`  -  包含验证消息的实际值 。
+
+** `invalidValue` - 属性值类型是 `String`、 `Date`、 `Number`、 `Enum`、 `UUID` 中的其中之一时才返回。
+--
+
+[[bean_validation_programmatic]]
+以编程的方式进行验证::
++
+--
+
+可以使用 `BeanValidation` 基础设施接口以编程的方式执行验证。该接口可在中间件和客户端层使用。它用于获取执行验证的 `javax.validation.Validator` 实现。验证的结果是一组 `ConstraintViolation` 对象。例如:
+
+[source, java]
+----
+include::{sourcesdir}/common/bean_validation_17.java[]
+----
+--

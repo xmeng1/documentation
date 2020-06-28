@@ -1,0 +1,123 @@
+:sourcesdir: ../../../../../source
+
+[[base_entity_classes]]
+===== 基础实体类
+
+本节将详细介绍基础实体类和接口。
+
+[[entity_base_classes]]
+image::EntityClasses.png[align="center"]
+
+* `Instance` – 定义了使用应用程序领域对象的基本方法：
+
+** 获取对象元类的引用;
+
+** 生成实例名称;
+
+** 根据名称读写属性值;
+
+** 添加监听器用于接收有关属性更改的通知。
+
+* `Entity` – 继承自 `Instance`，添加了实体标识符；同时 `Entity` 没有定义标识符的类型，该类型由其继承者决定。
+
+* `AbstractInstance` – 实现了使用属性更改监听器的逻辑。
++
+[WARNING]
+====
+`AbstractInstance` 以弱引用的方式存储监听器，如果添加的监听器没有外部引用，将立即被 GC 销毁。通常情况下，属性更改监听器是<<gui_vcl,可视化>>和 <<gui_data,数据>>组件，必定有其它对象引用，因此没有监听器丢失的问题。但是，如果监听器是由应用程序代码创建的，并且没有任何对象以自然方式引用它，则除了将其添加到 `Instance` 之外，还必须将其保存在某个对象字段中。
+====
+
+* `BaseGenericIdEntity` – 持久化和非持久化实体的基础类。实现了 `Entity` 接口但没有指定实体标识符（即主键）的类型。
+
+* `EmbeddableEntity` - 可嵌入的持久化实体的基础类。
+
+下面是关于在项目实体中继承基础实体的一些建议。非持久化实体应该继承与持久化实体相同的基类。框架是根据实体所在注册文件：<<persistence.xml>> 或 <<metadata.xml>> 来确定实体是否是持久化实体。
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/StandardEntity.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+StandardEntity::
+继承自 `StandardEntity` 的实体带有一组标准功能：UUID 类型的主键、包含创建人和修改人及创建时间和修改时间、还支持乐观锁和软删除机制。
++
+--
+image::EntityClasses_Standard.png[align="center"]
+
+* `HasUuid` – 具有全局唯一标识符实体的接口。
+
+* `Versioned` – 支持 <<optimistic_locking, 乐观锁>>实体的接口。
+
+* `Creatable` – 记录有关创建实例的时间和人员信息实体的接口。
+
+* `Updatable` – 记录有关上次修改实例的时间和人员的信息实体的接口。
+
+* `SoftDelete` – 支持<<soft_deletion,软删除>>实体的接口。
+--
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/BaseUuidEntity.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+BaseUuidEntity::
+继承自 `BaseUuidEntity` 的实体带有 UUID 类型主键，但不具备 `StandardEntity` 的所有功能。可以在具体实体类中有选择地实现一些接口，如 `Creatable`、`Versioned` 等。
++
+image::EntityClasses_Uuid.png[align="center"]
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/BaseLongIdEntity.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+BaseLongIdEntity::
+继承自 `BaseLongIdEntity` 或 `BaseIntegerIdEntity` 的实体具有 `Long` 或 `Integer` 类型的主键。可以在具体实体类中有选择地实现一些接口，`Creatable`、`Versioned` 等。强烈建议实现 `HasUuid`，因为它可以提供一些优化，并可以确保实例在分布式环境中的唯一标识。
++
+image::EntityClasses_Long.png[align="center"]
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/BaseStringIdEntity.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+BaseStringIdEntity::
+继承自 `BaseStringIdEntity` 的实体具有 `String` 类型的主键。可以在具体实体类中有选择地实现一些接口,如 `Creatable`、`Versioned` 等。强烈建议实现 `HasUuid`，因为它可以提供一些优化，并可以确保实例在分布式环境中的唯一标识。具体实体类必须有一个使用 `@Id` JPA 注解的字符串字段用来作为实体的主键。
++
+image::EntityClasses_String.png[align="center"]
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/BaseIdentityIdEntity.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+BaseIdentityIdEntity::
+继承自 `BaseIdentityIdEntity` 的实体，会映射到具有 IDENTITY 主键的表。可以在具体实体类中有选择地实现一些接口，如 `Creatable`、`Versioned` 等。强烈建议实现 `HasUuid`，因为它可以实现一些优化，并可以确保实例在分布式环境中的唯一标识。实体的 `id` 属性（即 `getId()`/`setId()`）是 `IdProxy` 类型，用来替换真实标识符，真实标识符会在插入数据时由数据库生成。
+
++
+image::EntityClasses_Identity.png[align="center"]
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/BaseIntIdentityIdEntity.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+BaseIntIdentityIdEntity::
+继承 `BaseIntIdentityIdEntity` 的实体，会映射到 `Integer` 类型的 IDENTITY 为主键的表（区别于 `BaseIdentityIdEntity` 中的 `Long` ）。在其它方面，`BaseIntIdentityIdEntity` 与 `BaseIdentityIdEntity` 类似。
++
+image::EntityClasses_IntIdentity.png[align="center"]
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/entity/BaseGenericIdEntity.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+BaseGenericIdEntity::
+除了上面情况之外，如果需要将实体映射到具有复合主键的表，则直接继承 `BaseGenericIdEntity` 。在这种情况下，具体实体类必须有一个嵌入类型的字段代表复合主键，并使用 `@EmbeddedId` JPA 注解。
+

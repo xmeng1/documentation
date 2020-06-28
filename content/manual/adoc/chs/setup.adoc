@@ -1,0 +1,57 @@
+[[setup]]
+== 安装
+
+系统要求::
+
+* 64-bit 操作系统： *Windows*，*Linux* 或者 *macOS* 。
+* 内存 – 使用 *CUBA Studio* 开发，8GB。
+* 硬盘空间 – 10 GB
+
+Java SE Development Kit (JDK)::
++
+--
+* 安装 JDK 8 然后在终端运行下面命令检查 Java 版本：
++
+`java -version`
++
+这个命令会输出 Java 版本信息，比如： `++1.8.0_202++`。
++
+[TIP]
+====
+CUBA {revnumber} 支持 Java 8，9，10 和 11。如果不需要支持使用 CUBA 老版本创建的项目（包括迁移到 CUBA {revnumber} 的项目），那么可以直接安装 Java 11。
+====
+
+* 设置 `++JAVA_HOME++` 环境变量为 JDK 的根目录路径，比如：`++C:\Java\jdk8u202-b08++`。
+
+** 在 *Windows* 系统，可以通过 *Computer* -> *Properties* -> *Advanced System Settings* -> *Advanced* -> *Environment variables* 来设置。这个变量的值需要加到 *系统变量（System variables）* 列表中。
+
+** 在 *macOS* 系统，建议在 `/Library/Java/JavaVirtualMachines` 安装 JDK，比如 `/Library/Java/JavaVirtualMachines/jdk8u202-b08`，然后在 `~/.bash_profile` 用下面的命令设置 `JAVA_HOME`：
++
+`export JAVA_HOME="$(/usr/libexec/java_home -v 1.8)"`
+
+* 如果是通过代理服务器上网，在运行开发工具和 Gradle 的时候需要给 JVM 设置一些关于代理的系统参数。这些参数在 http://docs.oracle.com/javase/8/docs/technotes/guides/net/proxies.html[这里] 有解释（可以查查 HTTP 和 HTTPS 协议的相关参数）。建议在系统级别通过 `++JAVA_OPTS++` 环境变量设置这些参数。
+--
+
+开发工具::
++
+--
+下面这些工具有助于使用 CUBA 框架开发：
+
+* *CUBA Studio* - 构建在 IntelliJ 平台之上并且针对 CUBA 项目量身定做的集成开发环境。可以安装为系统的独立运行程序，或者作为 IntelliJ IDEA 的插件安装（社区版或者终极版都行）。更多信息参考 {studio_man_url}[CUBA Studio 使用手册]。
+
+* *CUBA CLI* - 一个命令行工具，能帮助创建项目和项目元素的基本脚手架代码：实体，界面，服务，等等。使用这个工具的话，可以用任何 Java IDE 开发 CUBA 应用程序。更多信息参考 https://github.com/cuba-platform/cuba-cli[CUBA CLI GitHub]。
+
+如果不熟悉 Java，推荐使用 CUBA Studio，因为这是最高级最直观的工具。
+--
+
+数据库::
++
+--
+最基本的场景中，内置的 *HyperSQL* (link:$$http://hsqldb.org$$[http://hsqldb.org]) 就可以用来做数据库服务。对于研究平台能力和做应用程序原型来说足够了。如果需要构建生产环境应用程序，还是推荐安装<<dbms_types,平台支持>>的全功能 DBMS，比如 *PostgreSQL*。
+--
+
+网页浏览器::
++
+--
+基于平台开发的应用的 Web 界面支持所有流行的浏览器，包括 *Google Chrome* 、*Mozilla Firefox* 、 *Safari* 、 *Opera 15+* 、 *Internet Explorer 11* 、 *Microsoft Edge*。
+--

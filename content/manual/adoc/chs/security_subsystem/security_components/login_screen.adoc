@@ -1,0 +1,18 @@
+:sourcesdir: ../../../../source
+
+[[login_screen]]
+==== 登录界面
+
+登录界面提供使用登录名和密码登录的功能。登录名大小写敏感。
+
+Web Client 中的 *Remember Me - 记住我* 复选框可以通过应用程序属性<<cuba.web.rememberMeEnabled,cuba.web.rememberMeEnabled>> 设置。标准登录页中可选语言的下拉列表可以通过应用程序属性 <<cuba.localeSelectVisible,cuba.localeSelectVisible>> 和 <<cuba.availableLocales,cuba.availableLocales>> 设置。
+
+其它相关的应用程序属性有： <<cuba.web.loginDialogDefaultUser,cuba.web.loginDialogDefaultUser>>，<<cuba.web.loginDialogDefaultPassword,cuba.web.loginDialogDefaultPassword>> 和 <<cuba.web.loginDialogPoweredByLinkVisible,cuba.web.loginDialogPoweredByLinkVisible>>。
+
+在 Web Client，可以在 Studio 中自定义或完全替换标准登录窗口。在项目树选择 *Generic UI* 并点击右键菜单的 *New > Screen*。然后在 *Legacy Screen Templates* 标签页选择 *Login Window* 模板。会在 Web 模块创建新的 `ext-loginWindow.xml` 文件，并自动注册到 `web-screens.xml` 中。参阅 <<gui_web,>>。
+
+平台提供防暴力破解密码机制：参阅应用程序属性 <<cuba.bruteForceProtection.enabled,cuba.bruteForceProtection.enabled>>。
+
+需要更深层次的自定义鉴权流程，参阅 <<login>> 和 <<web_login>> 章节。
+
+`Login Screen` 的展示可以使用带 `$cuba-login-*` 前缀的 SCSS 变量进行自定义。可以在创建一个 <<web_theme_extension,主题扩展>> 或者一个 <<web_theme_creation,自定义主题>> 之后在可视化编辑器里修改这些变量的值。

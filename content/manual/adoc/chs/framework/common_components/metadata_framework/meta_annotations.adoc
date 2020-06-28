@@ -1,0 +1,23 @@
+:sourcesdir: ../../../../../source
+
+[[meta_annotations]]
+===== 元注解
+
+实体元注解是一组提供有关实体的附加信息的键值对（key-value）。
+使用<<metaClass,元类>>的 `getAnnotations()` 方法访问元注解。
+元注解的来源是：
+
+* `@OnDelete` 、`@OnDeleteInverse` 、`@Extends` <<entity_annotations,注解>>。通过这些注解将创建描述实体之间关系的特殊元注解。
+
+* 可扩展的元注解用 `@MetaAnnotation` 标明。这些注解会转换成元注解，key 是注解对应的 Java 类的全名称，value 是一组注解属性的映射。比如，`@TrackEditScreenHistory` 注解的 value 就是一个单一的映射：`value -> true`。平台提供几个这种类型的注解：`@NamePattern`, `@SystemLevel`, `@EnableRestore`, `@TrackEditScreenHistory`。在应用程序或者<<app_components,应用程序组件>>中，可以创建自定义的注解类然后使用 `@MetaAnnotation` 对自定义注解类进行标注。
+
+* 可选：实体元注解也可以在<<metadata.xml,metadata.xml>>文件中定义。如果 XML 中的元注解与 Java 实体类注解创建的元注解具有相同的名称，那么它将覆盖后者。
+
++
+下面的示例演示了如何通过 `metadata.xml` 中的元注解覆盖 Java 类中的注解：
++
+[source, xml]
+----
+include::{sourcesdir}/common/metaannotations_1.xml[]
+----
+

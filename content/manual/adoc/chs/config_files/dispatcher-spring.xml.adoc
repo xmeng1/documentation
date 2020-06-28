@@ -1,0 +1,41 @@
+:sourcesdir: ../../../source
+
+[[dispatcher-spring.xml]]
+=== dispatcher-spring.xml
+
+这种类型的文件为包含 Spring MVC 控制器（controller）的客户端 blocks 定义了一个额外的 Spring 框架容器的配置。
+
+这个给控制器创建的额外 Spring 容器是使用 Spring 主容器（配置在 <<spring.xml,spring.xml>> 文件）作为父容器来创建的。因此，在这个控制器容器内的 bean 可以使用主容器的 bean，但是主容器的 bean 却“看不见”控制器容器内的 bean。
+
+项目的 `dispatcher-spring.xml` 文件是通过 <<cuba.dispatcherSpringContextConfig,cuba.dispatcherSpringContextConfig>> 应用程序属性来定义的。
+
+平台的 *web* 和 *portal* 模块已经分别包含了这个配置文件：`cuba-dispatcher-spring.xml` 和 `cuba-portal-dispatcher-spring.xml`
+
+如果在项目中创建了 Spring MVC 控制器（比如在 *web* 模块），需要添加如下配置：
+
+* 假设控制器都在 `com.company.sample.web.controller` 包内创建，创建 `modules/web/src/com/company/sample/web/dispatcher-config.xml` 文件并且添加如下内容：
++
+[source, xml]
+----
+include::{sourcesdir}/config_files/dispatcher_spring_1.xml[]
+----
+
+* 在 `web-app.properties` 文件的 <<cuba.dispatcherSpringContextConfig,cuba.dispatcherSpringContextConfig>> 属性添加这个配置文件：
++
+[source, properties]
+----
+cuba.dispatcherSpringContextConfig = +com/company/sample/web/dispatcher-config.xml
+----
+
+*web* 模块中定义的控制器可以通过 `dispatcher` servlet 的 URL 地址访问，默认是以 `/dispatch` 开头。示例：
+
+----
+http://localhost:8080/app/dispatch/my-controller-endpoint
+----
+
+*portal* 模块中定义的控制器可以通过 web 应用程序的根节点访问，比如：
+
+----
+http://localhost:8080/app-portal/my-controller-endpoint
+----
+

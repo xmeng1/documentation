@@ -1,0 +1,166 @@
+:sourcesdir: ../../../../../../source
+
+'''
+[[abstractWindow]]
+====== AbstractWindow
+
+[WARNING]
+====
+这是旧版本的 API。对于从 7.0 开始的新 API，请参阅 <<screen_controllers>>。
+====
+
+`AbstractWindow` 是 <<abstractFrame,AbstractFrame>> 的子类，定义下列方法：
+
+[[dialogOptions]]
+* `getDialogOptions()` – 返回一个 `DialogOptions - 对话框选项` 对象，在界面以对话框模式（`WindowManager.OpenType.DIALOG`）打开的时候用来控制窗口的几何属性以及行为。这些选项可以在界面初始化的时候设置，也可以在运行时设置。参考下面的例子。
++
+设置宽度和高度：
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstractwindow_2.java[]
+----
++
+设置对话框在界面中的位置：
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstractwindow_9.java[]
+----
++
+设置对话框可通过点击外部区域关闭：
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstractwindow_7.java[]
+----
++
+设置对话框非模态（non-modal）打开，并且可改变大小：
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstractwindow_3.java[]
+----
++
+设置对话框打开时候最大化：
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstractwindow_8.java[]
+----
++
+设置界面总是按照对话框的方式打开，不论在调用时 `WindowManager.OpenType` 参数是如何选择：
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstractwindow_4.java[]
+----
+
+[[abstractWindow_contentSwitchMode]]
+* `setContentSwitchMode()` - 定义在指定的窗口中 <<cuba.web.mainTabSheetMode,主 tab 标签>>应当怎样切换标签页：隐藏还是清除界面内容。
++
+--
+有三个可选项：
+
+* `DEFAULT` - 切换模式由 TabSheet 模式 <<cuba.web.managedMainTabSheetMode,cuba.web.managedMainTabSheetMode>> 应用程序属性定义。
+
+* `HIDE` - 不考虑 TabSheet 的模式，直接隐藏。
+
+* `UNLOAD` - 不考虑 TabSheet 的模式，清除界面内容。
+--
+
+[[abstractWindow_saveSettings]]
+* `saveSettings()` - 界面关闭时，保存当前用户对界面的设置到数据库。
++
+比如，界面包含一个复选框 *showPanel* 用来管理某个面板是否可见。在下面的方法中，为复选框创建一个 XML 元素，然后用这个组件的值添加一个 `showPanel` 属性，最后为当前用户保存 XML 描述的 `settings` 元素内容到数据库：
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstractwindow_6.java[]
+----
+
+[[abstractWindow_applySettings]]
+* `applySettings()` - 当界面打开时，为当前用户恢复数据库保存的设置。
++
+这个方法可以被重写用来保存自定义设置。比如，在下面的方法中，取到上面例子中复选框的 XML 元素，然后确保需要的属性不是 null，之后将恢复的值设置到复选框上：
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstractwindow_5.java[]
+----
++
+另一个管理设置的例子就是应用程序内的 *Administration - 管理* 菜单的标准 *Server Log - 服务器日志* 界面，它能自动保存和恢复最近打开的日志文件。
+
+[[abstractWindow_ready]]
+* `ready()` - 控制器中可以实现的一个模板方法，用来拦截界面打开动作。当界面全部初始化完毕并且打开之后会调用这个方法。
+
+[[abstractWindow_validateAll]]
+* `validateAll()` – 验证一个界面。方法默认实现就是对所有实现了 `Component.Validatable` 接口的界面组件调用 `validate()` 方法，然后搜集异常的信息，并且显示相应的消息。如果有任何异常，方法会返回 `false`，否则返回 `true`。
++
+只有在需要完全重写界面验证过程的情况下，才需要重写这个方法。如果需要补充额外的验证，实现一个特殊的模板方法就足够了 - `postValidate()`。
+
+[[abstractWindow_postValidate]]
+* `postValidate()` – 可以在控制器实现的模板方法，用来做额外的界面验证。这个方法将验证错误信息保存在传给它的参数 `ValidationErrors` 对象内。之后，这些错误信息会跟标准验证的错误信息一起显示，示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstractwindow_1.java[]
+---- 
+
+[[abstractWindow_showValidationErrors]]
+* `showValidationErrors()` - 显示验证错误警告。可以重写这个方法来更改默认的警告行为。通知类型可以通过 <<cuba.gui.validationNotificationType,cuba.gui.validationNotificationType>> 应用程序属性来定义。
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstractwindow_10.java[]
+----
+
+[[abstractWindow_close]]
+* `close()` – 关闭当前界面。
++
+这个方法可以传入字符串参数，这个参数然后传递给 `preClose()` 模板方法，再传递给 `CloseListener` 监听器。因此，关于窗口关闭原因的信息可以通过发起关闭事件的代码获得。推荐使用这些常量来关闭编辑界面：提交改动后使用 `++Window.COMMIT_ACTION_ID++`，不提交改动的话使用 `++Window.CLOSE_ACTION_ID++`。
++
+如果任何数据源包含没保存的改动，在界面关闭前会弹出窗口提示相关信息。通知的类型可以通过 <<cuba.gui.useSaveConfirmation,cuba.gui.useSaveConfirmation>> 应用程序属性调整。
++
+`close()` 方法还有一个带有 `force = true` 参数的变体，这个方法可以不调用 `preClose()` 就关闭界面，也不会出现关于未保存信息的对话框消息。
++
+如果界面顺利关闭，`close()` 方法返回 `true`。如果关闭的过程中断，则会返回 `false`。、
+
+[[abstractWindow_preClose]]
+* `preClose()` 控制器中可以实现的一个模板方法，用来拦截界面关闭动作。这个方法可以接收从 `close()` 方法传递过来的参数。
++
+如果关闭的过程中断，`preClose()` 方法会返回 `false`。
+
+[[abstractWindow_addBeforeCloseWithCloseButtonListener]]
+* `addBeforeCloseWithCloseButtonListener()` - 当界面通过下列方法关闭的时候添加一个关闭时的监听器：界面的关闭按钮、面包屑（bread crumbs）或者 `TabSheet` 标签的关闭操作（Close - 关闭, Close All - 关闭全部, Close Others - 关闭其它）。如果需要避免用户误操作关闭窗口，可以调用 `BeforeCloseEvent` 事件的 `preventWindowClose()` 方法：
++
+[source, java]
+----
+addBeforeCloseWithCloseButtonListener(BeforeCloseEvent::preventWindowClose);
+----
+
+[[abstractWindow_addBeforeCloseWithShortcutListener]]
+* `addBeforeCloseWithShortcutListener` - 当界面通过快捷键方式（比如，`Esc` 按钮）关闭的时候，添加一个关闭时的监听器。如果需要避免用户误操作关闭窗口，可以调用 `BeforeCloseEvent` 事件的 `preventWindowClose()` 方法：
++
+[source, java]
+----
+addBeforeCloseWithShortcutListener(BeforeCloseEvent::preventWindowClose);
+----
+
+'''
+
+API::
+<<abstractWindow_addBeforeCloseWithCloseButtonListener,addBeforeCloseWithCloseButtonListener()>> -
+<<abstractWindow_addBeforeCloseWithShortcutListener,addBeforeCloseWithShortcutListener()>> -
+<<abstractWindow_applySettings,applySettings()>> -
+<<abstractWindow_close,close()>> -
+<<abstractWindow_contentSwitchMode,setContentSwitchMode()>> -
+<<dialogOptions,getDialogOptions()>> -
+<<abstractWindow_postValidate,postValidate()>> -
+<<abstractWindow_preClose,preClose()>> -
+<<abstractWindow_ready,ready()>> -
+<<abstractWindow_saveSettings,saveSettings()>> -
+<<abstractWindow_validateAll,validateAll()>>
+
+'''
+

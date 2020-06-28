@@ -1,0 +1,36 @@
+:sourcesdir: ../../../../../source
+
+[[uberjar_https]]
+===== 为 UberJAR 配置 HTTPS
+
+下面的示例是 UberJAR 部署的情况下配置自签发认证的 HTTPS。
+
+. 使用 JDK 自带的 `Java Keytool` 工具生成密钥和认证：
++
+[source, plain]
+----
+keytool -keystore keystore.jks -alias jetty -genkey -keyalg RSA
+----
+
+. 在项目根目录配置带有 SSL 配置的 `jetty.xml` 文件：
++
+[source, xml]
+----
+include::{sourcesdir}/deployment/uberjar-https.xml[]
+----
++
+`keyStorePassword`，`keyManagerPassword` 和 `trustStorePassword` 需要按照 `Keytool` 的设置来配置。
+
+. 在构建任务的配置中添加 `jetty.xml`：
++
+[source, groovy]
+----
+include::{sourcesdir}/deployment/uberjar-https.groovy[]
+----
+
+. 按照<<uberjar_deployment,部署 UberJAR>> 章节的介绍构建 Uber JAR。
+
+. 将 `keystore.jks` 跟项目的 JAR 放在一个目录下，然后启动 Uber JAR。
++
+通过浏览器访问 `\https://localhost:8443/app`。
+

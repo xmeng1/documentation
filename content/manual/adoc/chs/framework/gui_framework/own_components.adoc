@@ -1,0 +1,90 @@
+:sourcesdir: ../../../../source
+
+[[own_components]]
+==== 自定义可视化组件
+
+本节概述了在 CUBA 应用程序中创建自定义 web UI 组件的不同方法。使用这些方法的实用教程位于 <<own_component_samples>> 部分。
+
+[TIP]
+====
+在使用底层技术创建组件之前，需要首先考虑基于已存在通用界面组件的<<composite_components,组合组件>>。
+====
+
+可以使用以下技术创建新组件：
+
+. 在 Vaadin 扩展的基础上。
+
++
+--
+这是最简单的方法。在应用程序中使用扩展需要执行以下步骤：
+
+** 添加扩展工件的坐标到 <<build.gradle,build.gradle>>.
+
+** 在项目中创建 *web-toolkit* 模块。此模块包含一个 GWT widgetset 文件，用于创建可视化组件的客户端部分。
+
+** 将扩展项 widgetset 包含到项目的 widgetset 中。
+
+** 如果组件的外观不适合应用程序主题，请创建主题扩展并为新组件定义一些 CSS。
+
+请参阅 <<vaadin_addon_sample>> 部分中的示例。
+
+--
+
+. 对 JavaScript 库进行包装。
+
++
+--
+如果已经拥有可以满足需要的 JavaScript 组件，则建议使用此方法。要使用这种方式，需要执行以下操作：
+
+** 在 *web* 模块中创建服务端 Vaadin 组件。服务端组件为服务代码、访问方法、事件监听等定义 API，服务端组件必须继承 `AbstractJavaScriptComponent` 类。请注意，继承 JavaScript 组件时，不需要带有 widgetset 的 *web-toolkit* 模块。
+
+** 创建 JavaScript 连接器。连接器是一个用于初始化 JavaScript 组件并负责 JavaScript 和服务端代码之间的交互的函数。
+
+** 创建一个状态类。在其公共字段中定义从服务端发送到客户端的数据。此类必须继承 `JavaScriptComponentState`。
+
+请参阅<<js_library_sample>>章节中的示例。
+
+--
+
+. 发布为 link:https://www.webjars.org/[WebJar] 。有关详细信息，请参阅<<using_webjars,后续>>章节。
+
+. 发布为新的 link:http://www.gwtproject.org[GWT] 组件。
+
++
+--
+
+这是创建全新可视化组件的推荐方法。在应用程序中创建和使用 GWT 组件需要执行以下步骤：
+
+** 创建 *web-toolkit* 模块。
+
+** 创建一个客户端 GWT 部件类。
+
+** 创建一个服务端 Vaadin 组件。
+
+** 创建一个组件状态类来定义客户端和服务端之间发送的数据。
+
+** 创建一个连接器类来链接客户端代码与服务端组件。
+
+** 创建一个 RPC 接口，用于定义从客户端调用的服务器 API。
+
+请参阅 <<gwt_component_sample>> 章节中的示例。
+
+--
+
+将新组件集成到平台中有三个级别。
+
+* 在第一级，新组件可用作本地 Vaadin 组件。应用程序开发人员可以直接在界面控制器中使用此组件：创建新实例并将其添加到 <<webComponentsHelper,unwrapped>> 容器中。上述所有创建新组件的方法都支持这个级别的组件集成。
+
+// TODO update Studio info
+* 在第二级，将新组件集成到 CUBA 通用 UI 中。在这种情况下，从应用程序开发者的角度来看，它看起来与可视化组件库中的标准组件相同。开发人员可以在界面 XML 描述中定义组件，或者通过控制器中的 `UiComponents` 创建组件。请参阅 <<vaadin_addon_sample_gui>> 章节中的示例。
+
+* 在第三级，新组件可在 Studio 组件面板上使用，并可在 WYSIWYG 布局编辑器中使用。请参阅 <<own_component_in_studio>> 章节中的示例。
+
+include::own_components/using_webjars.adoc[]
+
+include::own_components/jsComponent.adoc[]
+
+include::own_components/helperScreenDependencyUtils.adoc[]
+
+include::own_components/own_component_samples.adoc[]
+

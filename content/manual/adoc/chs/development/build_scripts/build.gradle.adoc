@@ -1,0 +1,138 @@
+:sourcesdir: ../../../../source
+
+[[build.gradle]]
+==== build.gradle 的结构
+
+本章节介绍 `build.gradle` 脚本的结构和主要元素。
+
+buildscript::
++
+--
+脚本的 `buildscript` 部分定义了以下内容：
+
+* 平台的版本。
+
+* 一组用来加载项目依赖的 <<artifact_repository, 仓库>>。查看<<access_to_repo,仓库>>章节了解如何配置仓库。
+
+* 构建系统的依赖，包括 CUBA 的 Gradle 插件。
+
+在 `buildscript` 下面，是一些变量的定义。会在后面的脚本中用到。
+--
+
+cuba::
++
+--
+CUBA 特殊的构建逻辑封装在 `cuba` Gradle 插件里。CUBA 插件在构建脚本的根节点引用，同时也需要在所有模块的 `configure` 部分使用下面这个语句引用进来：
+
+[source, groovy]
+----
+apply(plugin: 'cuba')
+----
+
+*cuba* 插件的配置在 `cuba` 部分定义：
+
+[source, groovy]
+----
+include::{sourcesdir}/development/build_gradle_1.groovy[]
+----
+
+以下是一些可选的参数：
+
+* `artifact` - 这里定义项目<<artifact, 工件>>的分组和版本信息。工件的名称按照 `settings.gradle` 里面设置的模块名称来设置。
+
+** `group` - 工件组
+** `version` - 工件版本
+** `isSnapshot` - 如果设置 `true`，工件名称会被添加 `SNAPSHOT` 后缀。
++
+可以通过命令行参数来覆盖工件的版本，示例：
++
+[source, plain]
+----
+gradle assemble -Pcuba.artifact.version=1.1.1
+----
+
+* `tomcat` - 这部分定义了用来 <<fast_deployment, 快速部署>>的 Tomcat 服务的设置。
+
+** `dir` - Tomcat 的 <<build.gradle_setupTomcat, 安装>>目录。
+** `port` - Tomcat 监听端口，默认 8080。
+** `debugPort` - Java 调试监听端口，默认 8787。
+** `shutdownPort` - 监听 `SHUTDOWN` 命令的端口，默认 8005。
+** `ajpPort` - AJP 连接器端口，默认 8009。
+
+* `ide` - 这部分包含 Studio 和 IDE 的内容
+
+** `vcs` - 项目的版本控制系统配置，目前只支持 `Git` 或者 `svn`。
+** `copyright` - 插入到每个源文件开头的版权信息。
+** `classComment` - Java 源文件类声明开头插入的注释信息。
+
+* `uploadRepository` - 这部分定义了使用 `uploadArchives` 任务上传打包的项目工件目标 <<artifact_repository, 仓库>>的设置。
++
+** `url` - 仓库的地址 URL。如果不设置，默认会使用 Haulmont 的仓库地址。
+** `user` - 访问仓库的用户名。
+** `password` - 访问仓库的密码。
++
+也可以通过命令行参数的方式给这个上传仓库的任务提供参数：
++
+[source]
+----
+gradlew uploadArchives -PuploadUrl=http://myrepo.com/content/repositories/snapshots -PuploadUser=me -PuploadPassword=mypassword
+----
+--
+
+dependencies::
++
+--
+这部分包含了项目中使用的一组<<app_components,应用程序组件>>。组件通过他们各自的 *global* 模块来指定。在下面的例子中，使用了三个组件：`com.haulmont.cuba` (*cuba* 平台组件), `com.haulmont.reports` (*reports* premium 组件) 和 `com.company.base` (自定义组件)：
+
+[source, groovy]
+----
+dependencies {
+  appComponent("com.haulmont.cuba:cuba-global:$cubaVersion")
+  appComponent("com.haulmont.reports:reports-global:$cubaVersion")
+  appComponent("com.company.base:base-global:0.1-SNAPSHOT")
+}
+----
+--
+
+configure::
++
+--
+`configure` 部分包含<<app_modules,模块>>的配置。其中最主要的部分就是声明依赖，示例：
+
+[source,groovy]
+----
+include::{sourcesdir}/development/build_gradle_2.groovy[]
+----
+
+[[build.gradle_enhance]]
+`entitiesEnhancing` 配置模块用来对实体类进行字节码增强（weaving - 也叫织入），至少需要在 *global* 模块声明这个任务，也可以在其它模块分别声明。
+
+这里的 `main` 和 `test` 分别是项目和测试的代码目录，可选的 `persistenceConfig` 参数用来指定各自的 <<persistence.xml, persistence.xml>> 文件。如果这个可选参数没设置，这个任务会对 CLASSPATH 里能找到的 `*persistence.xml` 文件中的所有实体做增强。
+
+[source,groovy]
+----
+include::{sourcesdir}/development/build_gradle_3.groovy[]
+----
+
+非标准的模块依赖可以在 Studio 中通过 CUBA 项目视图的 *Project properties* 部分来设置。
+--
+
+[TIP]
+====
+对于动态版本依赖和版本冲突的问题，可以用 Maven 对此场景的解决方法。按照这个方法，正式版本的优先级会高于快照版本，而且越新的版本有越精确的版本编号。所有条件都一样的情况下，版本编号按照字母表的顺序定优先级，示例：
+
+[source, plain]
+----
+1.0-beta1-SNAPSHOT         // 最低优先级
+1.0-beta1
+1.0-beta2-SNAPSHOT         |
+1.0-rc1-SNAPSHOT           |
+1.0-rc1                    |
+1.0-SNAPSHOT               |
+1.0                        |
+1.0-sp                     V
+1.0-whatever
+1.0.1                      // 最高优先级
+----
+====
+

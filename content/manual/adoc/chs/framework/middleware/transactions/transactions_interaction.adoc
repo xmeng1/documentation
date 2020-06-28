@@ -1,0 +1,80 @@
+:sourcesdir: ../../../../../source
+
+[[transactions_interaction]]
+===== 事务交互示例
+
+嵌套事务的回滚::
++
+--
+如果嵌套事务是通过 `getTransaction()` 创建并回滚，则无法提交外层事务。例如：
+
+[source, java]
+----
+include::{sourcesdir}/middleware/transactions_3.java[]
+----
+
+<1> 调用方法创建嵌套事务
+
+<2> 假设发生异常
+
+<3> 处理异常并退出
+
+<4> 在这里将抛出异常，因为事务被标记为仅回滚（rollback only）。
+
+
+如果使用 `createTransaction()` 创建 `methodB()` 中的事务，那么回滚它将不会影响 `methodA()` 中的外层事务。
+--
+
+在嵌套事务中读取和修改数据::
++
+--
+首先看一下使用 `getTransaction()` 创建的依赖嵌套事务：
+
+[source, java]
+----
+include::{sourcesdir}/middleware/transactions_4.java[]
+----
+
+<1> 使用 name == "old name" 加载实体
+
+<2> 给字段设置新值
+
+<3> 调用方法创建嵌套事务
+
+<4> 获取与方法 methodA 中相同的 EntityManager 实例
+
+<5> 使用同样的标识符加载实体
+
+<6> 字段值是新的，因为我们使用相同的持久化上下文，并且根本没有调用 DB
+
+<7> 此时不进行实际的提交
+
+<8> 更改提交到 DB，它将包含 "name B"
+
+
+现在，看一下使用 `createTransaction()` 创建的独立嵌套事务的相同示例：
+
+[source, java]
+----
+include::{sourcesdir}/middleware/transactions_5.java[]
+----
+
+<1> 使用 name == "old name" 加载实体
+
+<2> 给字段设置新值
+
+<3> 调用方法创建嵌套事务
+
+<4> 创建新的 EntityManager 实例, 因为这是一个新事务
+
+<5> 使用相同的标识符加载一个实体
+
+<6> 字段值是旧的，因为一个旧的实体实例被从数据库加载了
+
+<7> 变更被提交到 DB，现在 "name B"值被存储到数据 DB
+
+<8> 由于启用乐观锁，这里将发生异常，提交失败
+
+在最后一个例子中，只有当实体支持乐观锁时，即只有它实现了 `Versioned` 接口时，才会发生第（8）点的异常。
+--
+

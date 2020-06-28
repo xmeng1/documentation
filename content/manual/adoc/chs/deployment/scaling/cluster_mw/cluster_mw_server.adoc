@@ -1,0 +1,27 @@
+:sourcesdir: ../../../../../source
+
+[[cluster_mw_server]]
+===== 配置多个 Middleware 服务交互
+
+多个 Middleware 服务器可以共同维护<<userSession,用户会话>>共享列表和其它类对象，还能协调处理过期的缓存。每个中间件服务都需要开启 <<cuba.cluster.enabled,cuba.cluster.enabled>> 参数启用这个功能。以下是 `app_home/local.app.properties` 文件的示例：
+
+[source,plain]
+----
+cuba.cluster.enabled = true
+
+cuba.webHostName = host3
+cuba.webPort = 8080
+----
+
+对于中间件服务来说，需要设定正确的 <<cuba.webHostName,cuba.webHostName>> 和 <<cuba.webPort,cuba.webPort>> 这两个属性的值，这样能用这两个属性组成唯一的<<serverId,服务器 ID>>。
+
+服务之间的交互机制是基于 link:http://www.jgroups.org[JGroups]。平台为 JGroups 提供了两个配置文件：
+
+* `jgroups.xml` - 基于 UDP 的协议栈，适用于启用了广播通信的本地网络。这个配置当集群功能开启的时候会被默认使用。
+
+* `jgroups_tcp.xml` - 基于 TCP 的协议栈，适用于任何网络。使用这个协议要求在 `TCP.bind_addr` 和 `TCPPING.initial_hosts` 参数中显式设定集群成员的地址。如果需要使用这个配置，需要设定 <<cuba.cluster.jgroupsConfig,cuba.cluster.jgroupsConfig>> 这个应用程序属性。
+
+为了配置环境中的 JGroups 参数，从 `cuba-core-<version>.jar` 的根目录拷贝合适的 `jgroups.xml` 文件到项目的 *core* 模块或者 `tomcat/conf/app-core` 目录，并且修改这个文件。
+
+`ClusterManagerAPI` bean 提供 Middleware 集群中服务器交互的编程接口。可以在应用程序中使用，需要时可参考 JavaDocs 和平台代码的用法。
+

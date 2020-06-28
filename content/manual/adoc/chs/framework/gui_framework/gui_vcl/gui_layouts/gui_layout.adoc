@@ -1,0 +1,66 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_layout]]
+====== layout
+
+`layout` 是<<screen_xml,界面布局>>的根节点元素，是一个可以对组件进行垂直布局的容器，类似 <<gui_BoxLayout,vbox>>。
+
+`layout` 的属性：
+
+* <<gui_attr_spacing,spacing>> - 设置布局中各组件之间的留白空隙。
+
+* <<gui_attr_margin,margin>> - 设置外边框和布局内容之间的缩进
+
+* <<gui_attr_expand,expand>> - 设置布局内的一个组件使用组件摆放方向的所有可用空间。
+
+* <<gui_attr_responsive,responsive>> - 设置容器应当按照可用空间进行响应式更改。
+
+* <<gui_attr_stylename,stylename>> - 定义布局的一个样式名称。
+
+* <<gui_attr_height,height>> - 设置布局的高度。
+
+* <<gui_attr_width,width>> - 设置布局的宽度。
+
+[[layout_maxHeight]]
+* `maxHeight` - 设置窗口布局最大的 CSS 高度，比如 `"640px"` 、 `"100%"`。
+
+[[layout_minHeight]]
+* `minHeight` - 设置窗口布局最小的 CSS 高度，比如 `"640px"` 、 `"100%"`。
+
+[[layout_maxWidth]]
+* `maxWidth` - 设置窗口布局最大的 CSS 宽度，比如 `"640px"` 、 `"100%"`。
+
+[[layout_minWidth]]
+* `minWidth` - 设置窗口布局最小的 CSS 宽度，比如 `"640px"` 、  `"100%"`。
+
+示例：
+
+[source, xml]
+----
+<layout minWidth="600px"
+        minHeight="200px">
+    <textArea width="800px"/>
+</layout>
+----
+
+.布局中不带滚动条的完整大小的 textArea
+image::layout_1.png[align="center"]
+
+.当窗口的大小小于布局的最小尺寸时，滚动条出现
+image::layout_2.png[align="center"]
+
+这些属性在弹出对话框中也有效：
+
+[source, xml]
+----
+<dialogMode forceDialog="true"
+            width="500"
+            height="250"/>
+<layout minWidth="600px"
+        minHeight="200px">
+    <textArea width="250px"/>
+</layout>
+----
+
+.对话框模式，当窗口的大小小于布局的最小尺寸时，滚动条出现
+image::layout_3.png[align="center"]

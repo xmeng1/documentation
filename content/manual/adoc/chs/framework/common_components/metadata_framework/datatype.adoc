@@ -1,0 +1,82 @@
+:sourcesdir: ../../../../../source
+
+[[datatype]]
+===== 数据类型接口
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/chile/core/datatypes/Datatype.html" class="api-docs-btn" target="_blank">API DOCS</a>
+</div>
+++++
+
+`Datatype` 接口定义了值和字符串互转的方法（格式化和解析）。每个实体属性，如果不是引用属性的话，就会有一个对应的 `Datatype`，平台用 `Datatype` 来格式化和解析属性值。
+
+数据类型注册在 `DatatypeRegistry` bean 中，这个 bean 根据项目以及项目依赖的<<app_components,应用程序组件>>中的 <<metadata.xml,metadata.xml>> 文件对 `Datatype` 的实现类进行加载和初始化。
+
+实体属性的数据类型可以通过相应的<<metaProperty,元属性>>使用 `getRange().asDatatype()` 方法获取。
+
+也可以使用注册的数据类型来格式化或者解析支持的数据类型的任意属性值。如需这么做，可以从 `DatatypeRegistry` 通过调用 `get(Class)` 或者 `getNN(Class)` 方法得到数据类型实例，传入需要转换的 Java 类型即可。
+
+数据类型通过下列规则跟实体属性关联：
+
+* 大多数情况下，一个实体属性都关联一个注册的 `Datatype` 实例，用来处理属性的 Java 类型。
++
+下面的例子中，`amount` 属性关联的是 `BigDecimalDatatype`
++
+[source, java]
+----
+@Column(name = "AMOUNT")
+private BigDecimal amount;
+----
++
+因为 `com/haulmont/cuba/metadata.xml` 有下面的记录：
++
+[source, xml]
+----
+<datatype id="decimal" class="com.haulmont.chile.core.datatypes.impl.BigDecimalDatatype"
+          default="true"
+          format="0.####" decimalSeparator="." groupingSeparator=""/>
+----
+
+* 可以通过 <<metaProperty_annotation,@MetaProperty>> 注解的 `datatype` 属性来显式指定一个数据类型。
++
+下面的例子中，实体的 `issueYear` 属性将会关联 `year` 数据类型。
++
+[source, java]
+----
+@MetaProperty(datatype = "year")
+@Column(name = "ISSUE_YEAR")
+private Integer issueYear;
+----
++
+如果项目的 `metadata.xml` 文件有下面的记录：
++
+[source, xml]
+----
+<datatype id="year" class="com.company.sample.YearDatatype"/>
+----
++
+所以可以看到，`@MetaProperty` 的 `datatype` 属性包含标识符，这个标识符用来在 `metadata.xml` 文件中注册数据类型的实现类。
+
+`datatype` 接口的基本方法：
+
+* `format()` – 将传入的值格式化成字符串。
+
+* `parse()` – 将字符串转换成相应类型的值。
+
+* `getJavaClass()` – 返回这个数据类型对应的 Java 类型。这个方法有一个默认实现，如果类带了 `@JavaClass` 注解，这个实现会返回此注解的值。
+
+`Datatype` 定义了用来做格式化和解析的两组方法：一组会考虑应用所在的 locale，另一组不会考虑。考虑了 locale 的转换用在用户界面的各个地方，不考虑 locale 的方法用在系统机制中，比如，在 {rest_man_url}[REST API] 的序列化时。
+
+使用忽略 locale 的解析需要在代码中写死或者在 `metadata.xml` 文件注册数据类型时显式指定。
+
+参考下一节了解怎么使用依赖 locale 的解析。
+
+include::datatype/datatype_format_strings.adoc[]
+
+include::datatype/datatype_custom_example.adoc[]
+
+include::datatype/datatype_ui_format.adoc[]
+
+include::datatype/datatype_date_number_format.adoc[]
+

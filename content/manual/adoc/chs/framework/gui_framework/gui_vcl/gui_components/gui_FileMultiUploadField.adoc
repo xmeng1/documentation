@@ -1,0 +1,127 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_FileMultiUploadField]]
+====== 多文件上传控件
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/FileMultiUploadField.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`FileMultiUploadField` 组件允许用户把文件上传到服务器。这个组件是个按钮；用户点击时，系统自带的文件选择器会弹出，此时用户可以选择多个文件来上传。
+
+image::gui_multipleUpload.png[align="center"]
+
+该组件对应的 XML 名称： `multiUpload`
+
+下面是一个使用 `FileMultiUploadField` 的示例。
+
+* 在界面的 XML 描述中声明这个组件:
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/multiupload_1.xml[]
+----
+
+* 在界面控制器中，需要注入该组件本身，还需要注入 <<file_upload,FileUploadingAPI>> 和 <<dataManager,DataManager>> 这两个接口。
++
+--
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/multiupload_2.java[]
+----
+
+<1> 在 `onInit()` 方法里面，添加了事件监听器，这样可以在文件上传成功或者出错时做出反馈。
+
+<2> 该组件将所有选择的文件上传到<<app_tiers,客户端层(client tier)>> 的临时存储（temporary storage）并且调用通过 `addQueueUploadCompleteListener()` 方法添加的监听器。
+
+<3> 在这个监听器里面，会调用 `FileMultiUploadField.getUploadsMap()` 方法获得临时存储的文件标识和文件名映射关系的 map。
+
+<4> 然后，通过调用 `FileUploadingAPI.getFileDescriptor()` 为每一条 map 记录创建相应的 `FileDescriptor` 对象。 `com.haulmont.cuba.core.entity.FileDescriptor` (别跟 `java.io.FileDescriptor` 混淆了) 是一个持久化实体，唯一定义一个上传的文件，并且也用这个类从系统下载文件。
+
+<5> `FileUploadingAPI.putFileIntoStorage()` 方法用来把文件从客户端层的临时存储移动到 <<file_storage,FileStorage>>。这个方法的参数是临时存储中文件的标识符和对应的 `FileDescriptor` 对象。
+
+<6> 在将文件上传到 `FileStorage` 之后，通过调用 `DataManager.commit()` 方法将 `FileDescriptor` 实例存到数据库。这个方法的返回值可以用来设置给一个实体的属性，这个属性关联此文件。这里，`FileDescriptor` 简单的保存在数据库。上传的文件可以通过 *Administration > External Files* 界面查看。
+
+<7> 完成整个上传过程之后，文件列表需要通过调用 `clearUploads()` 方法清空以便下一次上传再使用。
+--
+
+下面列出能跟踪上传进度的监听器：
+
+[[gui_FileMultiUploadField_FileUploadErrorListener]]
+* `FileUploadErrorListener`
+
+[[gui_FileMultiUploadField_FileUploadStartListener]]
+* `FileUploadStartListener`
+
+[[gui_FileMultiUploadField_FileUploadFinishListener]]
+* `FileUploadFinishListener`
+
+[[gui_FileMultiUploadField_QueueUploadCompleteListener]]
+* `QueueUploadCompleteListener`
+
+最大可上传的文件大小是由 <<cuba.maxUploadSizeMb,cuba.maxUploadSizeMb>> 应用程序属性定义的，默认是 20MB。如果用户选择了更大的文件的话，会有相应的提示信息，并且中断上传过程。
+
+`multiUpload` 属性：
+
+[[gui_FileMultiUploadField_accept]]
+* `accept` XML 属性 (或者相应的 `setAccept()` 方法) 用来设置文件选择对话框里面的文件类型掩码，但是用户还是可以选择“所有文件”来上传任意文件。
++
+这个属性的值需要是以英文逗号分隔的文件后缀名，比如：`++*.jpg,*.png++`。
+
+[[gui_FileMultiUploadField_fileSizeLimit]]
+* `fileSizeLimit` XML 属性 (或者相应的 `setFileSizeLimit()` 方法) 用来设置最大允许上传的文件大小。这个设置是针对每一个文件都有效的。
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/multiupload_3.xml[]
+----
+
+[[gui_FileMultiUploadField_permittedExtensions]]
+* `permittedExtensions` XML 属性 (或者相应的 `setPermittedExtensions()` 方法) 设置允许的文件扩展名白名单。
++
+这个属性的值需要是字符串的集合，其中每个字符串是以 `.` 开头的允许的文件扩展名，比如：
++
+[source,java]
+----
+uploadField.setPermittedExtensions(Sets.newHashSet(".png", ".jpg"));
+----
+
+[[gui_FileMultiUploadField_dropZone]]
+* `dropZone` XML 属性允许设置一个特殊的 <<gui_BoxLayout,BoxLayout>> 用来作为从浏览器外部拖拽文件可以放置的目标容器区域。如果这个容器的样式没有特殊设置，当文件被拖拽到这块区域的时候，这个容器会被高亮显示，否则目标区域不会显示。
+
+参考 <<images_recipe>> 有更多复杂的使用上传文件的例子。
+
+'''
+
+multiUpload 的属性::
+<<gui_FileMultiUploadField_accept,accept>> -
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_css,css>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_FileMultiUploadField_dropZone,dropZone>> -
+<<gui_attr_enable,enable>> -
+<<gui_FileMultiUploadField_fileSizeLimit,fileSizeLimit>> -
+<<gui_attr_height,height>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_FileUploadField_pasteZone,pasteZone>> -
+<<gui_FileMultiUploadField_permittedExtensions,permittedExtensions>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+multiUpload 监听器::
+<<gui_FileMultiUploadField_FileUploadErrorListener,FileUploadErrorListener>> -
+<<gui_FileMultiUploadField_FileUploadFinishListener,FileUploadFinishListener>> -
+<<gui_FileMultiUploadField_FileUploadStartListener,FileUploadStartListener>> -
+<<gui_FileMultiUploadField_QueueUploadCompleteListener,QueueUploadCompleteListener>>
+
+'''
+

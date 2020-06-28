@@ -1,0 +1,138 @@
+:sourcesdir: ../../../../../../source
+
+[[abstractEditor]]
+====== AbstractEditor
+
+[WARNING]
+====
+这是旧版本的 API。对于从 7.0 开始的新 API，请参阅 <<screen_controllers>>。
+====
+
+`AbstractEditor` 是<<screen_edit,编辑界面>>控制器的基类，<<abstractWindow,AbstractWindow>> 的子类。
+
+创建控制器类时，推荐使用需要编辑的实体作为 `AbstractEditor` 的泛型参数。这样会使 `getItem()` 和 `initNewItem()` 方法能操作指定的实体类型，应用程序代码也不需要做额外的类型转换。示例：
+
+[source, java]
+----
+include::{sourcesdir}/gui/abstracteditor_1.java[]
+---- 
+
+`AbstractEditor` 定义了下列方法：
+
+[[abstractEditor_getItem]]
+* `getItem()` – 返回编辑的实体实例，通过界面主<<datasources,数据源>>设置（比如在 XML 描述的根节点元素中通过 `datasource` 属性设置）。
++
+如果编辑的实体实例不是新建的，界面打开过程会按照主数据源设置的 <<views,view>> 来重新加载实体的实例。
++
+对 `getItem()` 返回实例的更改，会在数据源的状态中反映出来，之后会被送到 Middleware 然后提交给数据库。
++
+[WARNING]
+====
+需要注意的是，只有在界面通过 `setItem()` 初始化之后，`getItem()` 方法才能返回一个值。在此之前，这个方法只会返回 `null`，比如在 `init()` 或者 `initNewItem()` 方法里调用的时候。
+
+但是，在 `init()` 方法中，可以通过以下方法取到传递给 `openEditor()` 方法参数的实体实例：
+
+[source, java]
+----
+include::{sourcesdir}/gui/abstracteditor_2.java[]
+---- 
+
+`initNewItem()` 方法可以接收正确类型的实体作为参数。
+
+这两种情况下，获取到的实体实例之后都会被重新加载，除非是新建的。因此，不能对实体做修改，或者将此时的实体保存在某个字段留着将来用。
+====
+
+[[abstractEditor_setItem]]
+* `setItem()` – 当窗口通过 `openEditor()` 方式打开的时候，平台会调用这个方法将需要编辑的实体设置到主数据源。调用此方法时，所有的界面组件和数据源都已经创建了，并且控制器的 `init()` 方法也已经执行。
++
+如果是要初始化界面的话，推荐使用模板方法 `initNewItem()` 和 `postInit()`，而不要重写 `setItem()`。
+
+[[initNewItem]]
+* `initNewItem()` – 在设置编辑实体实例到主数据源之前平台会自动调用的模板方法。
++
+`initNewItem()` 方法只能给新创建的实体实例调用。这个方法不会给<<entity_states,游离>>实体调用。如果新实体实例必须在设置到主数据源之前做初始化，可以在控制器实现此方法。示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstracteditor_3.java[]
+---- 
++
+关于使用 `initNewItem()` 方法的更复杂的例子可以参阅 <<init_values_in_initNewItem,cookbook>>。
+
+[[abstractEditor_postInit]]
+* `postInit()` – 在编辑实体实例被设置到主数据源之后马上被平台调用的模板方法。在这个方法中，可以使用 `getItem()` 来获取新建的实体实例或者在界面初始化过程中重新加载的实体。
++
+这个方法可以在控制器作为界面初始化的最后一步实现：
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstracteditor_4.java[]
+---- 
+
+[[abstractEditor_commit]]
+* `commit()` – 验证界面，并且通过 <<dataSupplier,DataSupplier>> 提交数据改动至 Middleware。
++
+如果调用带有 `validate = false` 参数的方法，提交时不会做验证。
++
+建议不要重写此方法，改为使用特定的模板方法 - `postValidate()`，`preCommit()` 和 `postCommit()`。
+
+[[abstractEditor_commitAndClose]]
+* `commitAndClose()` – 验证界面，提交改动到 Middleware 并且关闭界面。`++Window.COMMIT_ACTION_ID++` 的值会传递给 `preClose()` 方法以及注册过的 `CloseListener` 监听器。
++
+建议不要重写此方法，改为使用特定的模板方法 - `postValidate()`，`preCommit()` 和 `postCommit()`。
+
+[[abstractEditor_preCommit]]
+* `preCommit()` – 在提交改动的过程中被平台调用的模板方法，在成功验证之后，但是在数据提交到 Middleware 之前。
++
+这个方法可以在控制器实现。如果返回值是 `false`，提交的过程会被中断，如果是关闭窗口过程（如果调用的 `commitAndClose()`）中的话，也会被中断。示例：
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstracteditor_5.java[]
+---- 
+
+[[abstractEditor_postCommit]]
+* `postCommit()` – 在提交改动的最后阶段被平台调用的模板方法。方法参数：
+
+** `committed` – 如果界面有改动，并且已经提交给 Middleware，设置为 `true`。
+
+** `close` – 如果界面需要在提交改动之后关闭的话，设置为 `true`。
++
+如果界面没有关闭，此方法的默认实现会展示关于成功提交的信息并且调用 `postInit()`。
++
+可以在控制器重写此方法，以便在成功提交改动之后做额外操作，比如：
++
+[source, java]
+----
+include::{sourcesdir}/gui/abstracteditor_6.java[]
+----
+
+下列图表展示初始化序列过程，以及编辑界面的不同提交改动方法。
+
+.编辑界面初始化过程
+image::EditorInit.png[align="center"]
+
+.使用 editWindowActions 子框架提交并关闭窗口
+image::EditorCommit.png[align="center"]
+
+.使用 extendedEditWindowActions 子框架提交界面改动
+image::ExtendedEditorCommit.png[align="center"]
+
+.使用 extendedEditWindowActions 子框架提交界面改动并关闭窗口
+image::ExtendedEditorCommitAndClose.png[align="center"]
+
+'''
+
+API::
+
+<<abstractEditor_commit,commit()>> -
+<<abstractEditor_commitAndClose,commitAndClose()>> -
+<<abstractEditor_getItem,getItem()>> -
+<<initNewItem,initNewItem()>> -
+<<abstractEditor_postCommit,postCommit()>> -
+<<abstractEditor_postInit,postInit()>> -
+<<abstractEditor_preCommit,preCommit()>> -
+<<abstractEditor_setItem,setItem()>>
+
+'''
+

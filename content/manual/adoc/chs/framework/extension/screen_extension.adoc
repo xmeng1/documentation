@@ -1,0 +1,108 @@
+:sourcesdir: ../../../../source
+
+[[screen_extension]]
+==== 扩展界面
+
+平台支持通过继承现有的界面描述来创建新的<<screen_descriptors,界面 XML 描述>>。
+
+通过在 `window` 根元素的 `extends` 属性中指定父描述路径来实现 XML 继承。
+
+XML 界面元素覆盖规则：
+
+* 如果新扩展的界面描述中有某个元素，则将使用以下算法在父描述中搜索相应的元素：
+
+** 如果覆盖的元素有 `id` 属性，则会在父描述中搜索具有相同 `id` 的相应元素。
+
+** 如果搜索成功，则找到的元素被 *覆盖*。
+
+** 否则，平台将先确定父描述中包含具有提供的路径和名称的元素数量。如果只有一个元素，则它被 *覆盖*。
+
+** 如果搜索没有产生结果，并且在父描述中没有具有给定路径和名称的元素或者有多个这种元素，则会 *添加* 新元素。
+
+* 被覆盖或添加的元素的文本将从扩展的新元素中复制。
+
+* 扩展的新元素的所有属性都会复制到被覆盖或添加的元素中。如果属性名称匹配，则从扩展的新元素中获取值。
+
+* 默认情况下，新元素将添加到元素列表的末尾。要将新元素添加到开头或使用任意位置，可以执行以下操作：
+
+** 在继承描述中定义一个额外的命名空间： `xmlns:ext="http://schemas.haulmont.com/cuba/window-ext.xsd"`。
+
+** 添加带有所需索引的 `ext:index` 属性到扩展元素，例如：`ext:index="0"`。
+
+要调试 XML 描述的转换过程，可以通过在 *Logback* 配置文件中将 `com.haulmont.cuba.gui.xml.XmlInheritanceProcessor` 记录器指定为 `TRACE` 级别，从而将结果 XML 输出到服务端日志。
+
+扩展历史版本界面::
++
+--
+框架中包含了一组使用<<screens,历史 API >>实现的历史界面，以提供向后兼容性。下面这个例子是扩展<<security_subsystem,安全子系统>>中实体 `User` 的界面。
+
+首先，看看 `ExtUser` 实体的浏览界面：
+
+.ext-user-browse.xml
+[source, xml]
+----
+include::{sourcesdir}/extension/ext-user-browse.xml[]
+----
+
+在此示例中，XML 描述继承自框架的标准 `User` 实体浏览界面。`address` 列以 `2` 为索引被添加到表中，因此它在 `login` 和 `name` 列之后显示。
+
+如果在<<screens.xml,screens.xml>>中注册一个新界面，新界面使用与父界面相同的标识符，这样新界面就会代替旧界面。
+
+[source, xml]
+----
+include::{sourcesdir}/extension/screens_registration.xml[]
+----
+
+同样，创建一个编辑界面：
+
+.ext-user-edit.xml
+[source, xml]
+----
+include::{sourcesdir}/extension/ext-user-edit.xml[]
+----
+
+使用父界面的标识符在 `screens.xml` 中注册：
+
+[source, xml]
+----
+include::{sourcesdir}/extension/screens_registration2.xml[]
+----
+
+一旦上面提到的这些步骤都完成了，应用程序会使用 `ExtUser` 以及相应的界面替换平台中标准的 `User` 实体和界面。
+
+界面控制器可以通过创建继承自界面控制器基类的新类进行扩展。类名需要在扩展的 XML 描述中通过根元素的 `class` 属性指定；上面提到的 XML 继承通用规则也会有效。
+--
+
+使用 CUBA Studio 扩展界面::
++
+--
+这个例子中，我们将对<<app_components_sample>>中提到的客户管理组件的 `Customer` 实体界面进行扩展，为其客户浏览表格添加一个 `Excel` 按钮，用来导出 Excel 表格。
+
+. 在 Studio 中创建一个新项目，并添加 Customer Manangemnt 组件。
+
+. 在 CUBA 项目树中右键点击 *Generic UI*，右键菜单中选择 *New > Screen*。然后在 *Screen Templates* 标签页选择 *Extend an existing screen*。在 *Extend Screen* 列表中，选择 `customer-browse.xml`。然后会在 *web* 模块创建新的 `ext-customer-browse.xml` 和 `ExtCustomerBrowse.java` 文件。
+
+. 打开 `ext-customer-browse.xml` 切换到 *Designer* 标签页。父界面的组件会展示在设计器的工作区。
+
+. 选择 `customersTable` 并添加一个新的 `excel` <<gui_Action,操作>>。
+
+. 在 `buttonsPanel` 添加一个按钮，链接到 `customersTable.excel` 操作。
+
+最后，`ext-customer-browse.xml` 的代码在 *Text* 标签页是如下：
+
+.ext-customer-browse.xml
+[source, xml]
+----
+include::{sourcesdir}/extension/ext-customer-browse.xml[]
+----
+
+再看看 `ExtCustomerBrowse` 界面控制器。
+
+.ExtCustomerBrowse.java
+[source, java]
+----
+include::{sourcesdir}/extension/ExtCustomerBrowse.java[]
+----
+
+由于界面标识符 `customers_Customer.browse` 与父界面的标识符一样，因此，每次调用时会用新界面替换旧界面。
+--

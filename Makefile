@@ -12,3 +12,19 @@ manual-ru-pdf:
 
 manual-en-html-single:
 	./gradlew buildManualEn --debug
+
+# CHS
+
+sync-chs:
+	cp -rf ../cn/documentation/content/manual/adoc/chs content/manual/adoc
+
+manual-chs-pdf:
+	./gradlew buildManualChsPdf --debug
+
+
+manual-chs-html-single:
+	./gradlew buildManualChs --debug
+##
+asciidoctor-pdf -a pdf-theme=basic-theme.yml -a pdf-fontsdir="/Users/mengxin/Library/Fonts" manual.adoc -v --trace
+
+asciidoctor-pdf -r asciidoctor-pdf-cjk-kai_gen_gothic -a pdf-style=KaiGenGothicCN manual.adoc -v --trace

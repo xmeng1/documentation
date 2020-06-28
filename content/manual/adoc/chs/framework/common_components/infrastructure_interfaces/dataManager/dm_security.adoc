@@ -1,0 +1,18 @@
+:sourcesdir: ../../../../../../source
+
+[[dm_security]]
+====== DataManager 安全机制
+
+DataManager 的 `load()`、`loadList()`、`loadValues()` 和 `getCount()` 方法会检查用户是否对要加载的实体有 READ <<permissions,权限>>。此外，从数据库加载实体也受访问组<<constraints,约束>>的限制。
+
+`commit()` 方法检查新建实体需要的 CREATE 权限、更新实体需要的 UPDATE 权限和删除实体需要的 DELETE 权限。
+
+默认情况下，在客户端调用时，`DataManager` 会检查实体操作（READ / CREATE / UPDATE / DELETE）的权限，但是在从中间件代码调用时忽略这些检查。默认情况不强制检查实体属性权限。
+
+如果要在中间件代码中使用 `DataManager` 时检查实体操作权限，请通过 `DataManager.secure()` 方法获取包装类并调用其方法。或者，可以设置 <<cuba.dataManagerChecksSecurityOnMiddleware,cuba.dataManagerChecksSecurityOnMiddleware>> 应用程序属性以打开整个应用程序的安全检查。
+
+只有在将 <<cuba.entityAttributePermissionChecking,cuba.entityAttributePermissionChecking>> 应用程序属性设置为 true 时，才会在中间件上强制执行属性权限。如果中间件为理论上可以被攻击的远程客户端提供服务，比如桌面客户端（这是可能的）。在这种情况下，还要将 <<cuba.keyForSecurityTokenEncryption,cuba.keyForSecurityTokenEncryption>> 应用程序属性设置为唯一值。如果应用程序仅使用 Web 或 Portal 客户端，则可以安全地保留这些属性的默认值。
+
+请注意，无论上述条件如何始终都会实施访问组<<constraints,约束>> （行级别安全性）。
+
+参阅 <<data_access_checks>> 章节全面了解框架中如何使用安全权限和约束。

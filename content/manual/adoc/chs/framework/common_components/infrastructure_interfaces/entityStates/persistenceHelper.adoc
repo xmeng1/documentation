@@ -1,0 +1,13 @@
+:sourcesdir: ../../../../../../source
+
+[[persistenceHelper]]
+====== PersistenceHelper
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/core/global/PersistenceHelper.html" class="api-docs-btn" target="_blank">API 文档
+   </a>
+</div>
+++++
+
+一个具有 <<entityStates, EntityStates>> 接口中静态方法的辅助类。

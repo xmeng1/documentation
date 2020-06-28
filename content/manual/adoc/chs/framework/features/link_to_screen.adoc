@@ -1,0 +1,58 @@
+:sourcesdir: ../../../../source
+
+[[link_to_screen]]
+==== 界面链接
+
+[WARNING]
+====
+参阅 <<url_history_navigation>> 部分，这里描述了 URL 和应用程序界面映射的更多功能。
+====
+
+Web 客户端<<app_tiers,block>>允许通过 URL 中提供的命令打开应用程序界面。如果浏览器没有已登录用户的会话信息，则应用程序将首先显示登录界面，在身份验证成功后进入应用程序主窗口，同时打开请求的界面。
+
+支持的命令列表由<<cuba.web.linkHandlerActions,cuba.web.linkHandlerActions>>应用程序属性定义。默认情况下是 `open` 和 `o`。在处理 HTTP 请求时，将分析 URL 的最后一部分，如果它与已注册的命令匹配，则将控制权传递给适当的处理器，该处理器是实现 `LinkHandlerProcessor` 接口的 bean。
+
+平台提供了一个接受以下请求参数的处理器：
+
+* `screen` – <<screens.xml,screens.xml>>中定义的界面名称，例如：
++
+[source, url]
+----
+http://localhost:8080/app/open?screen=sec$User.browse
+----
+
+* `item` – 要传递给<<screen_edit,编辑界面>>的实体实例，根据 `EntityLoadInfo` 类的约定进行编码，即 `entityName-instanceId` 或 `entityName-instanceId-viewName`。例如：
++
+[source, url]
+----
+http://localhost:8080/app/open?screen=sec$User.edit&item=sec$User-60885987-1b61-4247-94c7-dff348347f93
+
+http://localhost:8080/app/open?screen=sec$User.edit&item=sec$User-60885987-1b61-4247-94c7-dff348347f93-user.edit
+----
++
+要在打开的编辑器界面中直接创建新的实体实例，请在实体类名称前添加 `NEW-` 前缀，例如：
++
+[source, plain]
+----
+http://localhost:8080/app/open?screen=sec$User.edit&item=NEW-sec$User
+----
+
+* `params` – 界面<<screen_controller,控制器>>的 `init()` 方法的参数。参数格式为 `name1:value1,name2:value2`。参数值可以包括根据 `EntityLoadInfo` 类的约定编码的实体实例。例如：
++
+[source, url]
+----
+http://localhost:8080/app/open?screen=sales_Customer.lookup&params=p1:v1,p2:v2
+
+http://localhost:8080/app/open?screen=sales_Customer.lookup&params=p1:sales_Customer-01e37691-1a9b-11de-b900-da881aea47a6
+----
+
+如果要提供其它 URL 命令，请执行以下操作：
+
+* 在项目的 *web* 模块中创建一个实现了 `LinkHandlerProcessor` 接口的<<managed_beans,bean>>。
+
+* 如果应当由新的 bean 处理当前的 URL（URL 参数存储在 `ExternalLinkContext` 对象），那么这个 bean 的 `canHandle()` 方法必须返回 true。
+
+* 在 `handle()` 方法中执行请求的操作。
+
+bean 可以选择实现 Spring 的 `Ordered` 接口或包含 `Order` 注解。这样，可以在处理器链中指定 bean 的顺序。使用 `LinkHandlerProcessor` 接口的 `HIGHEST_PLATFORM_PRECEDENCE` 和 `LOWEST_PLATFORM_PRECEDENCE` 常量将 bean 放在平台中定义的处理器之前或之后。因此，如果指定的顺序小于 `HIGHEST_PLATFORM_PRECEDENCE`，则会更早地请求 bean，并且可以根据需要覆盖平台处理器定义的操作。
+

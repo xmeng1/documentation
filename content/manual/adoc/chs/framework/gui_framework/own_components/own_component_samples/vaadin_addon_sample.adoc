@@ -1,0 +1,88 @@
+:sourcesdir: ../../../../../../source
+
+[[vaadin_addon_sample]]
+====== 使用第三方 Vaadin 组件
+
+这是在应用程序项目中使用 `http://vaadin.com/addon/stepper` 中提供的 *Stepper* 组件的示例。该组件允许使用键盘、鼠标滚动或组件右侧的上/下按钮逐步更改文本框的值。
+
+在 CUBA Studio 中创建一个新项目，并将其命名为 `addon-demo`。
+
+只能在具有 *web-toolkit* 模块的应用程序项目中集成 Vaadin 扩展。使用 *CUBA Studio* 可以很方便的创建这个模块：在主菜单，点击 *CUBA > Advanced > Manage modules > Create 'web-toolkit' Module*。
+
+然后添加 vaadin 扩展需要的依赖：
+
+. 在<<build.gradle,build.gradle>>中，在 *web* 模块配置中添加包含组件的扩展包的依赖：
++
+[source, java]
+----
+configure(webModule) {
+    ...
+    dependencies {
+        ...
+        compile("org.vaadin.addons:stepper:2.4.0")
+    }
+----
+
+. *web-toolkit* 模块的 `AppWidgetSet.gwt.xml` 文件中，说明项目的部件继承自扩展的部件：
++
+[source, xml]
+----
+<module>
+    <inherits name="com.haulmont.cuba.web.widgets.WidgetSet" />
+
+    <inherits name="org.vaadin.risto.stepper.StepperWidgetset" />
+
+    <set-property name="user.agent" value="safari" />
+</module>
+----
++
+[TIP]
+====
+可以通过定义 `user.agent` 属性来加速部件编译。在此示例中，部件仅针对基于 WebKit 的浏览器（Chrome、Safari 等）进行编译。
+====
+
+现在，来自 Vaadin 扩展的组件被包含到项目中。我们看看如何在项目界面中使用它。
+
+* 创建包含下面两个字段的新实体 `Customer`：
+
+** String 类型的 `name`
+** Integer 类型的 `score`
+
+* 为新实体生成标准界面。确保 *Module* 字段设置为 `Module: 'app-web_main'`（这个字段只有在项目添加了 *gui* 模块之后才会显示）。直接使用 Vaadin 组件的界面必须放在 *web* 模块中。
++
+[TIP]
+====
+实际上，界面也可以放在 *gui* 模块中，但是这就需要使用 Vaadin 组件的代码移动到单独的<<companions,companion>>。
+====
+
+* 接下来，我们将 `stepper` 组件添加到界面上。
++
+将 `customer-edit.xml` 界面的 `form` 组件的 `score` 字段替换成一个 `hBox`，这个 `hBox` 将用来作为 Vaadin 组件的容器。
++
+[source, xml]
+----
+include::{sourcesdir}/ui_component/vaadin_no_gui/customer-edit-nogui.xml[]
+----
++
+将以下代码添加到 `CustomerEdit.java` 控制器：
++
+[source, java]
+----
+include::{sourcesdir}/ui_component/vaadin_no_gui/CustomerEditNoGui.java[]
+----
++
+`onInit()` 方法会初始化一个 stepper 组件的实例，可以用 `unwrap` 方法取到 Vaadin 容器的链接，然后将新组件添加进去。
++
+数据绑定是通过编程的方式在 `onBeforeShow()` 方法中为 `Customer` 实例的 `stepper` 组件设置当前值来实现的。此外，对应的实体属性是在用户改变值时，通过值变化的监听器来更新的。
+
+* 要调整组件样式，请在项目中创建主题扩展。使用 *CUBA Studio* 可以很方便扩展主题，点击 *CUBA > Advanced > Manage themes > Create theme extension*。在弹出窗口选择 `hover` 主题。另一个方式时使用 https://www.cuba-platform.com/marketplace/cuba-cli[CUBA CLI] 的 `extend-theme` 命令。之后，打开位于 *web* 模块中的 `themes/hover/com.company.demo/hover-ext.scss` 文件并添加以下代码：
++
+[source, css]
+----
+include::{sourcesdir}/ui_component/vaadin_no_gui/hover-ext.scss[]
+----
+
+* 启动应用程序服务。将生成如下所示的编辑界面：
+
+image::ui_component/customer_edit_result.png[align="center",358,250]
+

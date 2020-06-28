@@ -1,0 +1,36 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_presentations]]
+====== 展示设置
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/presentations/Presentations.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+展示设置机制允许用户管理表格（table）的列宽、排序方式等外观属性。
+
+image::gui_presentations.png[align="center"]
+
+用户通过展示设置可以：
+
+* 使用唯一的名称保存展示设置。表格的设置会自动保存在当前活动的展示设置中。
+
+* 编辑和删除展示设置。
+
+* 在不同设置之间切换。
+
+* 指定一个默认展示设置，当界面打开的时候会用这个设置来显示表格。
+
+* 创建全局的展示设置，对所有用户可见。如果需要创建、修改或者删除全局展示设置，此用户需要有 `cuba.gui.presentations.global` 安全<<permissions,权限>>。
+
+实现了 `com.haulmont.cuba.gui.components.Component.HasPresentations` 接口的组件都可以使用展示设置。这些组件是：
+
+* <<gui_Table,Table>>
+
+* <<gui_GroupTable,GroupTable>>
+
+* <<gui_TreeTable,TreeTable>>
+
+

@@ -1,0 +1,74 @@
+:sourcesdir: ../../../../source
+
+[[bean_extension]]
+==== 扩展业务逻辑
+
+平台业务逻辑的主要部分包含在 *Spring* bean 中。这样可以在应用程序中轻松地继承或重写它。
+
+要替换 bean 实现，应该创建一个类来实现接口或继承平台基础类并在应用程序的<<spring.xml,spring.xml>>中注册它。不能将 `@Component` 注解用到于继承类；只能在 XML 配置中覆盖 bean。
+
+下面是向<<persistenceTools,PersistenceTools>> bean 添加方法的示例。
+
+首先，创建一个带有必要方法的类：
+
+[source, java]
+----
+public class ExtPersistenceTools extends PersistenceTools {
+
+  public Entity reloadInSeparateTransaction(final Entity entity, final String... viewNames) {
+      Entity result = persistence.createTransaction().execute(new Transaction.Callable<Entity>() {
+          @Override
+          public Entity call(EntityManager em) {
+              return em.reload(entity, viewNames);
+          }
+      });
+      return result;
+  }
+}
+----
+
+在项目 *core* 模块的 `spring.xml` 中注册类，其标识符与平台 bean 相同：
+
+[source, xml]
+----
+<bean id="cuba_PersistenceTools" class="com.sample.sales.core.ExtPersistenceTools"/>
+----
+
+之后，*Spring* 上下文将始终返回 `ExtPersistenceTools` 实例而不是基类 `PersistenceTools` 的 实例。检查代码示例：
+
+[source, java]
+----
+Persistence persistence;
+PersistenceTools tools;
+
+persistence = AppBeans.get(Persistence.class);
+tools = persistence.getTools();
+assertTrue(tools instanceof ExtPersistenceTools);
+
+tools = AppBeans.get(PersistenceTools.class);
+assertTrue(tools instanceof ExtPersistenceTools);
+
+tools = AppBeans.get(PersistenceTools.NAME);
+assertTrue(tools instanceof ExtPersistenceTools);
+----
+可以使用相同的逻辑来重写<<app_components_sample,应用程序组件>>中的服务，例如：要替换 bean 实现，应该创建一个类，这个类扩展基础服务功能。在下面的示例中，创建了一个新类 `NewOrderServiceBean` ,并重写基类 `OrderServiceBean` 中的方法：
+
+[source, java]
+----
+public class NewOrderServiceBean extends OrderServiceBean {
+    @Override
+    public BigDecimal calculateOrderAmount(Order order) {
+        BigDecimal total = super.calculateOrderAmount(order);
+        BigDecimal vatPercent = new BigDecimal(0.18);
+        return total.multiply(BigDecimal.ONE.add(vatPercent));
+    }
+}
+----
+
+然后，如果在 `spring.xml` 中注册新创建的这个类，平台将会使用新的实现代替旧的实现 `OrderServiceBean` 。请注意，注册新的 bean 时，id 属性应该与应用程序组件中的基础服务的 `id` 一致，在 `class` 属性中指定新类的完全限定名：
+
+[source, xml]
+----
+<bean id="workshop_OrderService" class="com.company.retail.service.NewOrderServiceBean"/>
+----
+

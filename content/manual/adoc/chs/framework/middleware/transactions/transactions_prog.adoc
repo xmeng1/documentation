@@ -1,0 +1,27 @@
+:sourcesdir: ../../../../../source
+
+[[transactions_prog]]
+===== 编程式事务管理
+
+编程式事务管理使用 `com.haulmont.cuba.core.Transaction` 接口完成。可以通过<<persistence,Persistence>>基础接口的 `createTransaction()` 或 `getTransaction()` 方法获得对它的引用。
+
+`createTransaction()` 方法创建一个新事务并返回 `Transaction` 接口。后续调用此接口的 `commit()` 、 `commitRetaining()` 、 `end()` 方法控制创建的事务。如果在创建时有另一个活动的事务，它将先暂停并在新创建的事务完成后恢复。
+
+`getTransaction()` 方法要么创建新事务，要么附加到已有事务并返回一个嵌套事务。如果在调用时有一个活动的当前事务，那么该方法会成功完成，但后续调用嵌套事务的 `commit()`、 `commitRetaining()` 、 `end()` 方法对当前事务没有影响。但是，在没有调用嵌套事务的 `commit()` 方法的情况下调用 `end()` 方法，会将当前事务标记为 `RollbackOnly`。简单来说，就是只有嵌套事务成功提交了，外层事务才能提交。
+
+编程式事务管理的示例：
+
+[source, java]
+----
+include::{sourcesdir}/middleware/transactions_1.java[]
+----
+
+`Transaction` 接口还有 `execute()` 方法接受 action 类或 lambda 表达式。action 类或 lambda 表达式表示的操作将在事务中执行。这样可以以函数式编程风格组织事务管理，例如：
+
+[source, java]
+----
+include::{sourcesdir}/middleware/transactions_2.java[]
+----
+
+需要注意，给定 `Transaction` 实例的 `execute()` 方法只能调用一次，因为事务在执行完操作代码后结束。
+

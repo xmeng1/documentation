@@ -1,0 +1,132 @@
+:sourcesdir: ../../../../source
+
+[[docker_deployment]]
+==== 使用 Docker 部署
+
+本章节介绍了如何在 Docker 容器内部署 CUBA 应用程序。
+
+我们将使用在<<quick_start>>部分开发的示例项目作为例子，迁移到 PostgreSQL 数据库，并构建 <<uberjar_deployment,UberJAR>>，最后运行在容器中。事实上，构建为 WAR 的应用程序也能在容器化的 Tomcat 中运行，但是需要做更多的配置，所以如果只是示例，我们就用 UberJAR。
+
+配置并构建 UberJAR::
++
+--
+从 https://github.com/cuba-platform/sample-sales-cuba7 克隆示例程序，并且在 CUBA Studio中 {studio_man_url}/open_project.html[打开] 。
+
+首先，将数据库类型改为 PostgreSQL：
+
+. 在主菜单点击 *CUBA > Main Data Store Settings…​*。
+. 在 *Database type* 字段选择 *PostgreSQL* 然后点击 *OK*。
+. 在主菜单点击 *CUBA > Generate Database Scripts*。Studio 打开包含自动生成脚本的 *Database Scripts* 窗口。点击 *Save and close*。
+. 在主菜单点击 *CUBA > Create Database*。Studio 会在本地 PostgreSQL 服务创建 `sales` 数据库。
+
+接下来，配置构建 UberJAR 的 Gradle 任务。
+
+. 在主菜单点击 *CUBA > Deployment > UberJAR Settings*。
+. 勾选 *Build Uber JAR* 和 *Single Uber JAR* 复选框。
+. 点击 *Logback configuration file* 字段旁边的 *Generate* 按钮。
+. 点击 *Custom Jetty environment file* 字段旁边的 *Generate* 按钮。确保选择了 PostgreSQL 然后在 *Database URL* 字段输入 `postgres` 替换 `localhost`。这个配置是在使用下面描述的容器化的数据库时需要的。
+. 点击 *OK*。Studio 会在 `build.gradle` 文件中添加 <<build.gradle_buildUberJar>> 任务。
+. 为了保证日志文件在正确的位置，打开生成的 `etc/uber-jar-logback.xml` 文件，修改 `logDir` 属性：
++
+[source,xml]
+----
+<property name="logDir" value="${app.home}/logs"/>
+----
++
+还有，确保 Logback 配置文件限制了 `org.eclipse.jetty` logger 的级别至少为 `INFO`。如果文件中没有该 logger，可以添加：
++
+[source,xml]
+----
+<logger name="org.eclipse.jetty" level="INFO"/>
+----
+
+执行创建 JAR 的命令：
+
+[source, plain]
+----
+./gradlew buildUberJar
+----
+--
+
+创建 Docker 镜像::
++
+--
+现在创建 `Dockerfile` 然后构建我们应用程序的 Docker 镜像。
+
+. 在项目中创建 `docker-image` 目录。
+. 从 `build/distributions/uberJar` 复制 JAR 文件至该目录。
+. 使用下面的内容创建一个 `Dockerfile` 文件：
++
+[source, plain]
+----
+FROM openjdk:8
+
+COPY . /opt/sales
+
+CMD java -Dapp.home=/opt/sales-home -jar /opt/sales/app.jar
+----
+
+`app.home` Java 系统参数定义了<<app_home,应用程序主目录>>的文件夹，这里会存放日志文件和应用程序创建的其它文件。当运行容器时，我们能将该目录映射至宿主机的一个目录，这样能方便访问日志以及其它数据，包括上传至 <<file_storage,FileStorage>> 的文件。
+
+现在构建镜像：
+
+. 在项目根目录打开终端窗口。
+. 运行构建命令，在 `-t` 选项后面传递镜像名称以及 `Dockerfile` 所在的文件夹：
++
+[source, plain]
+----
+docker build -t sales docker-image
+----
+
+当执行 `docker images` 命令时，确保能显示 `sales` 镜像。
+--
+
+运行应用程序和数据库容器::
++
+--
+现在应用程序已经准备好可以在容器中运行了，但是我们还需要一个容器化的 PostgreSQL 数据库。为了管理两个容器 - 一个应用程序，一个数据库，我们使用 Docker Compose。
+
+在项目根目录创建 `docker-compose.yml` 文件，使用以下内容：
+
+[source, plain]
+----
+version: '2'
+
+services:
+  postgres:
+    image: postgres:9
+    environment:
+      - POSTGRES_DB=sales
+      - POSTGRES_USER=cuba
+      - POSTGRES_PASSWORD=cuba
+    ports:
+      - "5433:5432"
+  web:
+    depends_on:
+      - postgres
+    image: sales
+    volumes:
+      - /Users/me/sales-home:/opt/sales-home
+    ports:
+      - "8080:8080"
+----
+
+需要注意此文件中这些部分：
+
+* `volumes` 部分将容器的 `/opt/sales-home` 目录，也就是应用程序的主目录，映射到宿主机的 `/Users/me/sales-home` 目录。也就是说，应用程序的之日可以通过宿主机的 `/Users/me/sales-home/logs` 目录访问。
+
+* PostgreSQL 内部端口 5432 映射至宿主机的 5433 端口，避免与宿主机可能运行的 PostgreSQL 实例相冲突。使用该端口，可以在容器外访问数据库，比如，做数据库备份：
++
+----
+pg_dump -Fc -h localhost -p 5433 -d sales -U cuba > /Users/me/sales.backup
+----
+
+* 应用程序容器开放了端口 8080，所以应用程序 UI 可以通过 `++http://localhost:8080/app++` 在宿主机访问。
+
+要启动应用程序和数据库，在 `docker-compose.yml` 文件所在的文件夹打开终端，运行：
+
+[source, plain]
+----
+docker-compose up
+----
+--

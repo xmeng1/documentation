@@ -1,0 +1,54 @@
+:sourcesdir: ../../../../../source
+
+[[transaction_params]]
+===== 事务参数
+
+[[transaction_timeout]]
+事务超时::
++
+--
+可以为创建的事务设置超时时限（以秒为单位）。如果发生超时，事务将被中断并回滚。事务超时设置可以有效地限制数据库请求的最大持续时间。
+
+以编程方式管理事务时，通过传递给 `Persistence.createTransaction()` 方法的参数 `TransactionParams` 对象来指定超时。例如：
+
+[source, java]
+----
+include::{sourcesdir}/middleware/transactions_6.java[]
+----
+
+在声明式事务管理的情况下，使用 `@Transactional` 注解的 `timeout` 参数：
+
+[source, java]
+----
+include::{sourcesdir}/middleware/transactions_7.java[]
+----
+
+可以使用<<cuba.defaultQueryTimeoutSec,cuba.defaultQueryTimeoutSec>>应用程序属性定义默认超时时限。
+--
+
+[[transaction_read_only]]
+只读事务::
++
+--
+如果事务仅用于从数据库读取数据，则可以将事务标记为只读。例如，<<dataManager,DataManager>>的所有 `load` 方法默认使用只读事务。只读事务会有更好的性能，因为平台不执行处理可能修改实体的代码。`BeforeCommit` <<transaction_listeners,事务监听器>>也不会被调用。
+
+[WARNING]
+====
+如果只读事务的持久化上下文包含已修改的实体，则在提交事务时将抛出 `IllegalStateException`。这意味着只有在确定不修改任何实体时，才应将事务标记为只读。
+====
+
+以编程方式管理事务时，通过将 `TransactionParams` 对象传递给 `Persistence.createTransaction()` 方法来指定只读标识。例如：
+
+[source, java]
+----
+include::{sourcesdir}/middleware/transactions_8.java[]
+----
+
+在声明式事务管理的情况下，使用 `@Transactional` 注解的 `readOnly` 参数：
+
+[source, java]
+----
+include::{sourcesdir}/middleware/transactions_9.java[]
+----
+--
+

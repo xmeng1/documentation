@@ -1,0 +1,57 @@
+:sourcesdir: ../../../source
+
+[[qs_create_entities]]
+=== 创建实体
+
+下面我们创建客户（`Customer`）实体类。
+
+* 选中 CUBA 项目树面板中的 *Data Model* 部分，右键点击该节点，然后点击 *New* > *Entity*。这时会出现 *New CUBA Entity* 对话框窗口。
+
+* 在 *Entity name* 字段输入新实体类的名字 – `Customer`。
++
+image::quick_start/new_entity.png[align="center"]
+
+* 点击 *OK*。然后会在工作区出现实体设计的界面。
++
+image::quick_start/entity_designer.png[align="center"]
+
+* 这里会自动生成实体名字和数据库表名字，分别填写在 *Entity name* 和 *Table* 字段。
+
+* *Parent* 字段就按照默认给的值 `StandardEntity` 就可以。
+
+* *Inheritance* 字段不需改动。
+
+下一步，创建实体的属性。点击 *Attributes* 表格下面的 *New* 按钮。
+
+* 会出现 *Create attribute* 窗口。在 *Name* 字段输入属性名称 `name`，在 *Attribute type* 字段选择属性的数据类型，选择 `DATATYPE`，在 *Type* 字段选择 `String`。勾上 *Mandatory* 复选框。然后会在 *Column* 字段自动生成数据库表的列名。
++
+image::quick_start/new_attribute.png[align="center"]
++
+点击 *Add* 添加属性。
+
+* `email` 属性也按照相同的方式创建。但是对于该字段，我们需要添加验证。在创建该属性之后，点击在字段属性配置栏的 *Validation* 区域点击 *Email - not set* 链接。
+
++
+image::quick_start/email_attribute.png[align="center"]
++
+* 在窗口中勾选 *Enabled* 复选框并且填写验证错误消息 `Email address is not valid` 然后点击 *OK*。
++
+image::quick_start/email_validation_dialog.png[align="center"]
+
+现在切换到 *Text* 标签页，这里包含了 `Customer` 类的源代码。
+
+image::quick_start/customer_code.png[align="center"]
+
+现在 Customer 实体创建完了。
+
+下面创建 `Order` 实体。
+
+右键点击 CUBA 项目树中的 *Data Model* 部分，然后点击 *New* > *Entity*。输入 *Entity name* − `Order`。实体需要包含如下属性：
+
+* *Name* − `customer`, *Attribute type* − `ASSOCIATION`, *Type* − `Customer`, *Cardinality* − `++MANY_TO_ONE++`。
+
+* *Name* − `date`, *Attribute type* − `DATATYPE`, *Type* − `Date`。勾选 *Mandatory*。
+
+* *Name* − `amount`, *Attribute type* − `DATATYPE`, *Type* − `BigDecimal`。
+
+image::quick_start/new_entity_order.png[align="center"]

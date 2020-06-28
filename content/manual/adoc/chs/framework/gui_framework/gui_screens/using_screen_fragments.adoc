@@ -1,0 +1,159 @@
+:sourcesdir: ../../../../../source
+
+[[using_screen_fragments]]
+===== 使用界面片段
+
+在本章节，介绍如何定义和使用<<screen_controllers,界面片段>>。参考<<screen_fragment_events>>了解如何处理界面片段的生命周期事件。
+
+
+'''
+
+<<using_screen_fragment_decl,声明式使用界面片段>>
+
+<<using_screen_fragment_prog,编程式使用界面片段>>
+
+<<using_screen_fragment_params,给界面片段传递参数>>
+
+<<using_screen_fragment_data,界面片段中的数据组件>>
+
+<<using_screen_fragment_provided_data,使用已有的数据容器>>
+
+'''
+
+[[using_screen_fragment_decl]]
+声明式使用 fragment::
++
+--
+假设我们有用来输入地址的 fragment：
+
+.AddressFragment.java
+[source, java]
+----
+include::{sourcesdir}/gui/screens/address_fragment_1.java[]
+----
+
+.address-fragment.xml
+[source, xml]
+----
+include::{sourcesdir}/gui/screens/address_fragment_1.xml[]
+----
+
+然后我们可以在其它界面使用 `fragment` 元素来包含此 fragment，`fragment` 元素需要有指向 fragment id 的 `screen` 属性，fragment id 在其 `@UiController` 注解设置：
+
+.host-screen.xml
+[source, xml]
+----
+include::{sourcesdir}/gui/screens/address_host_1.xml[]
+----
+
+`fragment` 元素可以添加在界面任意的 UI 容器中，也包含最顶上的 `layout` 元素。
+--
+
+[[using_screen_fragment_prog]]
+编程式使用 fragment::
++
+--
+<<using_screen_fragment_decl,同一个片段>>也可以通过编程的方式添加到界面，需要在 <<screen_InitEvent,InitEvent>> 或 <<screen_AfterInitEvent,AfterInitEvent>> 事件处理器中添加：
+
+.host-screen.xml
+[source, xml]
+----
+include::{sourcesdir}/gui/screens/address_host_2.xml[]
+----
+
+.HostScreen.java
+[source, java]
+----
+include::{sourcesdir}/gui/screens/address_host_2.java[]
+----
+<1> - 注入 `Fragments` bean，用来实例化界面片段
+<2> - 用 class 创建片段控制器
+<3> - 从控制器中获取 `Fragment` 可视化组件，并添加到 UI 容器中。
+
+[WARNING]
+====
+如果该片段有参数，可以在将界面片段添加到界面之前通过公共 setter 方法设置。之后，片段控制器的 `InitEvent` 和 `AfterInitEvent` 处理方法里面可以访问到这些参数。
+====
+
+--
+
+[[using_screen_fragment_params]]
+给界面片段传递参数::
++
+--
+界面片段控制器可以有公共的 setter 方法用来接收参数，和<<screen_parameters,打开界面>>一样的做法。如果界面片段是使用编程的方式打开，可以显式的调用 setters：
+
+[source, java]
+----
+include::{sourcesdir}/gui/screens/address_host_3.java[]
+----
+<1> - 在将片段添加到界面之前先传递参数。
+
+如果片段是通过 XML 以声明的方式添加到界面，使用 `properties` 元素来传递参数，示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui/screens/address_host_4.xml[]
+----
+<1> - 传递一个字符串参数给 `setStrParam()` 方法。
+<2> - 传递一个数据容器给 `setDataContainerParam()` 方法。
+<3> - 传递 `TextField` 组件给 `setComponentParam()` 方法。
+
+使用 `value` 属性设置值，用 `ref` 属性指定界面组件的标识符。setters 必须使用合适类型的参数。
+--
+
+[[using_screen_fragment_data]]
+界面 fragment 中的数据组件::
++
+--
+界面 fragment 可以有自己的数据容器和数据加载器，通过 XML 元素 `data` 定义。同时，框架会为界面及其所有 fragments 创建<<gui_DataContext,DataContext>>的单例。因此，所有加载的实体都合并到同一数据上下文，并在父界面提交的时候一起保存更改。
+
+下面的例子中，会使用界面 fragment 自己的数据容器和加载器。
+
+假设在 fragment 中有 `City` 实体，我们希望使用下拉列表框展示可选的城市而不仅仅用文本控件来展示。可以跟普通界面一样，在 fragment 的 XML 描述中定义数据组件。
+
+.address-fragment.xml
+[source, xml]
+----
+include::{sourcesdir}/gui/screens/address_fragment_2.xml[]
+----
+
+如果需要在父界面打开时加载 fragment 的数据，需要订阅父界面事件：
+
+.AddressFragment.java
+[source, java]
+----
+include::{sourcesdir}/gui/screens/address_fragment_2.java[]
+----
+<1> - 订阅父界面的 <<screen_BeforeShowEvent,BeforeShowEvent>> 事件
+
+[WARNING]
+====
+`@LoadDataBeforeShow` 对界面 fragments 无效。
+====
+--
+
+[[using_screen_fragment_provided_data]]
+使用已有的数据容器::
++
+--
+下一个例子展示了如何在 fragment 中使用父界面的数据容器。
+
+.host-screen.xml
+[source, xml]
+----
+include::{sourcesdir}/gui/screens/address_host_3.xml[]
+----
+<1> - fragment 将在下面使用的数据容器
+
+.address-fragment.xml
+[source, xml]
+----
+include::{sourcesdir}/gui/screens/address_fragment_3.xml[]
+----
+<1> - `provided="true"` 表示使用同样 id 的容器必须存在于父界面或者嵌套的 fragment 中，也就是说必须在该 fragment 外部提供
+<2> - UI 组件连接到提供的数据容器
+
+在包含 `provided="true"` 属性的 XML 元素中，除了 `id` 之外其它所有的属性都会被忽略，但是也可以加上，以便提供设计思路。
+--
+

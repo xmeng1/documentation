@@ -1,0 +1,37 @@
+:sourcesdir: ../../../../../source
+
+[[enum_attributes]]
+===== 枚举属性
+
+<<jpa,JPA>> 对 `enum` 属性的标准用法是使用数据库的整型字段，保存从 `ordinal()` 方法获得的值。在生产环境下对系统进行扩展时，这种方法可能会导致以下问题：
+
+* 如果数据库中枚举的值不等于任何 `ordinal` 值，则无法加载实体实例。
+
+* 不能在现有的值之间添加新的枚举值，但是这在需要按枚举值排序时很重要。
+
+CUBA 中解决这些问题的方式是将存储在数据库中的值与枚举的 `ordinal` 值分离。要到这一点，实体的字段应该用存储在数据库中的字段类型声明（`Integer` 或 `String` 型），而实体的访问方法（getter / setter）则使用实际的枚举类型来定义。
+
+例如:
+
+[source, java]
+----
+include::{sourcesdir}/common/enum_1.java[]
+----
+
+在这种情况下，枚举类可以如下所示：
+
+[source, java]
+----
+include::{sourcesdir}/common/enum_2.java[]
+----
+
+为了将枚举属性正常地反映在<<metadata_framework,元数据>>中，枚举类必须实现 `EnumClass` 接口。
+
+如示例所示，`grade` 属性对应于存储在数据库中的 `Integer` 类型值，该值由 `CustomerGrade` 枚举的 `id` 字段指定，即 `10`  、 `20` 或 `30`。同时，应用程序代码和元数据框架通过访问方法（getter/setter）使用 `CustomerGrade` 枚举，这些方法中执行类型的转换。
+
+如果数据库中的值没有对应的枚举值，这时 `getGrade()` 方法将只返回 `null`。如果要添加一个新枚举值，例如 `HIGHER` 在 `HIGH` 和 `PREMIUM` 之间，只需添加 `id = 15` 的新枚举值就可以了，这样可以确保按 `Customer.grade` 字段正确排序。
+
+`Integer` 字段类型可以提供有序的常量列表，并允许在 JPQL 和 SQL 查询中排序（ `>` 、 `<` 、 `>=` 、 `<=` 、 `order by` ），同时也基本没有存储空间和性能方面的问题。但另一方面，在查询结果中，`Integer` 值不是“自描述”的，这使得在对数据库的原始数据或序列化后的数据进行调试时变地复杂了。就这点而言，使用 `String` 类型更方便。
+
+可以在 CUBA Studio 中使用 *Data Model > New > Enumeration* 菜单创建枚举。要将枚举用作实体属性，请在属性编辑器的 *Attribute type* 字段中选择 `ENUM`，然后在 *Type* 字段中选择枚举类。枚举值可以与在应用程序界面中显示的<<enum_localization,本地化名称>>相关联。
+

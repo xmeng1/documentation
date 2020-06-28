@@ -1,0 +1,31 @@
+:sourcesdir: ../../../../source
+
+[[userSession_log]]
+==== 用户会话日志
+
+这个机制用于使系统管理员可以获得用户登录和注销的历史数据。日志记录机制基于跟踪<<userSession,用户会话>>。每次创建 `UserSession` 对象时，日志记录都会将以下字段信息保存到数据库中：
+
+* 用户会话 ID。
+
+* 用户 ID。
+
+* <<user_substitution,代替用户>> ID。
+
+* 用户的最后一次动作（登录/注销/超时/终止）。
+
+* 请求登录的远程 IP 地址。
+
+* 用户会话的客户端类型（网页、门户）。
+
+* 服务器 ID（例如，`localhost:8080/app-core`）。
+
+* 事件开始日期。
+
+* 事件结束日期。
+
+* 客户端信息（会话环境：操作系统、Web 浏览器等）。
+
+默认情况下，不启用用户会话日志记录机制。启用日志记录机制的最简单方法是使用 *Administration > User Session Log* 应用界面上的 *Enable Logging* 按钮。或者使用 `cuba.UserSessionLogEnabled` 应用属性。
+
+如果需要的话可以创建 `sec$SessionLogEntry` 实体的报表。
+

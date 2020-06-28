@@ -1,0 +1,131 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_BoxLayout]]
+====== 盒子布局
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/BoxLayout.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`BoxLayout` 是一个顺序排列组件的容器。
+
+有三种类型的 `BoxLayout`，它们对应的 XML 元素如下：
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=hbox-sample" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+[[gui_BoxLayout_hbox]]
+* `hbox` − 组件在水平方向顺序排列。
++
+image::gui_hbox.png[align="center"]
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/boxlayout_1.xml[]
+----
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=vbox-sample" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+[[gui_BoxLayout_vbox]]
+* `vbox` − 组件在垂直方向顺序排列。`vbox` 默认具有 100%的宽度。
++
+image::gui_vbox.png[align="center"]
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/boxlayout_2.xml[]
+----
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=flowbox-sample" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+[[gui_BoxLayout_flowBox]]
+* `flowBox` − 组件被水平排列在一行。如果一行中没有足够的空间，则排列不下的组件将显示在下一行中（行为类似于 Swing 的 `FlowLayout`）。
++
+image::gui_flowbox.png[align="center"]
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/boxlayout_3.xml[]
+----
+
+在基于 Halo 的主题的 Web 客户端中，`BoxLayout` 可用于创建更复杂的组合布局。
+使用两个 Box 布局，一个 vbox 布局，设置 `stylename` 为  `card` 或 `well`。里面嵌套一个 hbox 布局， 并为其设置属性 `stylename="v-panel-caption"` ，  使用这个方法可以定义一个具有标题的面板，看起来像 https://vaadin.com/docs/-/part/framework/layout/layout-panel.html[Vaadin Panel]。
+
+* `card` 使布局看起来像卡片。
+
+* `well` 样式使卡片的外看起来带有下沉阴影效果。
+
+image::gui_boxlayout.png[align="center"]
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/boxlayout_4.xml[]
+----
+
+<<gui_api_getComponent,getComponent()>>方法允许通过索引获取 `BoxLayout` 的子组件：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/boxlayout_1.java[]
+----
+
+[[gui_BoxLayout_addShortcutAction]]
+可以在 `BoxLayout` 中使用键盘快捷键。使用 `addShortcutAction()` 方法设置快捷方式和要执行的操作：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/boxlayout.java[]
+----
+
+'''
+
+hbox 、 vbox 、 flowBox 的属性::
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expand,expand>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_id,id>> -
+<<gui_attr_margin,margin>> -
+<<gui_attr_spacing,spacing>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+API::
+<<gui_api_add,add>> -
+<<gui_api_addLayoutClickListener,addLayoutClickListener>> -
+<<gui_api_shortcut,addShortcutAction>> -
+<<gui_api_getComponent,getComponent>> -
+<<gui_api_getComponentNN,getComponentNN>> -
+<<gui_api_getComponents,getComponents>> -
+<<gui_api_margin,getMargin>> -
+<<gui_api_getOwnComponent,getOwnComponent>> -
+<<gui_api_getOwnComponents,getOwnComponents>> -
+<<gui_api_indexOf,indexOf>> -
+<<gui_api_remove,remove>> -
+<<gui_api_removeAll,removeAll>> -
+<<gui_api_margin,setMargin>> -
+<<gui_api_spacing,setSpacing>>
+
+'''
+

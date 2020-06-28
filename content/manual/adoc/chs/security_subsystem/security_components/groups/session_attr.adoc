@@ -1,0 +1,36 @@
+:sourcesdir: ../../../../../source
+
+[[session_attr]]
+===== 会话属性
+
+访问组可以为组中的用户定义<<userSession,用户会话>>属性。这些属性可以在设置<<constraints,约束>>时使用，也可以在其他应用程序代码中使用。
+
+当用户登录时，用户访问组的所有属性集合，以及组以上树形层级的属性集合都会被置于用户会话中。如果不同树形层级有相同的属性，最上层的会生效。所以，不可能在低树形层级组中覆盖属性值。如果发现有覆盖倾向，会在服务器<<logging,日志>>中记录一条警告日志。
+
+在定义 <<groups,访问组>> 的类中，也可以同时定义约束和会话属性。该类需位于 `core` 模块。下面是一个访问组的例子，其中定义了 `accessLevel` 会话属性值为 `1`：
+
+[source,java]
+----
+include::{sourcesdir}/security/session_attr_1.java[]
+----
+
+会话属性也可以在运行时通过 *Access Groups - 访问组* 界面定义：选择一个访问组然后切换到其 *Session Attributes - 会话属性* 标签页。
+
+会话属性可在代码中通过 `UserSession` 对象访问：
+
+[source, java]
+----
+@Inject
+private UserSessionSource userSessionSource;
+...
+Integer accessLevel = userSessionSource.getUserSession().getAttribute("accessLevel");
+----
+
+使用 `session$` 前缀，会话属性可以在<<constraints,约束>>中做为 JPQL 参数使用：
+
+[source, properties]
+----
+{E}.accessLevel = :session$accessLevel
+----
+
+

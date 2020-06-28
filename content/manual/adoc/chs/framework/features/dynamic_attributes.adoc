@@ -1,0 +1,39 @@
+:sourcesdir: ../../../../source
+
+[[dynamic_attributes]]
+==== 动态属性
+
+_Dynamic attributes - 动态属性_ 是额外的实体属性，可以在不需要修改数据库表结构或者重启应用的情况下为实体添加。动态属性通常用来在部署或者生产阶段为实体定义新属性。
+
+CUBA 动态属性实现了 link:$$https://en.wikipedia.org/wiki/Entity%E2%80%93attribute%E2%80%93value_model$$[Entity-Attribute-Value] 模型。
+
+.动态属性类关系图
+image::dynamic_attributes.png[align="center"]
+
+*  `Category` - 定义对象的一个 _category - 类别_ 以及相应的一组动态属性。这个类别必须分配给某些实体类型。
++
+比如，有个实体是 Car 类型的。可以为它定义两个类别：卡车（Truck）和客车（Passenger）。卡车类别需要包含载重量和车身类型属性，客车类别需要包含座位数和儿童座位属性。
+
+*  `CategoryAttribute` - 定义关联某些类别的动态属性。每个属性需要为一个明确类型描述一个字段。必要的 `Code` 字段包含属性的系统名称。`Name` 字段包含具有可读性的名称。
+
+*  `CategoryAttributeValue` - 特定实体实例动态属性的值。动态属性值物理存储在专门的 `++SYS_ATTR_VALUE++` 表内。表的每一行都有指向某些实体的 id（`++ENTITY_ID++` 列）。
+
+一个实体实例可以拥有跟这个实体类型相关的所有类别的动态属性。所以如果按照上面创建了两个关于 Car 的类别，则可以为一个 Car 实例定义两种类别中的任何动态属性。如果需要将实体实例分类到具体的某一类别（比如 Car 可以是卡车或者客车），那么实体需要实现 <<categorized_entity,Categorized>> 接口。这样实体实例就会有指向类别的引用，也只能包含此类别的动态属性。
+
+加载和保存动态属性是通过 <<dataManager,DataManager>> 来处理的。`LoadContext` 的 `setLoadDynamicAttributes()` 方法或流式 API 的 `dynamicAttributes()` 方法可以用来设置是否需要为实体实例加载动态属性。默认情况下，不会加载动态属性。同时，`DataManager` 总是会保存传递给 `commit()` 方法的实体实例的动态属性。
+
+对于任何继承自 `BaseGenericIdEntity` 的持久化实体，动态属性的值可以通过 `getValue()` / `setValue()` 方法来读写。此时，需要给方法传递一个带 `+++++` 前缀的属性 code。示例：
+
+[source, java]
+----
+include::{sourcesdir}/features/dynamicAttr_1.java[]
+----
+
+事实上，在应用中直接访问动态属性是很少用到的。任何动态属性都可以在绑定了包含动态属性的实体数据源的任何<<gui_Table,表格>>或者<<gui_Form,表单>>中自动展示。下面说的属性编辑器可以用来指定需要显示动态属性的界面和组件。
+
+访问动态属性的用户<<permissions,权限>>可以在<<roles,安全角色>>编辑器中跟普通属性一样配置。动态属性显示为带 `+++++` 前缀的属性。
+
+include::dynamic_attributes/dynamic_attributes_mgmt.adoc[]
+
+include::dynamic_attributes/categorized_entity.adoc[]
+

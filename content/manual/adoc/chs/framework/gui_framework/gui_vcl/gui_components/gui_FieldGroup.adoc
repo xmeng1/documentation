@@ -1,0 +1,331 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_FieldGroup]]
+====== 字段组
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/FieldGroup.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`FieldGroup` 用来集中显示和编辑实体的多个属性。
+
+image::gui_fieldGroup.png[align="center"]
+
+该组件对应的 XML 名称： `fieldGroup`
+
+[WARNING]
+====
+`FieldGroup` 只能在基于<<gui_legacy,历史 API>> 的界面中使用。当前 API 中通过 <<gui_Form,Form>> 组件提供类似功能。
+====
+
+下面这个例子展示了在 XML 中定义一组字段的情况：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/fieldgroup_1.xml[]
+---- 
+
+在上面这个例子中，`dsContext` 定义了一个包含单个实体 `Order` 的<<datasources,数据源>> `orderDs`。这里用 `fieldGroup` 组件的 `datasource` 属性来定义这个数据源。XML 元素 `field` 定义了那些需要显示在界面上的实体属性。
+
+`fieldGroup` 的 XML 元素:
+
+[[gui_FieldGroup_column]]
+* `column` – 可选元素，用来把字段放到多个列显示。为了达到这样的效果，`field` 元素不能直接放在 `fieldGroup` 元素里面，而需要放在一个 `column` 元素里，比如：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/fieldgroup_2.xml[]
+---- 
++
+这样的话，字段会被排成两列；第一列包含的几个字段的宽度会是 `250px`，第二列几个字段的宽度会是 `400px`。
++
+`column` 元素的属性:
++
+--
+[[gui_FieldGroup_column_width]]
+** `width` – 定义列中的字段宽度。默认的字段宽度是 `200px`。这里可以采用像素或者整个列宽的百分比来定义。
+
+[[gui_FieldGroup_column_flex]]
+** `flex` – 伸缩率，定义当 `fieldGroup` 整体的宽度发生变化时，此列相对于其它列水平伸缩的程度。比如，可以定义一列的 `flex=1`，另一列的 `flex=3`。
+
+[[gui_FieldGroup_column_id]]
+** `id` – 列 id，可选，在做<<screen_extension,界面扩展>>的时候会用到。
+--
+
+[[gui_FieldGroup_field]]
+* `field` – 主要的组件元素，定义组件的一个字段。
++
+自定义的字段也可以放在 `field` 元素里：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/fieldgroup_6.xml[]
+----
++
+`field` 元素的 XML 属性:
++
+--
+[[gui_FieldGroup_field_id]]
+** `id` – 如果 `property` 没设置，那么必须设置 id；如果 `property` 设置了，那么 id 默认跟 `property` 取一样的值。`id` 属性需要使用唯一的标识符，要么是 `property` 定义的字段名，要么是通过编程的方式定义的一个字段。如果是采取编程方式定义，那么 `field` 也需要有 `custom="true"` （参阅下面 custom 的说明）
+
+[[gui_FieldGroup_field_property]]
+** `property` - 如果 `id` 没设置，那么必须设置此属性；这个属性的值必须是一个实体属性的名称，用来显示这个绑定的字段。
+
+[[gui_FieldGroup_field_caption]]
+** `caption` − 定义字段的显示名称。如果没设置的话，则会显示实体的<<entity_localization,属性本地化名称>>。
+
+** `inputPrompt` - 如果这个字段使用的组件支持 <<gui_attr_inputPrompt,inputPrompt>> 属性的话，这里可以直接设置这个属性的值。
+
+[[gui_FieldGroup_field_visible]]
+** `visible` − 通过这个属性控制是否显示这个字段及其名称（caption）。
+
+[[gui_FieldGroup_field_datasource]]
+** `datasource` − 可以设置该字段单独的<<datasources,数据源>>，而不用整个 `fieldGroup` 组件的数据源。这样的话，一个 `fieldGroup` 就可以显示来自不同实体的属性了。
+
+** `optionsDatasource` 定义了一个用来做选项列表的<<datasources,数据源>>名称。可以给实体属性关联的字段定义选项数据源。默认情况下，选择关联实体的时候是通过一个查找界面来操作。但是如果 `optionsDatasource` 属性设置了，则可以通过下拉列表来选择。也就是说，其实设置这个属性会导致原本默认的 <<gui_LookupPickerField,LookupPickerField>> 会被 <<gui_PickerField,PickerField>> 替换掉。
+
+[[gui_FieldGroup_field_width]]
+** `width` − 设置字段宽度，不包括显示名称。默认是 `200px`。宽度值可以是像素值或者整个列宽的百分比。需要同时设置一列中所有的字段统一宽度，可以通过设置上面提到过的 `column` 的 `width` 属性。
+
+[[gui_FieldGroup_field_custom]]
+** `custom` – 如果设置成 `true`，表示这个字段不关联实体的属性，也不关联一个对应的组件。然后这个字段需要通过 `FieldGroup` 的 `setComponent()` 方法以编程方式实现，具体可以参考下面对于 `setComponent()` 的解释。
+
+[[gui_FieldGroup_field_generator]]
+** `generator` 属性用来以声明的方式创建自定义字段，需要设置这个属性的值为一个可以返回自定义组件的方法名：
++
+[source, xml]
+----
+<fieldGroup datasource="productDs">
+    <column width="250px">
+        <field property="description" generator="generateDescriptionField"/>
+    </column>
+</fieldGroup>
+----
+
++
+[source, java]
+----
+public Component generateDescriptionField(Datasource datasource, String fieldId) {
+    TextArea textArea = uiComponents.create(TextArea.NAME);
+    textArea.setRows(5);
+    textArea.setDatasource(datasource, fieldId);
+    return textArea;
+}
+----
+
+[[gui_FieldGroup_field_link]]
+** `link` - 如果设置成 `true`，那么这个字段会显示成一个到实体编辑器的链接而不显示一个实体选择器字段。这个场景在只让用户看到关联的实体而不允许用户去修改实体关系的时候会用到。
+
+[[gui_FieldGroup_field_linkScreen]]
+** `linkScreen` - 当 `link` 属性设置成 `true`，用来定义点击链接时需要打开的界面的标识符。
+
+[[gui_FieldGroup_field_linkScreenOpenType]]
+** `linkScreenOpenType` - 定义界面打开的类型（`++THIS_TAB++` 、  `++NEW_TAB++` 或者 `DIALOG`）。
+
+[[gui_FieldGroup_field_linkInvoke]]
+** `linkInvoke` - 定义一个控制器方法，在点击链接时调用这个方法，而不是打开界面。
+
+根据需要显示的实体属性类型的不同，可以使用下面这些 `field` 的属性：
+
+[[gui_FieldGroup_field_mask]]
+** `mask` 如果给一个文本型的实体属性设置这个 `mask` 属性，那么界面组件会用 <<gui_MaskedField,MaskedField>> 替换 <<gui_TextField,TextField>>，并使用适当的掩码，此时也可以设置 `valueMode` 属性。
+
+[[gui_FieldGroup_field_rows]]
+** `rows` 如果给一个文本型的实体属性设置这个 `rows` 属性，那么界面组件会用 <<gui_TextArea,TextArea>> 替换 <<gui_TextField,TextField>>，并将文字重组成适当的行数，此时也可以设置 `cols` 属性。
+
+** `maxLength` 对于文本型实体属性，可以定义 `maxLength` 属性，跟 <<gui_TextField,TextField>> 中描述的一致。
+
+** `dateFormat` 对于 `date` 或者 `dateTime` 类型的实体属性，可以设置 `dateFormat` 和 `resolution` 参数，使用的组件是 <<gui_DateField,DateField>>。
+
+** `showSeconds` 如果实体属性是 `time` 类型，可以设置界面组件 <<gui_TimeField,TimeField>> 的 `showSeconds` 属性。
+--
+
+`fieldGroup` 的 XML 属性:
+
+[[gui_FieldGroup_border]]
+* `border` 属性可以设置成 `hidden` 或者 `visible`。默认值是 `hidden`。如果设置成 `visible`，`fieldGroup` 组件会有边框（border）而且会被高亮。在 web 的实现中，通过添加 `cuba-fieldgroup-border` 这个 CSS 类显示边框。
+
+[[gui_FieldGroup_captionAlignment]]
+* `captionAlignment` 属性定义 `FieldGroup` 内字段的名称与字段的相对位置。可选项：`LEFT` 和 `TOP` 。
+
+[[gui_FieldGroup_fieldFactoryBean]]
+* `fieldFactoryBean` 在 XML 描述里面，声明式的字段默认是通过 `FieldGroupFieldFactory` 接口创建的。可以使用这个属性，覆盖默认工厂，将此属性设置成自定义 `FieldGroupFieldFactory` 实现的名称。
++
+[[gui_FieldGroup_setFieldFactory]]
+通过编程的方式创建 `FieldGroup` 的话，可以使用 `setFieldFactory()` 方法。
+
+`FieldGroup` 接口的方法：
+
+[[gui_FieldGroup_addField]]
+* `addField` 在运行时将字段添加到 `FieldGroup`。接受 `FieldConfig` 类型实例作为参数，也可以通过 `colIndex` 和 `rowIndex` 参数定义字段的位置。
+
+[[gui_FieldGroup_bind]]
+* `bind()` 在 `setDatasource()` 之后触发的方法，用来为添加的字段绑定相应的 UI 组件。
+
+[[gui_FieldGroup_createField]]
+* `createField()` 用来创建新的实现了 `FieldConfig` 接口的 FieldGroup 元素：
++
+[source, java]
+----
+fieldGroup.addField(fieldGroup.createField("newField"));
+----
+
+[[gui_FieldGroup_getComponent]]
+* `getComponent()` 返回一个跟字段绑定的可视化组件。这个也许在需要设置额外的组件参数时，通过这个方法得到这个可视化组件。因为上面提到的 `field` 提供的 XML 配置的参数有限。
++
+在界面控制器中，如果想获取对可视化组件的引用，可以采用<<screen_controller_injection,注入>>的方式，而不是通过显式地调用 `getFieldNN("id").getComponentNN()`   的方式。具体做法是，使用 `@Named` 注解，提供的注解参数是 `fieldGroup` 的标识符加 `.` 再加上字段标识符。
++
+比如下面例子中，在用一个字段选择关联的实体的时候，可以添加一个 Open 操作，然后删掉这个字段的 Clear 操作：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/fieldgroup_4.xml[]
+----
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/fieldgroup_5.java[]
+----
++
+要使用 `getComponent()` 获取或者注入字段组件，需要知道字段中使用的组件的类型。下面这个表列举了实体的属性类型和组件的对应关系：
++
+[cols="3*.^", frame="all"]
+|===
+| 实体属性类型| 附加条件| 字段可视化组件类型
+
+.2+| 关联实体
+| 指定了 `optionsDatasource`
+| <<gui_LookupPickerField,LookupPickerField>>
+
+|
+| <<gui_PickerField,PickerField>>
+
+| 枚举类型 (`enum`)
+|
+| <<gui_LookupField,LookupField>>
+
+.3+| `string`
+| 指定了 `mask`
+| <<gui_MaskedField,MaskedField>>
+
+| 指定了 `rows`
+| <<gui_TextArea,TextArea>>
+
+|
+| <<gui_TextField,TextField>>
+
+| `boolean`
+|
+| <<gui_CheckBox,CheckBox>>
+
+| `date`, `dateTime`
+|
+| <<gui_DateField,DateField>>
+
+| `time`
+|
+| <<gui_TimeField,TimeField>>
+
+.2+| `int`, `long`, `double`, `decimal`
+| 指定了 `mask`
+| <<gui_MaskedField,MaskedField>>
+
+|
+| <<gui_TextField,TextField>>
+
+| `UUID`
+|
+| <<gui_MaskedField,MaskedField>> 16 进制掩码
+
+|===
+
+[[gui_FieldGroup_removeField]]
+* `removeField()` 支持在运行时根据 `id` 移除字段.
+
+[[gui_FieldGroup_setComponent]]
+* `setComponent()` 为字段设置自定义的可视化组件。可以在 XML 元素 `field` 的属性 `custom="true"` 或者使用 `createField()` 方法创建字段时使用。当与 `custom="true"` 一起使用的时候，数据源（datasource）和对应的属性（property）需要手动设置。
++
+`FieldConfig` 接口类的实例可以通过 `getField()` 或者 `getFieldNN()` 方法获取，然后就可以调用它的 `setComponent()` 方法：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/fieldgroup_3.java[]
+----
+
+'''
+
+fieldGroup 的属性::
+<<gui_attr_align,align>> -
+<<gui_FieldGroup_border,border>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_FieldGroup_captionAlignment,captionAlignment>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_FieldGroup_fieldFactoryBean,fieldFactoryBean>> -
+<<gui_attr_id,id>> -
+<<gui_attr_height,height>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+column 的属性::
+<<gui_FieldGroup_column_flex,flex>> -
+<<gui_FieldGroup_column_id,id>> -
+<<gui_FieldGroup_column_width,width>>
+
+field 的属性::
+<<gui_FieldGroup_field_caption,caption>> -
+<<gui_attr_captionProperty,captionProperty>> -
+<<gui_FieldGroup_field_rows,cols>> -
+<<gui_FieldGroup_field_custom,custom>> -
+<<gui_FieldGroup_field_datasource,datasource>> -
+<<gui_DateField_dateFormat,dateFormat>> -
+<<gui_attr_description,description>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_enable,enable>> -
+<<gui_FieldGroup_field_generator,generator>> -
+<<gui_FieldGroup_field_id,id>> -
+<<gui_FieldGroup_field_link,link>> -
+<<gui_FieldGroup_field_linkInvoke,linkInvoke>> -
+<<gui_FieldGroup_field_linkScreen,linkScreen>> -
+<<gui_FieldGroup_field_linkScreenOpenType,linkScreenOpenType>> -
+<<gui_FieldGroup_field_mask,mask>> -
+<<gui_TextField_maxLength,maxLength>> -
+<<gui_attr_optionsDatasource,optionsDatasource>> -
+<<gui_FieldGroup_field_property,property>> -
+<<gui_attr_required,required>> -
+<<gui_attr_requiredMessage,requiredMessage>> -
+<<gui_DateField_resolution,resolution>> -
+<<gui_FieldGroup_field_rows,rows>> -
+<<gui_TimeField_showSeconds,showSeconds>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_FieldGroup_field_visible,visible>> -
+<<gui_attr_width,width>>
+
+field 的 XML 元素::
+<<gui_FieldGroup_column,column>> -
+<<gui_FieldGroup_field,field>> -
+<<gui_attr_inputPrompt,inputPrompt>> -
+<<gui_validator,validator>>
+
+API::
+<<gui_FieldGroup_addField,addField>> -
+<<gui_FieldGroup_bind,bind>> -
+<<gui_FieldGroup_createField,createField>> -
+<<gui_FieldGroup_getComponent,getComponent>> -
+<<gui_FieldGroup_removeField,removeField>> -
+<<gui_FieldGroup_setComponent,setComponent>> -
+<<gui_FieldGroup_setFieldFactory,setFieldFactory>>
+
+'''
+

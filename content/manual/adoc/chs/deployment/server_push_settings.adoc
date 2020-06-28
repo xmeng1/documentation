@@ -1,0 +1,157 @@
+:sourcesdir: ../../../source
+
+[[server_push_settings]]
+=== 服务推送设置
+
+CUBA 应用程序的<<background_tasks,后台任务>>机制采用服务推送技术。可能需要对应用程序或者代理服务做一些额外的配置。
+
+默认情况下，服务推送使用的 WebSocket 协议。下面这些应用程序属性影响平台的服务推送功能：
+
+<<cuba.web.pushLongPolling,cuba.web.pushLongPolling>>
+
+<<cuba.web.pushLongPollingSuspendTimeoutMs,cuba.web.pushLongPollingSuspendTimeoutMs>>
+
+<<cuba.web.pushEnabled,cuba.web.pushEnabled>>
+
+下面这些信息是从 Vaadin 网页上摘录的 - https://vaadin.com/docs/v8/framework/articles/ConfiguringPushForYourEnvironment.html[为你的环境配置推送]。
+
+[[server_push_settings_err_incomplete_chunked_encoding]]
+Chrome 错误消息 ERR_INCOMPLETE_CHUNKED_ENCODING::
++
+--
+这个完全正常，表示长轮询（long-polling）推送（push）连接由于第三方软件的原因断掉了。典型的场景就是当浏览器和服务器之间有个代理，如果这个代理配置了时限规则，一旦超时就断掉连接。浏览器应当在这个事件发生之后重新建立跟服务器的连接。
+--
+
+[[server_push_settings_]]
+Tomcat 8 + Websockets 错误消息::
++
+--
+[source, plain]
+----
+java.lang.ClassNotFoundException: org.eclipse.jetty.websocket.WebSocketFactory$Acceptor
+----
+
+这个错误暗示在 classpath 里面可能配置有 Jetty。这样的话运行环境就可能被误导，会尝试使用 Jetty 的 WebSocket 而不是使用 Tomcat 的。一个常见的原因是因为不小心部署了 `vaadin-client-compiler`，这里面有个 Jetty 依赖（比如 SuperDevMode 需要 Jetty）。
+--
+
+[[server_push_settings_glassfish_streaming]]
+Glassfish 4 + Streaming::
++
+--
+Glassfish 4 要求 *comet* 选项启动，这样才能使用 streaming。
+
+设置
+
+[source, plain]
+----
+(Configurations → server-config → Network Config → Protocols → http-listener-1 → HTTP → Comet Support)
+----
+
+或者使用
+
+[source, plain]
+----
+asadmin set server-config.network-config.protocols.protocol.http-listener-1.http.comet-support-enabled="true"
+----
+--
+
+[[server_push_settings_glassfish_websockets]]
+Glassfish 4 + Websockets::
++
+--
+如果使用的 Glassfish 4.0，升级到 Glassfish 4.1 就没问题了。
+--
+
+[[server_push_settings_weblogic_websockets]]
+Weblogic 12 + Websockets::
++
+--
+使用 WebLogic 12.1.3 或者更高的版本。WebLogic 12 默认指定了 WebSocket 超时的时间是 30 秒。为了避免定期重连，可以设置 WebLogic 的初始参数 `weblogic.websocket.tyrus.session-max-idle-timeout` 为 `-1`（无时限）或者一个比较大的值（单位是毫秒）。
+--
+
+[[server_push_settings_jboss_websockets]]
+JBoss EAP 6.4 + Websockets::
++
+--
+JBoss EAP 6.4 支持 websockets，但是默认这个功能是禁用的。要启用 WebSocket，需要更改 JBoss 使用 NIO 连接器：
+
+[source, plain]
+----
+$ bin/jboss-cli.sh --connect
+----
+
+然后运行下面这个命令：
+
+[source, plain]
+----
+batch
+/subsystem=web/connector=http/:write-attribute(name=protocol,value=org.apache.coyote.http11.Http11NioProtocol)
+run-batch
+:reload
+----
+
+然后把下面这些内容添加到 *WEB-INF/jboss-web.xml* 文件，这个文件加到 war 包里面启用 WebSockets：
+
+[source, xml]
+----
+<jboss-web version="7.2" xmlns="http://www.jboss.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.jboss.com/xml/ns/javaee schema/jboss-web_7_2.xsd">
+    <enable-websockets>true</enable-websockets>
+</jboss-web>
+----
+--
+
+[[server_push_settings_duplicate_resource]]
+重复资源错误::
++
+--
+如果服务的日志包含
+
+[source, plain]
+----
+Duplicate resource xyz-abc-def-ghi-jkl. Could be caused by a dead connection not detected by your server. Replacing the old one with the fresh one
+----
+
+这意味着，首先，浏览器连接到了服务端，并且使用了提供的推送连接的标识符。一切工作正常。然后，浏览器（很可能跟之前的是同一个）使用了相同的标识符再次连接，但是从服务端来看，之前的浏览器连接还是有效的。于是服务端就把之前的连接断掉然后在日志打印了这个警告。
+
+这个情况发生一般来说主要是在浏览器跟服务端之间有个代理，代理配置了在一定的无活动超时之后就断掉打开的连接（在服务端执行 push 命令之前不会有数据发送）。依据 TCP/IP 的工作原理，服务端根本不知道连接已经断了，然后认为旧连接还能用。
+
+有两种选择避免这个问题：
+
+. 如果能控制中间的代理，配置代理不要限时或者不要断掉推送连接（连接以 `/PUSH` 结尾）
+. 如果知道代理的时限是多少，配置应用程序的推送连接时限稍微小于代理的这个时限值，从而使服务端能在代理断掉连接之前先主动结束空闲连接并且知晓这个状态。
+.. 设置 `cuba.web.pushLongPolling` 参数为 `true` 来启用长轮询传输替代 WebSocket。
+.. 设置 `cuba.web.pushLongPollingSuspendTimeoutMs` 参数来控制 push 连接的时限，单位毫秒。
+
+即便没有配置代理，服务端也就能知道连接断掉的状态，但是还是有一些可能导致丢失推送的数据。如果碰巧服务端在连接刚刚好断掉之后推送了数据，服务端不会意识到这些数据推送到了一个关闭的连接中（根据 socket 的工作原理，特别是 Java 中 socket 的工作原理）。所以通过禁用连接时限或者设置服务端连接时限小于浏览器端也能解决这个潜在问题。
+--
+
+[[server_push_settings_using_proxy]]
+使用代理::
++
+--
+如果用户使用了一个不支持 WebSocket 的代理连接应用程序服务，设置 `cuba.web.pushLongPolling` 为 `true` 并且增加代理请求的超时时限至 10 分钟或者更多。
+
+如下是一个 *Nginx* 使用 WebSocket 的 web 服务的设置：
+
+[source, plain]
+----
+location / {
+    proxy_set_header X-Forwarded-Host $host;
+    proxy_set_header X-Forwarded-Server $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_read_timeout     3600;
+    proxy_connect_timeout  240;
+    proxy_set_header Host $host;
+    proxy_set_header X-RealIP $remote_addr;
+
+    proxy_pass http://127.0.0.1:8080/;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+}
+----
+--
+

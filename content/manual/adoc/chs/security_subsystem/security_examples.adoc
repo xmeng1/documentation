@@ -1,0 +1,11 @@
+:sourcesdir: ../../../source
+
+[[security_examples]]
+=== 访问权限控制示例
+
+本章节提供一些关于如何配置用户数据访问权限的实践建议。
+
+include::security_examples/roles_example.adoc[]
+
+include::security_examples/local_admins_example.adoc[]
+

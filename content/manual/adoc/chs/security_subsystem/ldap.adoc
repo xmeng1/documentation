@@ -1,0 +1,27 @@
+:sourcesdir: ../../../source
+
+[[ldap]]
+=== 集成 LDAP
+
+CUBA 应用程序可以跟 LDAP 集成以便提供以下便利：
+
+. 集中的将用户名和密码保存在 LDAP 数据库。
+
+. 对于 Windows 域用户，可以使用单点登录机制来登录应用系统而不需要提供用户名和密码。
+
+如果启用了 LDAP 集成，用户在应用系统中还是需要一个账号。用户的所有权限和其它属性（除了密码）都保存在应用程序数据库，LDAP 只是用来做用户认证。推荐将大部分用户的应用程序密码留空，除了那些需要标准认证的用户（参考下面）。如果 <<cuba.web.requirePasswordForNewUsers,cuba.web.requirePasswordForNewUsers>> 属性设置成 `false`，那么用户编辑界面不需要显示密码控件。
+
+如果用户的登录名列在 <<cuba.web.standardAuthenticationUsers,cuba.web.standardAuthenticationUsers>> 应用程序属性中，应用程序会尝试使用数据库保存的密码哈希值来做用户认证。这样的话，这个列表里的用户可以使用数据的密码登录系统，即便这个用户不在 LDAP 注册过。
+
+基于 CUBA 的应用程序通过 `LdapLoginProvider` bean 来跟 LDAP 交互。
+
+可以用 <<jespa,>> 章节描述的 *Jespa* 类库和相应的 `LoginProvider` 来启用跟活动目录（Active Directory）的进一步集成，包括使用 Windows 域用户的单点登录。
+
+可以通过自定义的 `LoginProvider`，`HttpRequestFilter` 或者 <<web_login, Web 登录规范>>描述的事件来实现自定义的登录机制。
+
+还有，可以为 REST API 客户端启用 LDAP 认证：{rest_man_url}#rest_api_v2_ldap[REST API 使用 LDAP 做认证] 。
+
+include::ldap/ldap_basic.adoc[]
+
+include::ldap/jespa.adoc[]
+

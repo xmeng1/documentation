@@ -1,0 +1,23 @@
+:sourcesdir: ../../../../../../source
+
+[[scheduled_tasks_cuba_control]]
+====== 任务处理控制
+
+* 为了启用任务处理，<<cuba.schedulingActive,cuba.schedulingActive>>应用程序属性应设置为 `true`。可以在 *Administration > Application Properties* 界面中执行此操作，也可以通过 `app-core.cuba:type=Scheduling` JMX bean（请参阅它的 `Active` 属性）执行此操作。
+
+* 一切通过系统界面对任务所做的更改将立即对集群中的所有服务器生效。
+
+* `app-core.cuba:type=Scheduling` JMX bean 的 `removeExecutionHistory()` 方法可用于删除旧的执行历史记录。该方法有两个参数：
+
+** `age` – 任务执行后经过的时间（以小时为单位）。
+
+** `maxPeriod` – 应删除的任务执行历史记录的最大 `Period`（以小时为单位）。这样可以仅删除频繁执行的任务的历史记录，同时保留每天一次执行历史记录。
++
+该方法可以自动调用。使用以下参数创建新任务：
+
+*** *Bean name* – `++cuba_SchedulingMBean++`
+
+*** *Method name* – `removeExecutionHistory(String age, String maxPeriod)`
+
+*** *Method parameters* – 例如，`age` = 72，`maxPeriod` = 12。
+

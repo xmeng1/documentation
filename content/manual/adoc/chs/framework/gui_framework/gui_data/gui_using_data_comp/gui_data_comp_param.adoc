@@ -1,0 +1,29 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_data_comp_param]]
+====== 在数据加载器中使用界面参数
+
+很多时候需要根据界面传递的参数加载界面需要的数据。下面是一个浏览界面的示例，使用了界面参数并且在加载数据时使用参数来过滤数据。
+
+假设有两个实体：`Country` 和 `City`。`City` 实体有 `country` 属性，是 `Country` 的引用。在 city 的浏览界面，可以接受一个 country 的实例，然后只展示该 country 的 city。
+
+首先，看看 city 界面的 XML 描述。其数据加载器包含一个带有参数的查询：
+
+[source, xml]
+----
+include::{sourcesdir}/gui/data_comp/data_comp_param_1.xml[]
+----
+
+city 界面控制器有一个 public 的参数setter，然后在 <<screen_BeforeShowEvent,BeforeShowEvent>> 处理器中使用了参数。注意，该界面没有 `@LoadDataBeforeShow` 注解，因为需要显式的触发数据加载：
+
+[source, java]
+----
+include::{sourcesdir}/gui/data_comp/data_comp_param_1.java[]
+----
+
+city 界面可以从其它界面为其传递一个 country 实例并打开，示例：
+
+[source, java]
+----
+include::{sourcesdir}/gui/data_comp/data_comp_param_2.java[]
+----

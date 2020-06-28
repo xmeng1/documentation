@@ -1,0 +1,56 @@
+:sourcesdir: ../../../../../../source
+
+[[screen_controller_injection]]
+====== 界面控制器依赖注入
+
+[WARNING]
+====
+这是旧版本的 API。对于从 7.0 开始的新 API，请参阅 <<screen_controllers>>。
+====
+
+在界面控制器进行依赖注入可以用来请求有效对象的引用。基于这个目的，要求在控制器内声明一个相应类型的字段，或者写一个带有相应参数类型的访问方法（setter），使用下面注解之一：
+
+* `@Inject` – 最简单的方法，会按照 JavaBeans 规则搜索匹配字段/方法类型以及字段名称的对象用来注入。
+
+* `@Named("someName")` – 显示的定义目标对象的名称。
+
+以下类型可以用来注入到控制器：
+
+* 在 XML 描述中定义的此界面的可视化组件。如果属性的类型是从 `Component` 类派生的，系统会搜索当前界面中相应名称的组件。
+
+* 在 XML 描述中定义的操作行为 - 参考 <<gui_Action>>。
+
+* 在 XML 描述中定义的<<datasources,数据源>>。如果属性的类型是从 `Datasource` 派生，系统会搜索当前界面中相应名称的数据源。
+
+* `UserSession`。如果属性的类型是 <<userSession,UserSession>>，系统会注入当前用户会话的对象。
+
+* `DsContext`。如果属性的类型是 `DsContext`，系统会注入当前界面的 `DsContext`。
+
+* `WindowContext`。如果属性的类型是 `WindowContext`，系统会注入当前界面的 `WindowContext`。
+
+* `DataSupplier`。如果属性的类型是 <<dataSupplier,DataSupplier>>，系统会注入相应的实例。
+
+* 任何定义在对应客户端 block 上下文的 bean。包括：
+
+**  客户端引入的 Middleware <<services,services>>
+
+** <<uiComponents,UiComponents>>
+
+** `WindowConfig`
+
+** `ExportDisplay`
+
+** <<background_tasks,BackgroundWorker>>
+
+* 如果以上提到的都不合适，并且控制器有<<companions,友类>>，如果类型匹配的话当前客户端的友类会被注入。
+
+[[screen_controller_injection_params]]
+还可以在控制器内注入传递给 `init()` 方法的 map 类型的参数，使用 `@WindowParam` 注解。此注解有 `name` 属性用来定义参数的名称（map 的键值）以及一个可选的 `required` 的属性。如果 `required = true` 并且 map 中没有相应的参数，则会在日志中添加一行 `WARNING` 的信息。
+
+下面例子注入了传递给控制器 `init()` 方法的 `Job` 实体：
+
+[source, java]
+----
+include::{sourcesdir}/gui/cdi_1.java[]
+---- 
+

@@ -1,0 +1,23 @@
+:sourcesdir: ../../../../../source
+
+[[polymer_offline]]
+===== 离线能力
+
+[WARNING]
+====
+试验功能！
+
+下面列出的技术目前并不被所有浏览器支持（比如 service worker 在 Safari https://jakearchibald.github.io/isserviceworkerready[还没实现]）
+====
+
+目前，跟 Polymer 一起，还提供 https://developers.google.com/web/progressive-web-apps/[Progressive Web Applications] 技术，比如 https://developer.mozilla.org/en-US/docs/Web/Manifest[web app manifest] https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/[2] 在用户的主页面展示 *native-like - 接近原生* 的样式。参考 Polymer 客户端模块的 `manifest.json` 文件。
+
+主要有两种方式：
+
+* Service Worker 主要用来缓存应用本身。可以看看跟 Polymer 客户端一起生成的 `sw-precache-config.js` 文件。如果要启用自动生成 Service Worker，在 `polymer.json` 中设置 `"addServiceWorker": true`。
+
+更多关于配置和使用 Service Worker 的内容可以参考 https://polymer-library.polymer-project.org/2.0/toolbox/service-worker[这里] 。
+
+* https://developer.mozilla.org/en-US/docs/Web/API/Storage/LocalStorage[Local storage] 和 https://developer.mozilla.org/en/docs/Web/API/IndexedDB_API[Indexed DB] 用来在本地保存数据。这些功能在相应的 Polymer 元素中提供： https://www.webcomponents.org/element/PolymerElements/app-storage?active=app-localstorage-document[app-localstorage-document] https://www.webcomponents.org/element/PolymerElements/app-storage?active=app-indexeddb-mirror[app-indexeddb-mirror] 。
+
+

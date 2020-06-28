@@ -1,0 +1,102 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_Tree]]
+====== 树
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-tree" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/Tree.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`Tree` 组件用于将具有自引用关系的实体显示为树状层次结构。
+
+image::gui_Tree.png[align="center"]
+
+组件的 XML 名称: `tree`
+
+下面是一个在界面 XML 描述中定义 `tree` 组件的示例:
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/tree_1.xml[]
+----
+
+这里，<<gui_attr_dataContainer,dataContainer>> 属性包含指向<<gui_collection_container,集合数据容器>>的引用，`hierarchyProperty` 属性定义了一个实体属性的名称，这个属性也指向同一个的实体（从而能形成树）。
+
+使用 `treechildren` 元素的 `captionProperty` 属性指定要显示为树节点名称的实体属性的名称，如果这个属性没有定义，将默认显示实体的<<namePattern_annotation,实例名称>>。
+
+[[gui_Tree_setItemCaptionProvider]]
+使用 `setItemCaptionProvider()` 方法可以设置一个函数，用来将实体的属性名称作为标题放到数的每项中。
+
+在 `Tree` 中进行选择：
+
+[[gui_Tree_multiselect]]
+* `multiselect` 设置是否允许树节点多选。如果 `multiselect` 设置为 `true`，用户可在按住 *Ctrl* 或 *Shift* 键的情况下使用键盘或鼠标选择多个节点。多选模式默认关闭。
+
+[[gui_Tree_selectionMode]]
+* `selectionMode` - 设置行选择模式。有三种预定义的选择模式：
++
+--
+* `SINGLE` - 单一记录选择模式。
+* `MULTI` - 多选模式，跟在表格中多选类似。
+* `NONE` - 禁止选择。
+
+行选择事件可以通过 `SelectionListener` 监听器进行跟踪。选择事件的发起者可以通过<<gui_api_UserOriginated,isUserOriginated()>>方法跟踪。
+
+`selectionMode` 属性比废弃的 `multiselect` 属性有更高的优先级。
+--
+
+`setItemClickAction()` 用于定义一个<<gui_Action,操作>>，双击树节点时执行。
+
+每个树节点左边可以定义一个图标。在界面控制器中的 `setIconProvider()` 方法中创建一个 `Function` 接口的实现来设置图标：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/treeIconProvider_1.java[]
+----
+
+[[gui_Tree_treechildren]]
+对于之前的老界面，`Tree` 组件可以绑定到一个<<datasources,数据源>>而不是<<gui_data_containers,数据容器>>。这种情况下，需要定义嵌套的 `treechildren` 元素，这个元素需要包含指向在 <<gui_attr_datasource,datasource>> 属性定义的 `hierarchicalDatasource` 的引用。`hierarchicalDatasource` 的声明需要包含 `hierarchyProperty` 属性，此属性定义了实体属性的名称，这个属性也指向相同的实体。
+
+'''
+
+tree 的属性::
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_captionProperty,captionProperty>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_id,id>> -
+<<gui_Tree_multiselect,multiselect>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+tree 的元素::
+<<gui_Table_actions,actions>> -
+<<gui_Tree_treechildren,treechildren>>
+
+treechildren 的属性::
+<<gui_attr_captionProperty,captionProperty>> -
+<<gui_attr_datasource,datasource>>
+
+API::
+<<gui_Tree_setItemCaptionProvider,setItemCaptionProvider>>
+
+'''
+

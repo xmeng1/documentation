@@ -1,0 +1,35 @@
+:sourcesdir: ../../../../source
+
+[[credits]]
+==== 关于软件组件信息
+
+平台提供了注册应用程序中使用的第三方软件组件信息（credits）以及在 UI 中显示这些组件信息的功能。组件信息包括软件组件名称、网站链接和许可文本。
+
+平台提供的<<app_components,应用程序组件>>包含了自己的描述文件，如 `com/haulmont/cuba/credits.xml` 、 `com/haulmont/reports/credits.xml` 等。<<cuba.creditsConfig,cuba.creditsConfig>>应用程序属性可用于指定应用程序的描述文件。
+
+`credits.xml` 文件的结构如下：
+
+* `items` 元素列出了使用的库及其许可文本，许可文本既可以在嵌入的 `license` 元素中声明，也可以在 `license` 属性中指定一个指向 `licenses` 文本的链接。
++
+可以引用在当前文件中声明的许可，也可以引用在 `cuba.creditsConfig` 变量中声明的任何其它文件中的许可，前提是这些文件在当前文件之前。
+
+* `licenses` 元素列出了用到的通用许可的文本（例如 LGPL）。
+
+可以使用 `com/haulmont/cuba/gui/app/core/credits/credits-frame.xml` 框架（frame）显示所有第三方软件组件列表，该框架从 `cuba. creditsConfig` 中定义的文件加载信息。下面是在界面中嵌入这个框架的示例：
+
+[source, xml]
+----
+<dialogMode width="500" height="400"/>
+<layout expand="creditsBox">
+  <groupBox id="creditsBox"
+            caption="msg://credits"
+            width="100%">
+      <frame id="credits"
+              src="/com/haulmont/cuba/gui/app/core/credits/credits-frame.xml"
+              width="100%"
+              height="100%"/>
+  </groupBox>
+</layout>
+----
+
+如果以对话框模式（`WindowManager.OpenType.DIALOG`）打开包含该框架的界面，则必须指定高度；否则，滚动条可能无法正常工作。请参阅上面示例中的 `dialogMode` 元素。

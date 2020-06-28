@@ -1,0 +1,52 @@
+:sourcesdir: ../../../../source
+
+[[build_task_start]]
+==== 启动构建任务
+
+构建脚本中定义的 Gradle 任务可以通过如下方式启动：
+
+* 如果是在 CUBA Studio 中使用项目，很多从 *CUBA* 主菜单执行的命令都实际上代理给 Gradle 任务：*Build Tasks* 菜单下的所有命令，以及 *Start/Stop/Restart Application Server* 和 *Create/Update Database* 命令。
+
+* 或者，也可以通过执行项目中的 `gradlew` 脚本（Gradle Wrapper）来执行任务。
+
+* 还有一个方式就是使用手动安装的 Gradle 版本 {gradleVersion}。这种情况可以直接执行 Gradle 安装目录下 `bin` 子目录里的 `gradle` 可执行文件。
+
+比如，通过执行以下命令可以编译 Java 文件，并且构建项目的 JAR 包：
+
+.Windows:
+[source]
+----
+gradlew assemble
+----
+
+.Linux & macOS:
+[source]
+----
+./gradlew assemble
+----
+
+[WARNING]
+====
+如果项目用了 Premium 插件，并且不是用 Studio 启动项目构建，那么需要给 Gradle 传递 Premium 插件的密钥，可以参考 <<access_to_premium_repo, 这里>>有更多细节。
+====
+
+按照通常使用的顺序，以下是一些典型需要使用的构建任务。
+
+* `assemble` – 编译 Java 文件并且构建项目工件的 JAR 包，存在各个模块的 `build` 子目录。
+
+* `clean` – 删除项目各个模块下的 `build` 子目录。
+
+* <<build.gradle_setupTomcat,setupTomcat>> – 安装并配置 Tomcat 到 `build.gradle` 脚本中 `cuba.tomcat.dir` 属性定义的路径。
+
+* <<build.gradle_deploy,deploy>> – 部署应用程序到 Tomcat 服务。Tomcat 服务是之前通过 `setupTomcat` 任务预先安装的。
+
+* <<build.gradle_createDb,createDb>> – 创建应用程序数据库，并且执行相应的<<db_scripts,数据库脚本>>。
+
+* <<build.gradle_updateDb,updateDb>> – 通过执行相应的<<db_scripts,数据库脚本>>来更新已有的数据库。
+
+* <<build.gradle_start,start>> – 启动 Tomcat 服务。
+
+* <<build.gradle_stop,stop>> – 停止已经启动的 Tomcat 服务。
+
+* <<build.gradle_restart,restart>> – 顺序执行 `stop`, `deploy`, `start` 这三个任务。
+

@@ -1,0 +1,33 @@
+:sourcesdir: ../../../../../../source
+
+[[polymer_tools]]
+====== 使用原生 Polymer 工具
+
+在开发 Polymer 组件的时候可以使用原生的 Polymer 框架工具集。这样的话如果项目里有一个单独的团队做前端就会很方便，系统需要安装 `Node.js`。
+
+全局安装 `bower` 和 `polymer-cli`：
+
+[source]
+----
+npm install bower polymer-cli -g
+----
+
+然后可以不用 Gradle 来构建和运行 web 应用程序：
+
+[source]
+----
+cd modules/front
+npm install
+bower install
+polymer serve
+----
+
+如果想要使用 Polymer 服务来做 app 的后台服务（而不是 Tomcat），需要在 `modules/front/index.html` 里面指定 REST API 的绝对路径，示例：
+
+[source,html]
+----
+<myapp-shell api-url="http://localhost:8080/app/rest/"></myapp-shell>
+----
+
+然后可以通过 `++http://localhost:8081++`（也许需要根据命令行输出更改端口号）访问 web 应用，这个 web 应用对应的后台 REST API 在 `++http://localhost:8080/app/rest/++`。
+

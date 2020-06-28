@@ -1,0 +1,96 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_Embedded]]
+====== 嵌入式组件（废弃）
+
+[WARNING]
+====
+从 CUBA Platform 6.8 开始这个 `Embedded` 组件就不推荐使用了。替换方案是使用 <<gui_Image,Image>> 组件来显示图片，用 <<gui_BrowserFrame,BrowserFrame>> 组件来嵌入网页。
+====
+
+`Embedded` 组件是用来显示图片和在应用程序界面中嵌入任何形式的网页。
+
+该组件对应的 XML 名称： `embedded`
+
+下面这个例子演示了怎样用这个组件显示一个从 <<file_storage,FileStorage>> 读取的图片：
+
+* 在 XML 描述中定义该组件：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/embedded_1.xml[]
+---- 
+
+* 在界面控制器中，注入该组件和 `FileStorageService` 接口。在 `init()` 方法中，从调用方获取 `FileDescriptor`，然后加载对应的文件到字节数组中，并通过字节数组创建 `ByteArrayInputStream` 然后传给组件的 `setSource()` 方法：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/embedded_2.java[]
+----
+
+[[gui_Embedded_type]]
+`Embedded` 组件支持几种不同类型的内容，在 HTML 里以不同方式渲染。可以用 `setType()` 来设置内容类型。支持的类型如下：
+
+* `OBJECT`  - 允许在 HTML 的 <object> 和 <embed> 标签里嵌入特定的文件类型。
+
+* `IMAGE`  - 在 HTML 的 <img> 标签嵌入图片。
+
+* `BROWSER`  - 在 HTML 的 <iframe> 中嵌入一个网页。
+
+在 Web Client 里面，这个组件支持显示存储在 `VAADIN` 文件夹的文件。可以采用相对路径来访问这个文件夹的资源，比如：
+
+[[gui_Embedded_relativeSrc]]
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/embedded_6.xml[]
+----
+
+或者：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/embedded_5.java[]
+----
+
+也可以通过应用程序属性 <<cuba.web.resourcesRoot,cuba.web.resourcesRoot>> 来定义源文件目录。然后采用 `file://`  、`url://`，或者 `theme://` 这些前缀引用这个目录下的文件：
+
+[[gui_Embedded_src]]
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/embedded_7.xml[]
+----
+
+或者
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/embedded_3.java[]
+---- 
+
+如果要显示外部网页，把外部网页的 URL 传给这个组件就行了：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/embedded_4.java[]
+---- 
+
+'''
+
+embedded 的属性::
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_height,height>> -
+<<gui_attr_id,id>> -
+<<gui_Embedded_relativeSrc,relativeSrc>> -
+<<gui_Embedded_src,src>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+'''
+

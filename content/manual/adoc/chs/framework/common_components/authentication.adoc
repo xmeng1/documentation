@@ -1,0 +1,13 @@
+:sourcesdir: ../../../../source
+
+[[authentication]]
+==== 用户认证
+
+本节从开发人员的角度描述了一些访问控制方面的内容。有关配置用户数据访问限制的完整信息，请参阅<<security_subsystem>>。
+
+include::authentication/userSession.adoc[]
+
+include::authentication/login.adoc[]
+
+include::authentication/securityContext.adoc[]
+

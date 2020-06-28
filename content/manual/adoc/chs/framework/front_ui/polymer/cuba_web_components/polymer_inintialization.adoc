@@ -1,0 +1,14 @@
+:sourcesdir: ../../../../../../source
+
+[[polymer_inintialization]]
+====== 初始化
+
+为了使用任何 `cuba-` 元素，需要用 `cuba-app` 元素来初始化通用类库以及 REST API 连接：
+
+[source,html]
+----
+<cuba-app api-url="/app/rest/"></cuba-app>
+----
+
+这个只需要在 app 中放在一个地方（一次），而且尽可能在程序初始化的早期。不要在初始化之后动态改变属性值，也不要挂载/脱挂（attach/detach）其它元素。
+

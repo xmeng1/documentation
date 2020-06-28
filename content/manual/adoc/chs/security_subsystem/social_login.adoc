@@ -1,0 +1,108 @@
+:sourcesdir: ../../../source
+
+[[social_login]]
+=== 社交网站登录
+
+本章节提到的主要是使用 Facebook，Twitter 和 Google+这三个社交网络，依据网络情况，有些网址可能需要科学上网访问。
+
+社交网站登录也是<<sso,单点登录（SSO）>> 的一种形式，可以通过社交网站的账号（比如 Facebook，Twitter 或者 Google+）来登录 CUBA 系统，而不需要为 CUBA 应用程序创建特定的账号。
+
+[TIP]
+====
+也可以参考 https://www.cuba-platform.cn/guides/anonymous-access-and-social-login[匿名访问和社交网站登录] 向导。
+
+此向导包含了为 CUBA 应用程序设置公共访问，以及使用 Google、Facebook 或 GitHub 账号自定义登录的实现。
+====
+
+下面将使用 Facebook 来作为社交网络登录的示例。Facebook 使用 OAuth2 认证机制，想了解更多细节请参考 Facebook API 和 Facebook Login Flow： https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow 。
+
+示例项目代码在这里： https://github.com/cuba-platform/sample-social-login[GitHub]，以下列出关键点的实现。
+
+. 为了连接项目到 Facebook，需要创建 *App ID* （唯一应用程序标识符）和 *App Secret* （为应用程序项目发送到 Facebook 的请求做认证的一种密码）。按照 https://developers.facebook.com/docs/apps/register[介绍] 申请，然后在 *core* 模块的 `app.properties` 文件中分别以 `facebook.appId` 和 `facebook.appSecret` 这两个属性注册申请到的值。示例：
++
+--
+[source, properties]
+.https://github.com/cuba-platform/sample-social-login/blob/master/modules/core/src/com/company/demo/app.properties[app.properties]
+----
+facebook.appId = 123456789101112
+facebook.appSecret = 123456789101112abcde131415fghi16
+----
+
+同样也需要配置在 Facebook app 注册的 URL，填写在 *core* 和 *web* 模块的应用程序属性文件的 <<cuba.webAppUrl,cuba.webAppUrl>> 参数。示例：
+
+[source, properties]
+----
+cuba.webAppUrl = http://cuba-fb.test:8080/app
+----
+--
+
+. 扩展 https://github.com/cuba-platform/sample-social-login/blob/master/modules/web/src/com/company/demo/web/login/ext-loginWindow.xml[登录界面] 添加社交网络登录按钮。这个按钮将调用 `loginFacebook()` 方法 - 社交网络登录流程的入口。
+
+. 为了使用 Facebook 用户账号，需要在 CUBA 标准的用户账号中添加一个额外字段。扩展 `User` 实体并添加字符串类型的属性 `facebookId`：
++
+[source, java]
+.https://github.com/cuba-platform/sample-social-login/blob/master/modules/global/src/com/company/demo/entity/SocialUser.java[SocialUser.java]
+----
+@Column(name = "FACEBOOK_ID")
+protected String facebookId;
+----
+
+. 创建服务，根据提供的 `facebookId` 在应用数据库查找用户，然后要么返回已有用户，要么创建新用户：
++
+[source, java]
+.https://github.com/cuba-platform/sample-social-login/blob/master/modules/global/src/com/company/demo/service/SocialRegistrationService.java[SocialRegistrationService.java]
+----
+include::{sourcesdir}/security/security_SocialRegistrationService.java[]
+----
++
+[source, java]
+.https://github.com/cuba-platform/sample-social-login/blob/master/modules/core/src/com/company/demo/service/SocialRegistrationServiceBean.java[SocialRegistrationServiceBean.java]
+----
+include::{sourcesdir}/security/security_SocialRegistrationServiceBean.java[]
+----
+
+. 创建服务来管理登录过程。本示例中是： https://github.com/cuba-platform/sample-social-login/blob/master/modules/global/src/com/company/demo/service/FacebookService.java[FacebookService] 包含两个方法： `getLoginUrl()` 和 `getUserData()`。
++
+--
+* `getLoginUrl()` 生成登录 URL，基于应用程序 URL 和 OAuth2 返回类型（代码、访问令牌（access token）或者两者都有，参考 https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow[Facebook API 文档] 了解更多返回类型）。这个方法的实现可以参考 https://github.com/cuba-platform/sample-social-login/blob/master/modules/core/src/com/company/demo/service/FacebookServiceBean.java[FacebookServiceBean.java] 文件。
+
+* `getUserData()` 使用提供的应用程序 URL 和代码来查找 Facebook 用户，并且返回已有用户的数据或者创建新用户。在这个例子中，希望获取用户的 id，姓名和 email，id 也就是上面创建的 `facebookId`。
+--
+
+. 在 *core* 模块的 `app.properties` 文件中定义 `facebook.fields` 和 `facebook.scope` 应用程序属性：
++
+[source, properties]
+.https://github.com/cuba-platform/sample-social-login/blob/master/modules/core/src/com/company/demo/app.properties[app.properties]
+----
+facebook.fields = id,name,email
+facebook.scope = email
+----
+
+. 返回扩展登录窗口控制器的 `loginFacebook()` 方法。这个控制器的所有代码在 https://github.com/cuba-platform/sample-social-login/blob/master/modules/web/src/com/company/demo/web/login/ExtAppLoginWindow.java[ExtAppLoginWindow.java] 文件。
++
+--
+在这个方法中，有针对当前会话的请求处理（request handler），保存当前 URL 并且调用重定向到 Facebook 认证表单：
+
+[source,java]
+.https://github.com/cuba-platform/sample-social-login/blob/master/modules/web/src/com/company/demo/web/login/ExtAppLoginWindow.java[ExtAppLoginWindow.java]
+----
+include::{sourcesdir}/security/security_loginFacebook.java[]
+----
+
+`handleFacebookCallBackRequest()` 方法会处理 Facebook 认证表单之后的函数回调。首先，使用 `UIAccessor` 实例来锁住 UI 直到登录请求处理完毕。
+
+然后，`FacebookService` 会获取 facebook 用户账号的 email 和 id。在这之后，相应的 CUBA 用户会通过 `facebookId` 被查找到，或者在此过程中被系统创建。
+
+接下来，认证会被触发，这个用户的用户会话会被加载，然后 UI 会更新。之后会移除 Facebook 回调处理，因为此时不再需要认证了。
+
+[source,java]
+.https://github.com/cuba-platform/sample-social-login/blob/master/modules/web/src/com/company/demo/web/login/ExtAppLoginWindow.java[ExtAppLoginWindow.java]
+----
+include::{sourcesdir}/security/security_handleFacebookCallBackRequest.java[]
+----
+--
+
+现在，当用户在登录界面点击 *Facebook* 按钮时，应用程序会跟用户请求使用 Facebook 账号和邮箱，如果得到用户授权，这个账号登录后会直接跳转到应用程序主界面。
+
+可以通过使用自定义的 `LoginProvider`, `HttpRequestFilter` 或者 <<web_login>> 章节提到的事件来实现定制化登录机制。
+

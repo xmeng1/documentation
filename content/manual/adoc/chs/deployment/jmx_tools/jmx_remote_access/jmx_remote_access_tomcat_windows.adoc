@@ -1,0 +1,52 @@
+:sourcesdir: ../../../../../source
+
+[[jmx_remote_access_tomcat_windows]]
+===== Windows 下 Tomcat JMX 配置
+
+* 按照下面方法编辑 `bin/setenv.bat`：
++
+[source,plain]
+----
+set CATALINA_OPTS=%CATALINA_OPTS% ^
+-Dcom.sun.management.jmxremote ^
+-Djava.rmi.server.hostname=192.168.10.10 ^
+-Dcom.sun.management.jmxremote.ssl=false ^
+-Dcom.sun.management.jmxremote.port=7777 ^
+-Dcom.sun.management.jmxremote.authenticate=true ^
+-Dcom.sun.management.jmxremote.password.file=../conf/jmxremote.password ^
+-Dcom.sun.management.jmxremote.access.file=../conf/jmxremote.access
+----
++
+这里，`java.rmi.server.hostname` 参数需要包含服务运行的机器的实际 IP 地址或者 DNS 名称；`com.sun.management.jmxremote.port` 用来设置 JMX 工具连接的端口号。
+
+* 编辑 `conf/jmxremote.access` 文件，需要包含连接 JMX 的用户名以及他们的访问级别，示例：
++
+[source, plain]
+----
+admin readwrite
+----
+
+* 编辑 `conf/jmxremote.password` 文件，需要包含 JMX 用户的密码，示例：
++
+[source, plain]
+----
+admin admin
+----
+
+* 对于运行 *Tomcat* 服务的用户，他们应当只有密码文件的只读权限。可以通过以下方式配置权限：
+
+** 打开命令行窗口，切换到 conf 目录
+
+** 执行命令：
++
+[source, plain]
+----
+cacls jmxremote.password /P "domain_name\user_name":R
+----
++
+这里 `++domain_name\user_name++` 是用户所在的域和用户名称。
+
+** 这个命令执行之后，这个文件在 *Explorer* 会显示锁住状态（有个锁的图标）。
+
+* 如果 *Tomcat* 是按照 Windows 服务的方式安装的，那么服务需要以具有能访问 jmxremote.password 权限的用户身份启动。需要注意的是，这种情况下会忽略 `bin/setenv.bat` 文件，相应的 JVM 启动参数应该通过配置 Tomcat 服务的应用程序来设置。
+

@@ -1,0 +1,50 @@
+:sourcesdir: ../../../../../../source
+
+[[screen_layout_mistakes]]
+====== 常见的布局错误
+
+[[screen_layout_mistake_1]]
+常见错误 1. 为自适应尺寸（根据内容）的容器内的组件设置相对尺寸::
++
+--
+具有相对尺寸的错误布局示例：
+
+image::cookbook/screen_layout_rules_17.png[align="center"]
+
+在此示例中，`label` 具有 100％的高度，而 `VBox` 的默认高度是 AUTO，即基于内容自适应。
+
+
+使用 expand 的错误布局示例：
+
+image::cookbook/screen_layout_rules_18.png[align="center"]
+
+Expand 隐式将标签设置为 100％的相对高度，与上面的示例一样，这种做法不正确。
+在这种情况下，界面可能看起来不像预期的那样。某些组件可能会消失或大小为零。如果遇到一些奇怪的布局问题，请首先检查是否正确指定了相对尺寸。
+--
+
+[[screen_layout_mistake_2]]
+常见错误 2. 给 ScrollBox 中的组件指定了 100％的尺寸::
++
+--
+错误布局示例：
+
+image::cookbook/screen_layout_rules_19.png[align="center"]
+
+由于这样的错误，即使嵌套组件的大小超过滚动区域，`ScrollBox` 中的滚动条也不会出现。
+
+image::cookbook/screen_layout_rules_20.png[align="center"]
+--
+
+[[screen_layout_mistake_3]]
+常见错误 3. 没有足够空间情况下的组件对齐::
++
+--
+错误布局的示例：
+
+image::cookbook/screen_layout_rules_21.png[align="center"]
+
+在此示例中，`HBox` 根据内容自适应大小，因此标签对齐无效。
+
+image::cookbook/screen_layout_rules_22.png[align="center"]
+--
+

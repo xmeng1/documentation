@@ -1,0 +1,21 @@
+:sourcesdir: ../../../../source
+
+[[serverId]]
+==== 服务器 ID
+
+_Server ID_ 用来在 *Middleware* 集群中提供服务器的可靠标识。标识符的格式是 `host:port/context`：
+
+[source, plain]
+----
+tezis.haulmont.com:80/app-core
+----
+
+[source, plain]
+----
+192.168.44.55:8080/app-core
+----
+
+标识符是使用配置参数 <<cuba.webHostName,cuba.webHostName>>，<<cuba.webPort,cuba.webPort>>，<<cuba.webContextName,cuba.webContextName>> 来组合的，所以对于在集群中的 Middleware blocks 来说，设定这几个参数非常重要。
+
+Server ID 可以通过 `ServerInfoAPI` bean 来获取，或者通过 <<serverInfoMBean,ServerInfoMBean>> 这个 JMX 接口获取。
+

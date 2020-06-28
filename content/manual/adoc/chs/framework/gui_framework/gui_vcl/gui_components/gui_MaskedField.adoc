@@ -1,0 +1,104 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_MaskedField]]
+====== 掩码字段
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=masked-field" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/MaskedField.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+这是一个文本字段控件，其中的数据以预定义格式输入。例如，使用 `MaskedField` 输入电话号码很方便。
+
+该组件对应的 XML 名称： `maskedField`
+
+`MaskedField` 基本上复制了 <<gui_TextField,TextField>> 的功能，但是不能为掩码字段设置 `datatype`。因此，`MaskedField` 仅适用于 `String` 类型的文本和实体属性。`MaskedField` 具有以下特定属性：
+
+[[gui_MaskedField_mask]]
+* `mask` – 为字段设置掩码。要设置掩码，请使用以下字符：
+
+** `#` – 数字
+
+** `U` – 大写字母
+
+** `L` – 小写字母
+
+** `?` – 字母
+
+** `А` – 字母或数字
+
+** `*` – 任何字符
+
+** `H` – 大写十六进制字符
+
+** `h` – 小写十六进制字符
+
+** `~` – " +" 或者 "-" 字符
+
+[[gui_MaskedField_valueMode]]
+* `valueMode` – 定义返回值的格式（带掩码或不带掩码），可以使用 `masked` 或 `clear` 作为值。
+
+下面提供了带有用于输入电话号码的掩码的文本字段示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/maskedfield_1.xml[]
+----
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/maskedfield_2.java[]
+---- 
+
+image::gui_MaskedField.png[align="center"]
+
+image::gui_MaskedField_maskedValueMode.png[align="center"]
+
+'''
+
+maskedField 的属性::
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_MaskedField_mask,mask>> -
+<<gui_TextField_maxLength,maxLength>> -
+<<gui_attr_property,property>> -
+<<gui_attr_required,required>> -
+<<gui_attr_requiredMessage,requiredMessage>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_TextField_trim,trim>> -
+<<gui_MaskedField_valueMode,valueMode>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+maskedField 的元素::
+<<gui_validator,validator>>
+
+API::
+<<gui_TextField_EnterPressListener,addEnterPressListener>> -
+<<gui_api_addValueChangeListener,addValueChangeListener>> -
+<<gui_api_contextHelp,setContextHelpIconClickHandler>>
+
+'''
+

@@ -1,0 +1,21 @@
+:sourcesdir: ../../../../../source
+
+[[build.gradle_startDb]]
+===== 启动本地 HSQL 数据库
+
+`startDb` – `CubaHsqlStart` 类型的任务，用来启动本地 HSQLDB 服务。
+任务参数：
+
+* `dbName` – 数据库名称，默认 `cubadb`。
+
+* `dbDataDir` – 数据库目录，默认是项目的 `deploy/hsqldb` 子目录。
+
+* `dbPort` – 数据库服务端口号，默认是 `9001`。
+
+示例：
+
+[source, groovy]
+----
+include::{sourcesdir}/development/build_gradle_startDb_1.groovy[]
+----
+

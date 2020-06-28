@@ -1,0 +1,4 @@
+[[app_start_recipe]]
+=== 在程序启动时执行代码
+
+示例参阅<<entity_listeners_registration,注册实体监听器>>部分。

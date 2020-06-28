@@ -1,0 +1,138 @@
+:sourcesdir: ../../../../../../source
+
+[[jpql_macro]]
+====== JPQL 中的宏
+
+JPQL 查询文本可以包含宏，这些宏在执行查询之前执行会被转换为可执行的 JPQL，并且还可以修改查询参数集。
+
+宏解决了以下问题：
+
+* JPQL 有一个限制，这个限制导致条件中不能依赖给定的当前时间字段，（即像“current_date -1”这样的表达式不起作用），宏为这个限制提供一个解决方法。
+
+* 能够将 `Timestamp` 类型字段（日期/时间字段）与日期进行比较。
+
+下面是更多细节：
+
+@between:: 
++
+--
+格式为 `++@between(field_name, moment1, moment2, time_unit)++` 或 `++@between(field_name, moment1, moment2, time_unit, user_timezone)++`，其中
+
+* `++field_name++` 是要比较的属性的名称。
+
+* `moment1` 、 `moment2` – 开始时间点、结束时间点， `++field_name++` 的值在这两个时间点之间。时间点应该使用一个表达式定义，这个表达式包含了 `now` 变量与整数的加减运算。
+
+* `++time_unit++` – 定义在时间点表达式中 `now` 中增加或减去的时间间隔的单位和时间点精度。下面是可能用到的值：`year` 、 `month` 、 `day` 、 `hour` 、 `minute` 、 `second`。
+
+* `++user_timezone++` - 一个可选参数，用于定义在查询中要使用的当前用户<<timeZone,时区>>。
+
+宏在 JPQL 中转换为以下表达式：`++field_name >= :moment1 and field_name < :moment2++`
+
+例 1. 查询今天创建的 Customer:
+
+[source, jpql]
+----
+select c from sales_Customer where @between(c.createTs, now, now+1, day)
+----
+
+例 2. 查询过去 10 分钟内创建的 Customer:
+
+[source, jpql]
+----
+select c from sales_Customer where @between(c.createTs, now-10, now, minute)
+----
+
+例 3. 查询过去 5 天内的文件，考虑当前用户时区：
+
+[source, jpql]
+----
+select d from sales_Doc where @between(d.createTs, now-5, now, day, user_timezone)
+----
+--
+
+@today:: 
++
+--
+格式为 `++@today(field_name)++` 或 `++@today(field_name, user_timezone)++` ，帮助定义检查属性值是否属于当天条件。从本质上讲，这是 `@between` 宏的一个特例。
+
+例：查询今天创建的 Customer：
+
+[source, jpql]
+----
+select d from sales_Doc where @today(d.createTs)
+----
+--
+
+@dateEquals:: 
++
+--
+格式为 `++@dateEquals(field_name, parameter)++` 或 `++@dateEquals(field_name, parameter, user_timezone)++`，允许定义一个检查 `++field_name++` （`Timestamp` 格式）是否落入 `parameter` 传递的日期范围的条件。
+
+例如:
+
+[source, jpql]
+----
+select d from sales_Doc where @dateEquals(d.createTs, :param)
+----
+
+可以使用 `now` 属性来传入当前日期。如果需要设置日期偏移量，则可以将 `now` 与 `+` 或者 `-` 一起使用，示例：
+
+[source, jpql]
+----
+select d from sales_Doc where @dateEquals(d.createTs, now-1)
+----
+--
+
+@dateBefore:: 
++
+--
+格式为 `++@dateBefore(field_name, parameter)++` 或 `++@dateBefore(field_name, parameter, user_timezone)++` ，允许定义一个条件检查 `++field_name++` 值（`Timestamp` 格式）小于 `parameter` 传递的日期。
+
+例如:
+
+[source, jpql]
+----
+select d from sales_Doc where @dateBefore(d.createTs, :param, user_timezone)
+----
+
+可以使用 `now` 属性来传入当前日期。如果需要设置日期偏移量，则可以将 `now` 与 `+` 或者 `-` 一起使用，示例：
+
+[source, jpql]
+----
+select d from sales_Doc where @dateBefore(d.createTs, now+1)
+----
+--
+
+@dateAfter:: 
++
+--
+格式为 `++@dateAfter(field_name, parameter)++` 或 `++@dateAfter(field_name, parameter, user_timezone)++`，允许定义条件，即 `++field_name++` 值的日期 （`Timestamp` 格式）大于或等于 `parameter` 传递的日期。
+
+例如:
+
+[source, jpql]
+----
+select d from sales_Doc where @dateAfter(d.createTs, :param)
+----
+
+可以使用 `now` 属性来传入当前日期。如果需要设置日期偏移量，则可以将 `now` 与 `+` 或者 `-` 一起使用，示例：
+
+[source, jpql]
+----
+select d from sales_Doc where @dateAfter(d.createTs, now-1)
+----
+--
+
+@enum:: 
++
+--
+允许使用完全限定的枚举常量名称而不是其数据库标识符。这可以简化在整个应用程序代码中搜索枚举用例的过程。
+
+例如:
+
+[source, jpql]
+----
+select r from sec$Role where r.type = @enum(com.haulmont.cuba.security.entity.RoleType.SUPER) order by r.name
+----
+--
+

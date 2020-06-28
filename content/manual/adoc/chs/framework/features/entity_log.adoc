@@ -1,0 +1,15 @@
+:sourcesdir: ../../../../source
+
+[[entity_log]]
+==== 实体日志
+
+此机制在<<entity_listeners,实体监听器>>级别跟踪实体的持久化，即确保能跟踪所有经过<<entityManager,EntityManager>>的持久化上下文的数据库变更。但是不跟踪使用 SQL 对数据库实体的直接更改，包括使用<<nativeQuery,NativeQuery>>或<<queryRunner,QueryRunner>>执行的更改。
+
+修改后的实体实例在保存到数据库之前传递给 `EntityLogAPI` bean 的 `registerCreate()` 、`registerModify()` 和 `registerDelete()` 方法。每个方法都有 `auto` 参数，通过这个参数控制实体监听器添加的自动日志与通过从应用程序代码调用这些方法添加的手动日志分离。当从实体监听器调用这些方法时，`auto` 参数的值为 `true`。
+
+日志包含有关修改时间、修改实体的用户以及修改后属性新值的信息。日志实体存储在与 `EntityLogItem` 实体对应的 *SEC_ENTITY_LOG* 表中。更改的属性值存储在 *CHANGES* 列中，在中间件加载时，将属性转换为 `EntityLogAttr` 实体的实例。
+
+include::entity_log/entity_log_setup.adoc[]
+
+include::entity_log/entity_log_view.adoc[]
+

@@ -1,0 +1,11 @@
+:sourcesdir: ../../../../source
+
+[[jmx_remote_access]]
+==== 设置远程 JMX 连接
+
+本章节介绍需要进行远程 JMX 工具连接的 *Tomcat* 启动配置。
+
+include::jmx_remote_access/jmx_remote_access_tomcat_windows.adoc[]
+
+include::jmx_remote_access/jmx_remote_access_tomcat_linux.adoc[]
+

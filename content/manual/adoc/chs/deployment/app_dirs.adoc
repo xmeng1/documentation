@@ -1,0 +1,17 @@
+:sourcesdir: ../../../source
+
+[[app_dirs]]
+=== 应用程序文件目录
+
+本章节介绍应用程序中各个 <<app_tiers,blocks>> 在运行时使用到的系统文件目录。
+
+include::app_dirs/conf_dir.adoc[]
+
+include::app_dirs/work_dir.adoc[]
+
+include::app_dirs/log_dir.adoc[]
+
+include::app_dirs/temp_dir.adoc[]
+
+include::app_dirs/db_dir.adoc[]
+

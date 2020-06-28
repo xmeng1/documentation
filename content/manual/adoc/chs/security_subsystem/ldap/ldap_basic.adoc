@@ -1,0 +1,37 @@
+:sourcesdir: ../../../../source
+
+[[ldap_basic]]
+==== 基础 LDAP 集成
+
+如果参数 <<cuba.web.ldap.enabled,cuba.web.ldap.enabled>> 设置为 `true`，则启用了 `LdapLoginProvider`。
+这种情况下，使用 Spring LDAP 类库做用户认证。
+
+下列 Web 客户端应用程序属性用来设置集成 LDAP：
+
+* <<cuba.web.ldap.enabled,cuba.web.ldap.enabled>>.
+
+* <<cuba.web.ldap.urls,cuba.web.ldap.urls>>.
+
+* <<cuba.web.ldap.base,cuba.web.ldap.base>>.
+
+* <<cuba.web.ldap.user,cuba.web.ldap.user>>.
+
+* <<cuba.web.ldap.password,cuba.web.ldap.password>>.
+
+* <<cuba.web.ldap.userLoginField,cuba.web.ldap.userLoginField>>.
+
+<<app_properties_files,local.app.properties>> 文件示例：
+
+[source, properties]
+----
+cuba.web.ldap.enabled = true
+cuba.web.ldap.urls = ldap://192.168.1.1:389
+cuba.web.ldap.base = ou=Employees,dc=mycompany,dc=com
+cuba.web.ldap.user = cn=System User,ou=Employees,dc=mycompany,dc=com
+cuba.web.ldap.password = system_user_password
+----
+
+参考 <<cuba.web.requirePasswordForNewUsers, cuba.web.requirePasswordForNewUsers>>。
+
+在集成了活动目录（Active Directory）的情况下，当使用应用程序来创建用户的时候，用不带域的用户名设置 `sAMAccountName`。
+

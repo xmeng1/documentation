@@ -1,0 +1,54 @@
+:sourcesdir: ../../../../../source
+
+[[value_datasources]]
+===== 值数据源
+
+[WARNING]
+====
+这是旧版本的 API。对于从 7.0 开始的新 API，请参阅 <<gui_data>>。
+====
+
+通过值数据源可以执行返回纯数值或者数值聚合（aggregates）的查询语句。比如，可以为 customer 做一些数据统计：
+
+[source, sql]
+----
+select o.customer, sum(o.amount) from demo_Order o group by o.customer
+----
+
+值数据源通过称为 `KeyValueEntity` 的特殊类型的实体跟其它实体交互。这种类型的实体可以在运行时包含任意数量的属性。所以在上面的例子中，`KeyValueEntity` 实例会包含两个属性：第一个是 `Customer` 类型的属性，第二个是 `BigDecimal` 类型的属性。
+
+值数据源的实现类继承了其它广泛使用的集合数据源类，并且实现了一个特殊的接口：`ValueDatasource`。下面这个图展示了值数据源的实现类以及它们的基类：
+
+image::ValueDatasources.png[align="center"]
+
+`ValueDatasource` 接口声明了以下方法：
+
+* `addProperty()` - 由于这个数据源可以返回带有任意数量属性的实体，可以通过此方法添加期待返回的属性。这个方法接收属性的名称和对应的类型作为参数，类型可以用<<datatype,数据类型>>或者 Java 类表示。如果是 Java 类的话，那么要求这个类必须是实体类或者是一种<<datatype,数据类型>>支持的类。
+
+* `setIdName()` 是一个可选调用的方法，通过这个方法来定义返回的实体中作为主键的属性。也就是说，数据源中返回的 `KeyValueEntity` 实例会用这个方法指定的属性作为唯一标识符。否则的话，`KeyValueEntity` 实例会用随机的 UUID 做主键。
+
+* `getMetaClass()` 返回一个动态生成的 `MetaClass` 接口的实现对象，用来表示当前 `KeyValueEntity` 实例的元数据。这些元数据是通过之前调用的 `addProperty()` 来定义的。
+
+值数据源可以在 XML 描述中声明式的使用。对应不同的实现类，有三中 XML 元素：
+
+* `valueCollectionDatasource`
+* `valueGroupDatasource`
+* `valueHierarchicalDatasource`
+
+值数据源的 XML 定义必须包含 `properties` 元素，用来定义数据源中包含的 `KeyValueEntity` 实例的属性（参考上面提到的 `addProperty()` 方法）。`property` 元素的顺序需要按照查询语句返回值的顺序排列。比如，在下面的定义中，`customer` 属性会从 `o.customer` 列取得值，`sum` 属性会从 `sum(o.amount)` 列取得值：
+
+[source, xml]
+----
+include::{sourcesdir}/gui/value_datasources_1.xml[]
+----
+
+值数据源设计只能用来读取数据，因为 `KeyValueEntity` 并不是可持久化实体，不能通过标准的持久化机制保存到数据库。
+
+可以手动创建值数据源或者在 Studio 中通过 *Screen designer* 界面的 *Datasources* 标签页创建。
+
+image::ValueDatasources_Studio.png[align="center"]
+
+通过 *Properties* 编辑器可以创建针对某种数据类型或者 Java 类的数据源属性。
+
+image::ValueDatasources_Studio_properties.png[align="center"]
+

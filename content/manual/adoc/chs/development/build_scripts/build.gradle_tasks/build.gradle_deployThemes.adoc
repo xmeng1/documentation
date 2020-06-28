@@ -1,0 +1,15 @@
+:sourcesdir: ../../../../../source
+
+[[build.gradle_deployThemes]]
+===== 部署样式主题
+
+`deployThemes` - `CubaDeployThemeTask` 类型的任务，构建和部署项目内定义的<<gui_themes,主题>>至目前已经 <<build.gradle_deploy,部署>>且在运行的 web 应用程序中。不需要重启服务的情况下，主题的改动就能生效。
+
+示例:
+
+[source, groovy]
+----
+task deployThemes(type: CubaDeployThemeTask, dependsOn: buildScssThemes) {
+}
+----
+

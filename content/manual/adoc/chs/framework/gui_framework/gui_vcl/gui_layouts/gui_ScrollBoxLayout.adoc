@@ -1,0 +1,119 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_ScrollBoxLayout]]
+====== 滚动盒子布局
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-scrollbox" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/ScrollBoxLayout.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`ScrollBoxLayout` − 一个支持内容滚动的容器。
+
+image::gui_scrollBox.png[align="center"]
+
+该组件的 XML 名称： `scrollBox`
+
+下面是一个 XML 描述示例：
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/scrollboxlayout_1.xml[]
+---- 
+
+[[gui_ScrollBox_orientation]]
+* 组件排列的方向可以通过 `orientation` 属性定义 ，可选值： `horizontal` 或 `vertical`。默认为 `vertical`。
+
+[[gui_ScrollBox_scrollBars]]
+* `scrollBars` 属性可以配置滚动条。它的值可以是 `horizontal` 或者 `vertical` - 分别用于水平滚动和垂直滚动，`both` - 两个方向都有滚动条。将值设置为 `none` 禁止向任何方向的滚动。
+
+[[gui_ScrollBox_contentHeight]]
+* `contentHeight` - 设置内容高度。
+
+[[gui_ScrollBox_contentWidth]]
+* `contentWidth` - 设置内容宽度。
+
+[[gui_ScrollBox_contentMaxHeight]]
+* `contentMaxHeight` - 设置内容的最大 CSS 高度，例如，`"640px"`、`"100%"`。
+
+[[gui_ScrollBox_contentMinHeight]]
+* `contentMinHeight` - 设置内容的最小 CSS 高度，例如，`"640px"`、`"auto"`。
+
+[[gui_ScrollBox_contentMaxWidth]]
+* `contentMaxWidth` - 设置内容的最大 CSS 宽度，例如，`"640px"`、`"100%"`。
+
+[[gui_ScrollBox_contentMinWidth]]
+* `contentMinWidth` - 设置内容的最小 CSS 宽度，例如，`"640px"`、`"auto"`。
+
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/scrollboxlayout_2.xml[]
+----
+
+.带有 textArea 的显示完整的 scrollBox
+image::gui_scrollBox_1.png[align="center"]
+
+.窗口尺寸调整时滚动条出现，管理内容的宽度
+image::gui_scrollBox_2.png[align="center"]
+
+
+[TIP]
+====
+建议设置内容的高和宽，否则，放置在 `scrollBox` 中的组件只能有固定大小或默认大小。
+
+如果没有设置内容高和宽，不要给嵌套组件设置 `height="100%"` 或 `width="100%"` 属性。
+====
+
+[[gui_ScrollBox_addShortcutAction]]
+可以在 `ScrollBox` 中使用快捷键。使用 `addShortcutAction()` 方法设置快捷键和要执行的操作：
+
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/scrollboxlayout.java[]
+----
+
+'''
+
+scrollBox 的属性::
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_id,id>> -
+<<gui_attr_margin,margin>> -
+<<gui_ScrollBox_orientation,orientation>> -
+<<gui_ScrollBox_scrollBars,scrollBars>> -
+<<gui_attr_spacing,spacing>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_width,width>>
+
+API::
+<<gui_api_add,add>> -
+<<gui_api_shortcut,addShortcutAction>> -
+<<gui_api_getComponent,getComponent>> -
+<<gui_api_getComponentNN,getComponentNN>> -
+<<gui_api_getComponents,getComponents>> -
+<<gui_api_margin,getMargin>> -
+<<gui_api_getOwnComponent,getOwnComponent>> -
+<<gui_api_getOwnComponents,getOwnComponents>> -
+<<gui_api_indexOf,indexOf>> -
+<<gui_api_remove,remove>> -
+<<gui_api_removeAll,removeAll>> -
+<<gui_api_margin,setMargin>> -
+<<gui_api_spacing,setSpacing>>
+
+'''
+

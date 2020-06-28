@@ -1,0 +1,9 @@
+:sourcesdir: ../../../../../source
+
+[[screen_agent]]
+===== 界面代理
+
+[WARNING]
+====
+在 v.7.0 中界面代理已经被移除，并且没有替代方案。可以使用 `DeviceInfoProvider` bean 获取 `DeviceInfo`，然后可以为每种设备类型创建不同的界面或在界面中打开 fragments。
+====

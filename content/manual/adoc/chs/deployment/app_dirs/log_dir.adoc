@@ -1,0 +1,15 @@
+:sourcesdir: ../../../../source
+
+[[log_dir]]
+==== 日志目录
+
+日志目录是应用程序创建日志文件的位置。其地址和内容是由 *Logback* 框架的配置决定，配置由 `logback.xml` 提供。参阅 <<logging>> 了解细节。
+
+日志文件的位置一般用<<app_home,应用程序主目录>>的相对位置指定，示例：
+
+[source,xml]
+----
+include::{sourcesdir}/deployment/log_dir_1.xml[]
+----
+
+还需要设置 <<cuba.logDir,cuba.logDir>> 这个应用程序属性与 `logback.xml` 里面配置的目录一致。这样管理员可以通过 *Administration > Server Log* 界面加载和查看日志。

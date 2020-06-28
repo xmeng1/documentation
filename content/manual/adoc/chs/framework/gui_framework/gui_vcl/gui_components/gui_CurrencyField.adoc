@@ -1,0 +1,108 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_CurrencyField]]
+====== 货币组件
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-currencyfield" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/CurrencyField.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`CurrencyField` 是文本字段的子类型，专门用来输入货币值。在这个字段内部有个货币符号，默认是右对齐状态。
+
+image::gui_currencyField.png[align="center"]
+
+该组件对应的 XML 名称： `currencyField`
+
+基本上，`CurrencyField` 跟 <<gui_TextField,TextField>> 的功能是一样的。可以给这个字段手动设置一个<<datatype,数据类型>>，但是只支持从 `NumericDatatype` 继承的数字类型。如果提供的数据类型不能解析，程序会抛出异常。
+
+`CurrencyField` 也可以通过 <<gui_attr_dataContainer,dataContainer>> 和 <<gui_attr_property,property>> 属性绑定<<gui_data_containers,数据容器>> ：
+
+[source,xml]
+----
+<currencyField currency="$"
+               dataContainer="orderDc"
+               property="amount"/>
+----
+
+`currencyField` 属性:
+
+[[gui_CurrencyField_currency]]
+* `currency` - 作为货币符号的文本。
++
+[source,xml]
+----
+<currencyField currency="USD"/>
+----
+
+[[gui_CurrencyField_currencyLabelPosition]]
+* `currencyLabelPosition` - 设置组件内货币符号的位置：
++
+--
+** `LEFT` - 在组件文字输入的左侧
+** `RIGHT` - 在组件文字输入的右侧（默认值）。
+--
+
+[[gui_CurrencyField_showCurrencyLabel]]
+* `showCurrencyLabel` - 定义是否需要显示货币符号。
+
+'''
+
+currencyField 的属性::
+
+<<gui_attr_align,align>> -
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_colspan,colspan>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_TextField_conversionErrorMessage,conversionErrorMessage>> -
+<<gui_attr_css,css>> -
+<<gui_CurrencyField_currency,currency>> -
+<<gui_CurrencyField_currencyLabelPosition,currencyLabelPosition>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_TextField_datatype,datatype>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_attr_property,property>> -
+<<gui_attr_required,required>> -
+<<gui_attr_requiredMessage,requiredMessage>> -
+<<gui_attr_rowspan,rowspan>> -
+<<gui_CurrencyField_showCurrencyLabel,showCurrencyLabel>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+currencyField 预定义的样式::
+<<gui_attr_stylename_huge,huge>> -
+<<gui_attr_stylename_large,large>> -
+<<gui_attr_stylename_small,small>> -
+<<gui_attr_stylename_tiny,tiny>>
+
+API::
+<<gui_validator,addValidator>> -
+<<gui_api_addValueChangeListener,addValueChangeListener>> -
+<<gui_api_commit,commit>> -
+<<gui_api_discard,discard>> -
+<<gui_api_isModified,isModified>> -
+<<gui_api_contextHelp,setContextHelpIconClickHandler>> -
+<<gui_CurrencyField_currency,setCurrency>> -
+<<gui_CurrencyField_currencyLabelPosition,setCurrencyLabelPosition>> -
+<<gui_CurrencyField_showCurrencyLabel,setShowCurrencyLabel>>
+
+'''
+

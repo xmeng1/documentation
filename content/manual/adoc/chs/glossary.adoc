@@ -1,0 +1,145 @@
+[[glossary]]
+[glossary]
+== 术语表
+
+*Application Tiers - 应用分层*::
+参考 <<app_tiers,>>。
+
+[[app_properties_glossentry]]
+*Application Properties - 应用程序属性*::
+应用程序属性是为应用程序配置和功能等不同方面配置的带有名称的数据值。参考 <<app_properties,>>。
+
+*Application Blocks - 应用程序 block*::
+参考 <<app_tiers,>>。block，作为专用词，中文一般不翻译。
+
+[[artifact]]
+*Artifact - 工件*::
+在本手册的上下文中，工件是指一个文件（通常是 JAR 或者 ZIP 文件）包含了可执行代码或者构建项目生成的其它代码。工件具有按照特定规则定义的名称和版本号，并且可以保存在工件仓库里。
+
+[[artifact_repository]]
+*Artifact Repository - 工件仓库*::
+按特定目录结构保存 <<artifact,artifacts>> 的服务器，当项目启动构建时，项目依赖的工件都从这个仓库加载。
+
+[[base_projects]]
+*Base Projects - 基本项目*::
+跟<<app_components,应用程序组件>>一个意思，这个术语在之前版本的平台和文档中使用。
+
+[[container]]
+*Container - 容器*::
+容器控制应用程序里面对象的生命周期以及配置。这个是依赖注入（反转控制）机制的基本组件。
++
+CUBA 框架使用 *Spring 框架* 的容器。
+
+*DB - 数据库*::
+关系型数据库。
+
+*Dependency Injection - 依赖注入*::
+也称反转控制（IoC）。一个用来获取使用的对象链接的机制，这个机制会假设一个对象只需要声明它依赖的那些对象，而由容器来帮助创建所有需要的对象并将这些对象注入到依赖他们的对象中去。
++
+参考 https://en.wikipedia.org/wiki/Dependency_injection 
+
+[[eager_fetching]]
+*Eager Fetching - 预加载*::
+跟请求的实体一起加载子类实体以及关联实体的数据。
+
+[[entity]]
+*Entity - 实体*::
+数据模型的主要元素，参考 <<data_model,>>。
+
+*Entity Browser - 实体浏览界面*::
+包含一个用来显示<<entity,实体>>列表的表格以及一些用来创建、编辑和删除实体的按钮的界面。
+
+*EntityManager*::
+中间件层的组件，用来持久化<<data_model,实体>>。
++
+参考 <<entityManager,>>.
+
+[[interceptor]]
+*Interceptor - 拦截器*::
+面向切面编程的一个概念，可以用来改变或者扩展对象方法的执行过程。
++
+参考 https://en.wikipedia.org/wiki/Interceptor_pattern
+
+[[jmx]]
+*JMX*::
+Java Management Extensions − 提供工具来管理应用、系统对象和设备的一种技术。为 <<jmx_beans,JMX-components>> 定义了标准。
++
+更多细节可以参考 http://www.oracle.com/technetwork/java/javase/tech/javamanagement-140525.html
++
+也可参考 <<jmx_tools,>>。
+
+[[jpa]]
+*JPA*::
+Java Persistence API – <<orm,ORM>> 技术的一套标准规范。CUBA 框架使用实现了此规范的 *EclipseLink* 框架。
+
+[[jpql]]
+*JPQL*::
+数据库独立的面向对象的查询语言，是 JPA 规范的一部分。参考 https://en.wikibooks.org/wiki/Java_Persistence/JPQL 。
+
+*Lazy loading - 懒加载*::
+参考 <<lazy_loading,>>.
+
+[[local_attribute]]
+*Local attribute - 本地属性*::
+实体的属性，此属性不关联其它实体，也不是其它实体的集合。典型情况下，实体的所有本地属性都存在数据库的一张表内（当然不包括特定的实体继承的情况）。
+
+*Localized message pack - 本地化语言消息包*::
+参考 <<message_packs,>>。翻译时有时候简称语言包，本地化语言包等。
+
+*Managed Beans - 托管 bean*::
+托管至<<container,容器>>的组件，包含应用程序业务逻辑。
++
+参考 <<managed_beans,>>.
+
+*Main Message Pack - 主语言消息包*::
+参考 <<main_message_pack,>>.
+
+*MBeans*::
+带有 JMX 接口的<<managed_beans,Spring bean>>。典型情况下，这些 bean 包含一个内部状态（比如可以是缓存，配置数据或者统计数据），这个内部状态需要通过 JMX 访问。
+
+[[middleware_glossentry]]
+*Middleware - 中间件*::
+中间层 –  包含业务逻辑的<<app_tiers,应用程序层>>，跟数据库通信并且为更高的客户端层提供接口通用接口服务。有时候不翻译，有时候翻译成中间件或者中间层。
+
+[[optimistic_locking]]
+*Optimistic locking - 乐观锁*::
+乐观锁 - 用来管理不同用户访问共享数据的一种方式，这里假设不同用户对同一实体实例只有非常低的可能性进行并发访问。采用这种方案并不会真正意义上对数据加锁，而是在数据发生变动时检查在数据库是否存在更新版本的数据。如果存在，则会抛出异常，用户需要重新加载实体。
++
+也可参考 https://en.wikipedia.org/wiki/Optimistic_concurrency_control
+
+*ORM*::
+对象关系映射 – 将关系型数据库的表跟编程语言中对象进行关联的一种技术。
++
+参考 <<orm,>>.
+
+[[persistence_context]]
+*Persistent context - 持久化上下文*::
+一组从数据库加载的或者刚创建的实体实例。持久化上下文作为当前事务的数据缓存。当事务提交时，所有持久化上下文内的实体变更都被保存到数据库。
++
+参考 <<entityManager,>>.
+
+[[screen_controller_glossentry]]
+*Screen Controller - 界面控制器*::
+包含界面初始化和事件处理逻辑的 Java 类。结合界面的 <<screen_xml_glossentry,XML 描述>>一起工作。
++
+参考 <<screen_controller,>>.
+
+*Services - 服务*::
+中间件服务为客户端调用提供业务接口并且形成中间件壁垒。服务可以封装业务逻辑或者将执行过程代理给其他的<<managed_beans, Spring Beans>>。
++
+参考 <<services,>>.
+
+*Soft deletion - 软删除*::
+参考 <<soft_deletion,>>.
+
+*UI*::
+用户界面。
+
+*View - 视图*::
+参考 <<views,>>
+
+[[screen_xml_glossentry]]
+*XML-descriptor - 界面 XML 描述*::
+包含界面可视化组件布局和数据组件的 XML 文件。
++
+参考 <<screen_xml,>>.

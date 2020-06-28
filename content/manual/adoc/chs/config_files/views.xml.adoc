@@ -1,0 +1,87 @@
+:sourcesdir: ../../../source
+
+[[views.xml]]
+=== views.xml
+
+这个类型的文件用来描述共享视图（views），参考 <<views_creation>>。
+
+XML schema： {xsd_url}/view.xsd.
+
+`views` – 根节点元素。
+
+`views` 的元素：
+
+* `view` – `view` 视图描述元素。
++
+--
+`view` 属性：
+
+* `class` – 实体类。
+
+* `entity` – 实体名称，比如 `sales_Order`。这个属性可以用来替代 `class` 属性。
+
+* `name` – 仓库中的视图名称，实体范围内需要名称唯一。
+
+* `systemProperties` – 启用包含定义在持久化实体 `BaseEntity` 基类和 `Updatable` 接口中的<<entity_base_classes,基础接口>>系统属性。此参数为可选参数，默认为 `true`。
+
+* `overwrite` – 启用覆盖视图功能，通过同一类以及部署在仓库（repository）的名称来覆盖同名视图。可选参数，默认为 `false`。
+
+* `extends` – 指定一个用来继承实体属性的实体视图。比如，声明 `++extends="_local"++`，这样会将实体的所有 <<local_attribute,local attributes>> 添加到当前视图。也是可选参数。
+
+`view` 的元素：
+
+* `property` – `ViewProperty` 视图属性描述元素。
+
+`property` 的属性：
+
+* `name` – 实体属性名称。
+
+* `view` – 对于引用类型属性，设定一个实体关联的视图名称，用来加载实体的属性。
+
+* `fetch` - 对于引用类型属性，设定如何从数据库取关联实体。参考  <<views,>> 了解细节。
+
+`property` 的元素：
+
+* `property` – 跟实体属性描述关联。这个用来在当前描述中定义一个关联实体的无命名单行（inline）视图。
+--
+
+* `include` – 包含另外一个 `views.xml` 文件。
++
+--
+`include` 的属性：
+
+* `file` – 文件路径，符合 <<resources,Resources>> 接口规范。
+--
+
+示例：
+
+[source, xml]
+----
+<views xmlns="http://schemas.haulmont.com/cuba/view.xsd">
+
+  <view class="com.sample.sales.entity.Order"
+        name="order-with-customer"
+        extends="_local">
+      <property name="customer" view="_minimal"/>
+  </view>
+
+  <view class="com.sample.sales.entity.Item"
+        name="itemsInOrder">
+      <property name="quantity"/>
+      <property name="product" view="_minimal"/>
+  </view>
+
+  <view class="com.sample.sales.entity.Order"
+        name="order-with-customer-defined-inline"
+        extends="_local">
+      <property name="customer">
+          <property name="name"/>
+          <property name="email"/>
+      </property>
+  </view>
+
+</views>
+----
+
+也可以参考 <<cuba.viewsConfig,cuba.viewsConfig>> 应用程序属性。
+

@@ -1,0 +1,23 @@
+:sourcesdir: ../../../source
+
+[[extension]]
+=== 功能扩展
+
+平台可以在应用程序中扩展和覆盖其以下方面的功能：
+
+* 扩展实体属性集。
+
+* 扩展界面功能。
+
+* 扩展和覆盖 *Spring* bean 中包含的业务逻辑。
+
+下面是前两个操作的示例，通过将 "Address" 字段添加到平台<<users,安全子系统>>的 `User` 实体来说明。
+
+include::extension/entity_extension.adoc[]
+
+include::extension/screen_extension.adoc[]
+
+include::extension/bean_extension.adoc[]
+
+include::extension/servlet_registration.adoc[]
+

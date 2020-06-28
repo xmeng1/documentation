@@ -1,0 +1,17 @@
+:sourcesdir: ../../../../source
+
+[[groups]]
+==== 访问组
+
+访问组能将用户以树形层级关系组织，分配<<constraints,约束>>和自定义任意<<session_attr,会话属性>>。
+
+一个用户只能加入一个访问组，但是用户加入的访问组树形层级以上的约束列表和会话属性都会被继承。
+
+通过 *Administration* > *Access Groups* 界面管理访问组：
+
+image::group_users.png[align="center"]
+
+include::groups/constraints.adoc[]
+
+include::groups/session_attr.adoc[]
+

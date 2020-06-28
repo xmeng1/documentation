@@ -1,0 +1,54 @@
+:sourcesdir: ../../../../../source
+
+[[datasource_listeners]]
+===== 数据源监听器
+
+[WARNING]
+====
+这是旧版本的 API。对于从 7.0 开始的新 API，请参阅 <<gui_data>>。
+====
+
+通过<<datasources,数据源>>监听器接收数据源及其包含实体的状态变化的消息通知。
+
+一共有四种类型的监听器。其中三个，`ItemPropertyChangeListener`，`ItemChangeListener` 和 `StateChangeListener` 都是定义在 `Datasource` 接口中的，可以在任何数据源使用。`CollectionChangeListener` 定义在 `CollectionDatasource` 里，只能在集合数据源使用。
+
+跟 GUI 的 <<gui_api_addValueChangeListener,ValueChangeListener>> 相比，数据源的监听器在界面的生命周期之上提供了更好的控制，建议在界面有绑定数据源的可视化组件的情况下使用。
+
+使用数据源监听器的示例：
+
+[source, java]
+----
+include::{sourcesdir}/gui/datasources_14.java[]
+----
+
+以下介绍上面用到的监听器接口：
+
+* `ItemPropertyChangeListener` 通过 `Datasource.addItemPropertyChangeListener()` 方法添加。当数据源包含的实体的一个属性值发生改变的时候，会触发这个监听。可以通过传递给监听器的 event 对象获取实体本身的实例、改变的属性名称以及该属性的新旧值。
++
+`ItemPropertyChangeListener` 可以对通过界面组件修改实体内容而引起变化的情况作出反应，比如，当用户修改了文本输入框的内容。
+
+* `ItemChangeListener` 通过 `Datasource.addItemChangeListener()` 方法添加。当通过 `Datasource.getItem()` 方法返回的选中的实体发生改变时触发。
++
+对于 `Datasource` 的情况，当另外一个实例（或者 `null`）通过 `setItem()` 方法赋值给数据源的时候会触发此事件。
++
+对于 `CollectionDatasource` 的情况，当在关联的可视化组件中，选中的元素变化的时候会触发此事件。比如，可以是选中的表格的一行，树的一个节点或者下拉列表中的一个元素。
+
+* `StateChangeListener` 通过 `Datasource.addStateChangeListener()` 方法添加。当数据源的状态发生变化时触发。数据源的状态可以是 `Datasource.State` 枚举类型对应的三种状态之一：
++
+--
+** `++NOT_INITIALIZED++` – 数据源刚被创建。
+
+** `INVALID` – 数据源关联的整个 <<dsContext,DsContext>> 刚创建。
+
+** `VALID` – 数据源可用状态，此时，`Datasource` 包含了一个实体或者 null，`CollectionDatasource` 则是包含了一组实体实例或者一个空的集合。
+
+对于复杂的<<screen_edit,编辑界面>>来说，接收数据源状态变化的消息通知可能很重要，因为复杂的编辑界面中通常包含了好几个<<frame,界面子框架>>，所以有时候很难跟踪到设置编辑实体到数据源的时刻。在这种情况下，就可以用 `StateChangeListener` 来做界面中某些元素的延时初始化：
+
+[source, java]
+----
+include::{sourcesdir}/gui/datasources_17.java[]
+---- 
+--
+
+* `CollectionChangeListener` 通过 `CollectionDatasource.addCollectionChangeListener()` 方法添加。当数据源中保存的实体集合发生变化的时候触发。event 对象提供 `getOperation()` 方法返回 `CollectionDatasource.Operation` 类型的值：`REFRESH - 刷新`，`CLEAR - 清空`，`ADD - 添加`，`REMOVE - 删除`，`UPDATE - 更新`。这些值反映了引起集合变化的操作。
+

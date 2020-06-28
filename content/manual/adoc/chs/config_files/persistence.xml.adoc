@@ -1,0 +1,23 @@
+:sourcesdir: ../../../source
+
+[[persistence.xml]]
+=== persistence.xml
+
+这种类型的文件是 JPA 的标准文件，用来注册持久化实体以及 <<orm,ORM>> 框架参数配置。
+
+项目的 `persistence.xml` 文件通过应用程序属性 <<cuba.persistenceConfig,cuba.persistenceConfig>> 定义。
+
+当 Middleware block 启动时，这些文件会被组合成单一的 `persistence.xml` 文件，保存在应用程序的 <<work_dir,work folder>> 目录。文件的顺序很重要，因为列表中后面的文件会覆盖前面文件的 ORM 参数设置。
+
+一个文件示例：
+
+[source, xml]
+----
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="1.0">
+  <persistence-unit name="sales" transaction-type="RESOURCE_LOCAL">
+      <class>com.sample.sales.entity.Customer</class>
+      <class>com.sample.sales.entity.Order</class>
+  </persistence-unit>
+</persistence>
+----
+

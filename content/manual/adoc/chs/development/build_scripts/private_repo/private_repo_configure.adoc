@@ -1,0 +1,39 @@
+:sourcesdir: ../../../../../source
+
+[[private_repo_configure]]
+===== 配置代理仓库
+
+点击左边面板的 *Repositories* 连接。
+
+在打开的 *Repositories* 页，点击 *Add* 按钮，然后选择 *Proxy Repository*。此处会添加一个新的仓库，在 *Configuration* 标签页填写所需的信息：
+
+- *Repository ID*: `cuba-work`
+- *Repository Name*: `cuba-work`
+- *Provider*: `Maven2`
+- *Remote Storage Location*: `++https://repo.cuba-platform.com/content/groups/work++`
+- *Auto Blocking Enabled*: `false`
+- 启用 *Authentication*, 设置 *Username*: `cuba`, *Password*: `cuba123`
+- 点击 *Save* 按钮.
+
+创建一个仓库组（Repository Group）：在 Nexus 点击 *Add* 按钮，然后选择 *Repository Group* 然后在 *Configuration* 标签页填写：
+
+- *Group ID*: `cuba-group`
+- *Group Name*: `cuba-group`
+- *Provider*: `Maven2`
+- 从 *Available Repositories* 添加仓库 *cuba-work* 到 *Ordered Group Repositories*
+- 点击 *Save* 按钮
+
+如果订购了 Premium 插件服务，可以添加一个 premium 的仓库：
+
+- *Repository ID*: `cuba-premium`
+- *Repository Name*: `cuba-premium`
+- *Provider*: `Maven2`
+- *Remote Storage Location*: `++https://repo.cuba-platform.com/content/groups/premium++`
+- *Auto Blocking Enabled*: `false`
+- 启用 *Authentication*，使用授权码的前半部分（短横之前的部分）作为 *Username*，后半部分（短横之后的部分）作为 *Password*。
+- 点击 *Save* 按钮。
+- 点击 *Refresh* 按钮。
+- 选择 *cuba-group* 组。
+- 在 *Configuration* 标签页，添加 *cuba-premium* 仓库到组里，放到 *cuba-work* 之后。
+- 点击 *Save* 按钮。
+

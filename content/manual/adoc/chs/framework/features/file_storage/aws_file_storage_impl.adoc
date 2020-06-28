@@ -1,0 +1,12 @@
+:sourcesdir: ../../../../../source
+
+[[aws_file_storage_impl]]
+===== Amazon S3 文件存储实现
+
+标准文件存储实现可以使用云存储服务代替。建议为云部署使用单独的云文件存储服务，因为部署应用的云服务器通常不能保证外部文件在其硬盘上的永久存储。
+
+https://github.com/cuba-platform/cuba-aws[AWS 文件存储] 扩展提供了针对 Amazon S3 文件存储服务的开箱即用支持。如要支持其他的服务，需要自己实现自定义逻辑。
+
+如需在应用程序中使用 Amazon S3 支持，请按照 https://github.com/cuba-platform/cuba-aws/blob/master/README.md[README] 的介绍进行安装和配置。
+
+存储文件夹结构的组织方式与<<file_storage_impl,标准实现>>类似。

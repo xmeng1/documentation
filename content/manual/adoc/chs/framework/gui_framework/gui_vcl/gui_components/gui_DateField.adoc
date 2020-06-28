@@ -1,0 +1,162 @@
+:sourcesdir: ../../../../../../source
+
+[[gui_DateField]]
+====== 日期时间组件
+
+++++
+<div class="manual-live-demo-container">
+    <a href="https://demo.cuba-platform.cn/sampler/open?screen=simple-datefield" class="live-demo-btn" target="_blank">在线示例</a>
+</div>
+++++
+
+++++
+<div class="manual-live-demo-container">
+    <a href="http://files.cuba-platform.com/javadoc/cuba/7.2/com/haulmont/cuba/gui/components/DateField.html" class="api-docs-btn" target="_blank">API 文档</a>
+</div>
+++++
+
+`DateField` 由日期控件和时间控件组成。日期控件是支持输入的控件，在输入框里面带有一个可以下拉选择日期的按钮，时间控件则在日期输入控件的右边：
+
+image::gui_dateFieldSimple.png[align="center"]
+
+该组件对应的 XML 名称：`dateField`
+
+* 如需创建一个关联数据的日期控件，需要用 <<gui_attr_dataContainer,dataContainer>> 和 <<gui_attr_property,property>> 属性来设置：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/datefield_1.xml[]
+---- 
++
+在上面这个例子中，界面有 `Order` 实体的数据容器 `orderDc`，`Order` 实体拥有 `date` 属性。XML 里面将 `dateField` 的 <<gui_attr_dataContainer,dataContainer>> 属性指向这个数据容器，然后将 <<gui_attr_property,property>> 属性指向实体中需要显示在这个控件的字段。
+
+* 如果这个控件关联实体的一个属性，它能根据实体属性的类型自动填充日期时间格式：
+
+** 如果这个实体属性是 `java.sql.Date` 类型或者这个属性有 `@Temporal(TemporalType.DATE)` 注解，那么时间控件部分会被隐藏不显示。日期控件部分的格式会按照 `date` <<datatype,数据类型>>的格式显示，这个格式从<<main_message_pack,主本地化消息包>>中的 `dateFormat` 键获取。
+
+** 其它情况下，时间控件会显示小时和分钟。时间部分的格式会按照 `time` <<datatype,数据类型>>的格式显示，这个格式从<<main_message_pack,主本地化消息包>>的 `timeFormat` 键获取。
+
+[[gui_DateField_datatype]]
+* 如果该控件不与实体属性相关联（比如没有设置数据容器和属性名称），可以使用 `datatype` 属性设置数据类型。 `DateField` 使用如下数据类型：
+** `date`
+** `dateTime`
+** `localDate`
+** `localDateTime`
+** `offsetDateTime`
+
+[[gui_DateField_dateFormat]]
+* 日期时间格式也可以通过组件的 `dateFormat` 属性来设置。这个属性的值可以是一个定义日期时间格式的字符串或者语言包中的一个键。
++
+日期时间格式是使用 `SimpleDateFormat` 类提供的规则来定义。( http://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html )。 如果格式中没有 `H` 或者 `h` 的话，时间控件部分将不显示。
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/datefield_2.xml[]
+---- 
++
+image::gui_dateField_format.png[align="center"]
++
+[WARNING]
+====
+`DateField` 主要目的是通过填充占位符来使用键盘快速输入。所以这个组件只支持包含数字和分隔符的日期时间格式。那些复杂的含有星期文字表述或者月文字表述的格式目前是不支持的。
+====
+
+[[gui_DateField_range]]
+* 可以通过 `rangeStart` 和 `rangeEnd` 属性来定义可选的日期范围。一旦日期范围设定了，其它在范围之外的日期都会变成不可选状态。日期范围可以用"yyyy-MM-dd"这样的格式在界面 XML 里面配置或者在程序里通过相应的 setter 来设置。
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/datefield_4.xml[]
+----
++
+image::gui_datefield_month_range.png[align="center"]
+
+[[gui_DateField_autofill]]
+* `autofill` 属性设置为 `true` 则会支持在输入了 “日” 之后会自动填充年和月。如果该属性未启用，且日期没有填全，DateField 会清空值。
++
+如果 `autofill` 启用，并且设置了 `rangeStart` 或 `rangeEnd`，会在自动填写日期时考虑这两个值的设置。
+
+* `DateField` 组件值的变化，跟其它实现了 `Field` 接口的组件一样，都可以用 `ValueChangeListener` 来监听。可以使用<<gui_api_UserOriginated,isUserOriginated()>> 方法跟踪  `ValueChangeEvent` 的来源。
+
+[[gui_DateField_resolution]]
+* 日期和时间的精度可以用组件的 `resolution` 属性来定义，这个属性的值需要是 `DateField.Resolution` 枚举类型 - `SEC` 、`MIN` 、`HOUR` 、`DAY` 、 `MONTH` 、`YEAR`。默认精度是 `MIN`，精确到分钟。
++
+如果 `resolution="DAY"` 而且 `dateFormat` 没有给定的话，控件的显示格式会从<<main_message_pack,主本地化消息包>>里的 `dateFormat` 键获取。
++
+如果 `resolution="MIN"` 而且 `dateFormat` 没有给定的话，控件的显示格式会从<<main_message_pack,主本地化消息包>>里的 `dateTimeFormat` 键获取。下面这个例子是精确到月的日期时间组件的写法：
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/datefield_3.xml[]
+---- 
+
+image::gui_dateField_resolution.png[align="center"]
+
+* `DateField` 还可以在服务器和用户之间转换时间戳的时区，前提是用户通过 `setTimeZone()` 设置了<<timeZone,时区>>。当这个组件绑定了一个实体里的时间戳类型的属性的时候，时区会通过当前的<<userSession,用户会话>>自动设定。如果组件没有绑定时间戳类型的属性，可以通过在界面控制器调用 `setTimeZone()` 手动设置时区，这样 `DateField` 可以自动进行时区转换。
+* 日历中的当前日期是根据用户浏览器的时间戳确定的，依赖操作系统时区的设置。用户会话的<<timeZone,时区>>不会影响此功能。
+
+[[gui_datefield_borderless]]
+* 在选用 Halo-based 主题的 Web Client，如果需要无边框无背景的样式，可以通过预定义的 `borderless` 样式来实现。同样，也支持 XML 配置或者在界面控制器使用编程方法实现。
++
+[source, xml]
+----
+include::{sourcesdir}/gui_vcl/datefield_5.xml[]
+----
++
+当用编程方法实现的时候，选用 `HaloTheme` 类的以 `DATEFIELD_` 开头的常量：
++
+[source, java]
+----
+include::{sourcesdir}/gui_vcl/datefield_6.java[]
+----
+
+'''
+
+dateField 的属性::
+<<gui_attr_align,align>> -
+<<gui_DateField_autofill,autofill>> - 
+<<gui_attr_caption,caption>> -
+<<gui_attr_captionAsHtml,captionAsHtml>> -
+<<gui_attr_contextHelpText,contextHelpText>> -
+<<gui_attr_contextHelpTextHtmlEnabled,contextHelpTextHtmlEnabled>> -
+<<gui_attr_css,css>> -
+<<gui_attr_dataContainer,dataContainer>> -
+<<gui_attr_datasource,datasource>> -
+<<gui_DateField_datatype,datatype>> -
+<<gui_DateField_dateFormat,dateFormat>> -
+<<gui_attr_description,description>> -
+<<gui_attr_descriptionAsHtml,descriptionAsHtml>> -
+<<gui_attr_editable,editable>> -
+<<gui_attr_enable,enable>> -
+<<gui_attr_expandRatio,box.expandRatio>> -
+<<gui_attr_height,height>> -
+<<gui_attr_icon,icon>> -
+<<gui_attr_id,id>> -
+<<gui_attr_property,property>> -
+<<gui_attr_stylename,stylename>> -
+<<gui_attr_required,required>> -
+<<gui_DateField_range,rangeEnd>> -
+<<gui_DateField_range,rangeStart>> -
+<<gui_attr_requiredMessage,requiredMessage>> -
+<<gui_DateField_resolution,resolution>> -
+<<gui_attr_tabIndex,tabIndex>> -
+<<gui_attr_visible,visible>> -
+<<gui_attr_width,width>>
+
+dateField 的 XML 元素::
+<<gui_validator,validator>>
+
+dateField 的预定义样式::
+<<gui_datefield_borderless,borderless>> -
+<<gui_attr_stylename_small,small>> -
+<<gui_attr_stylename_tiny,tiny>>
+
+API::
+<<gui_api_addValueChangeListener,addValueChangeListener>> -
+<<gui_api_commit,commit>> -
+<<gui_api_discard,discard>> -
+<<gui_api_isModified,isModified>> -
+<<gui_api_contextHelp,setContextHelpIconClickHandler>>
+
+'''
+

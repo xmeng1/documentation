@@ -1,0 +1,15 @@
+:sourcesdir: ../../../../../source
+
+[[screen_layout_rules]]
+===== 界面布局规则
+
+下面的章节介绍如何在界面上正确放置可视化组件和容器。
+
+include::screen_layout_rules/screen_layout_rules_positioning.adoc[]
+
+include::screen_layout_rules/screen_layout_rules_margins.adoc[]
+
+include::screen_layout_rules/screen_layout_rules_alignment.adoc[]
+
+include::screen_layout_rules/screen_layout_mistakes.adoc[]
+

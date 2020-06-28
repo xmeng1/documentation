@@ -1,0 +1,17 @@
+:sourcesdir: ../../../../source
+
+[[entity_snapshots]]
+==== 实体快照
+
+实体保存机制与<<entity_log,实体日志>>非常相似，目的在于跟踪运行时的数据变化，具有以下独特的特征：
+
+* 能保存通过特定<<views,视图>>定义的整个实体关系图的状态（或快照）。
+
+* 应用程序代码能显式调用快照保存机制。
+
+* 平台允许查看和比较实体快照。
+
+include::entity_snapshots/entity_snapshots_save.adoc[]
+
+include::entity_snapshots/entity_snapshots_view.adoc[]
+

@@ -1,0 +1,57 @@
+:sourcesdir: ../../../../../source
+
+[[web_theme_inheritance]]
+===== 使用应用程序组件中的主题
+
+如果项目包含带有自定义主题的<<app_components,应用程序组件>>，则可以将此主题用于整个项目。
+
+要按原样继承主题，只需将其添加到<<cuba.themeConfig,cuba.themeConfig>>应用程序属性：
+
+[source, plain]
+----
+cuba.web.theme = {theme-name}
+cuba.themeConfig = com/haulmont/cuba/hover-theme.properties /com/company/{app-component-name}/{theme-name}-theme.properties
+----
+
+如果要覆盖父主题中的某些变量，则首先需要在项目中创建主题扩展。
+
+在下面的例子中，我们将使用<<web_theme_creation>>部分中的 `facebook` 主题。
+
+. 按照步骤为应用程序组件创建 `facebook` 主题。
+
+. 使用 Studio 菜单安装应用程序组件，如<<app_components_sample>>部分所述。
+
+. 在使用应用程序组件的项目中扩展 `halo` 主题。
+
+. 通过 IDE，将 `themes` 目录下的所有文件名中的 `halo` 重命名为 `facebook`，以获得以下结构：
++
+[source, plain]
+----
+include::{sourcesdir}/gui/themes/themes_28.scss[]
+----
+
+. `app-component.scss` 文件合并应用程序组件的主题修改。在 SCSS 构建过程中，Gradle 插件会自动查找应用程序组件并将其导入生成的 `modules/web/build/themes-tmp/VAADIN/themes/{theme-name}/app-components.scss` 文件中。
++
+默认情况下，`app-component.scss` 不包含来自 `{theme-name}-ext-defaults` 的变量改动。要包含变量改动到 app 组件包，需要在 `app-component.scss` 中手动导入：
++
+[source, css]
+----
+include::{sourcesdir}/gui/themes/themes_29.scss[]
+----
++
+在这个阶段，`facebook` 主题已经从 app 组件导入到项目中。
+
+. 现在，可以使用 `com.company.application` 包中的 `facebook-ext.scss` 和 `facebook-ext-defaults.scss` 文件覆盖 app 组件主题中的变量，并为具体项目自定义变量。
+
+. 将以下属性添加到 `web-app.properties` 文件中，以使应用程序的 *Settings* 菜单中的 `facebook` 主题可用。使用相对路径从 app 组件引用 `facebook-theme.properties`。
++
+[source, plain]
+----
+include::{sourcesdir}/gui/themes/themes_30.scss[]
+----
+
+[TIP]
+====
+如果主题构建有任何问题，请检查 `modules/web/build/themes-tmp` 目录。它包含所有文件和生成的 `app-component.scss`，从而能够查找 SCSS 编译问题。
+====
+

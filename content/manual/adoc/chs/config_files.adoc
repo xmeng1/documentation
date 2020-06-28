@@ -1,0 +1,30 @@
+[[config_files]]
+[appendix]
+== 项目配置文件
+
+本附录介绍 CUBA 应用程序中包含的主要配置文件。
+
+include::config_files/app-component.xml.adoc[]
+
+include::config_files/context.xml.adoc[]
+
+include::config_files/default-permission-values.xml.adoc[]
+
+include::config_files/dispatcher-spring.xml.adoc[]
+
+include::config_files/menu.xml.adoc[]
+
+include::config_files/metadata.xml.adoc[]
+
+include::config_files/permissions.xml.adoc[]
+
+include::config_files/persistence.xml.adoc[]
+
+include::config_files/remoting-spring.xml.adoc[]
+
+include::config_files/spring.xml.adoc[]
+
+include::config_files/views.xml.adoc[]
+
+include::config_files/web.xml.adoc[]
+

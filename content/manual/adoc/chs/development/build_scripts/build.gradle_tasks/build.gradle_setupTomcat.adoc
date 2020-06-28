@@ -1,0 +1,7 @@
+:sourcesdir: ../../../../../source
+
+[[build.gradle_setupTomcat]]
+===== 配置 Tomcat
+
+`setupTomcat` – `CubaSetupTomcat` 类型的任务，为应用程序的<<fast_deployment,快速部署>>方式安装并且初始化本地 Tomcat。当使用 *cuba* Gradle 插件的时候，此任务会自动创建并添加到项目中，所以不需要在 `build.gradle` 中声明这个任务。Tomcat 的安装目录通过 `cuba` 任务的 `tomcat.dir` 来指定。默认值是项目的 `build/tomcat` 子目录。
+

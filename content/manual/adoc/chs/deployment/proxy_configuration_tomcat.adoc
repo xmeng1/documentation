@@ -1,0 +1,124 @@
+:sourcesdir: ../../../source
+
+[[proxy_configuration_tomcat]]
+=== Tomcat 的代理设置
+
+对于系统集成的情况，可能需要一个代理服务器。本章节介绍配置 Nginx HTTP-server 作为 CUBA 应用程序的代理服务。
+
+[TIP]
+====
+设置代理的时候，别忘了设置 <<cuba.webAppUrl,cuba.webAppUrl>> 的值。
+====
+
+[[tomcat_for_proxy]]
+Tomcat 配置::
++
+--
+如果 Tomcat 是在一个代理服务的后面工作，也许要进行一些配置，以便 Tomcat 能正确的分发代理服务器的请求头。
+
+首先，在 Tomcat 配置文件 `conf/server.xml` 中添加 `Valve` 属性，拷贝粘贴以下代码：
+
+[source,xml]
+----
+<Valve className="org.apache.catalina.valves.RemoteIpValve"
+        remoteIpHeader="X-Forwarded-For"
+        requestAttributesEnabled="true"
+        internalProxies="127\.0\.0\.1"/>
+----
+
+`conf/server.xml` 文件中还有另一个配置需要考虑是否修改 - `AccessLogValve` 模式。
+可以在模式中添加 `%{x-forwarded-for}i`，这样 Tomcat 的访问日志会记录源 IP 地址和代理服务器 IP 地址：
+----
+<Valve className="org.apache.catalina.valves.AccessLogValve"
+    ...
+    pattern="%h %{x-forwarded-for}i %l %u %t &quot;%r&quot; %s %b" />
+----
+
+然后重启 Tomcat 服务：
+
+[source,plain]
+----
+sudo service tomcat8 restart
+----
+
+NGINX::
+
+Nginx 这边有下面两个配置。示例都在 Ubuntu 18.04 上测试通过。
+
+. <<direct_proxy,直接代理>>
+. <<redirect_to_path,重定向至路径>>
+
+比如，你的应用程序在地址：`++http://localhost:8080/app++`
+
+
+[[install_nginx]]
+运行下面命令安装 Nginx：
+
+[source,plain]
+----
+sudo apt-get install nginx
+----
+
+浏览器打开 `++http://localhost++` 确保 Nginx 能工作，应该打开的是 Nginx 的欢迎页面。
+
+现在可以删除默认 Nginx 网页的符号链接（symlink）了：
+
+[source,plain]
+----
+rm /etc/nginx/sites-enabled/default
+----
+--
+
+下一步，按照下面两种方式的任意一种配置代理。
+
+[[direct_proxy]]
+直接代理::
++
+--
+直接代理的情况下，网页请求都是由代理处理，然后直接透明的转发给应用程序。
+
+创建 Nginx 网站配置文件 `/etc/nginx/sites-enabled/direct_proxy`：
+
+[source,plain]
+----
+include::{sourcesdir}/deployment/direct_proxy.yml[]
+----
+
+重启 Nginx：
+
+[source,plain]
+----
+sudo service nginx restart
+----
+
+现在可以通过 `++http://localhost/app++` 访问应用程序。
+--
+
+[[redirect_to_path]]
+转发路径::
++
+--
+这个例子说明如何将应用程序的 URL 路径从  /app 更换成 /，就像应用程序是直接部署在根目录（类似部署在/ROOT 的效果）。这种方法允许通过 `++http://localhost++` 访问应用程序。
+
+创建 Nginx 网站配置文件 `/etc/nginx/sites-enabled/root_proxy`：
+
+[source,plain]
+----
+include::{sourcesdir}/deployment/root_proxy[]
+----
+
+然后重启 Nginx
+
+[source,plain]
+----
+sudo service nginx restart
+----
+
+现在可以通过 `++http://localhost++` 访问应用程序。
+--
+
+[TIP]
+====
+类似的部署指令对于 <<proxy_configuration_uberjar,Jetty>>，`WildFly` 等等 web 服务器也有效。但是可能也需要对这些 web 服务器添加一些附加的配置。
+====
+

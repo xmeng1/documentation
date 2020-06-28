@@ -1,0 +1,56 @@
+:sourcesdir: ../../../../source
+
+[[entity_attribute_access]]
+==== 实体属性访问控制
+
+<<security_subsystem,安全子系统 >> 允许根据用户权限设置对实体属性的访问。也就是说，框架可以根据分配给当前用户的角色自动将属性设置为只读或隐藏。但有时可能还想根据实体或其关联实体的当前状态动态更改对属性的访问。
+
+
+属性访问控制机制允许对特定实体实例创建其属性的隐藏、只读或必须(required)规则，并自动将这些规则应用于<<gui_framework,通用 UI>> 组件和 {rest_man_url}[REST API]。
+
+该机制的工作原理如下：
+
+* 当 <<dataManager,DataManager>> 加载一个实体时，它会找到实现 `SetupAttributeAccessHandler` 接口的所有 Spring bean，并传递 `SetupAttributeAccessEvent` 对象作为参数调用它们的 `setupAccess()` 方法。此对象包含处于托管状态的已加载实例，以及三个用于存储属性名称的集合：只读属性集合、隐藏属性集合和必须属性集合（这些集合最初为空）。
+
+* `SetupAttributeAccessHandler` 接口的实现类分析实体的状态并适当地填充事件对象中的属性名称集合。这些类实际上是用于定义给定实例的属性访问规则的容器。
+
+* 该机制将由规则定义的属性名称保存在实体实例本身（在关联的 `SecurityState` 对象中）。
+
+* 在客户端层，通用 UI 和 REST API 使用 `SecurityState` 对象来控制对实体属性的访问。
+
+要为特定实体类型创建规则，请执行以下操作：
+
+* 在项目的 *core* 模块中创建<<managed_beans, Spring Bean>> 并实现 `SetupAttributeAccessHandler` 接口。使用被处理实体的类型对接口进行参数化。bean 范围(scope)必须是默认的单例(singleton)。必须实现接口方法：
+
+** `supports(Class)` 如果处理器设计为处理给定的实体类，则返回 true。
+
+** `setupAccess(SetupAttributeAccessEvent)` 在这个方法中通过操作属性集合来设置访问权限。应该使用事件对象的 `addHidden()`、 `addReadOnly()` 和 `addRequired()` 方法填充只读、隐藏和必须属性的集合。可通过 `getEntity()` 方法获得实体实例，实体实例处于托管状态，因此可以安全地访问其属性和其关联实体的属性。
+
+例如，假设 `Order` 实体具有 `customer` 和 `amount` 属性，可以根据客户（customer）创建以下规则来限制对 `amount` 属性的访问：
+
+[source, java]
+----
+include::{sourcesdir}/common/attr_access_3.java[]
+----
+
+[[entity_attribute_access_gui]]
+通用 UI 中的属性访问控制::
++
+--
+在发送<<screen_BeforeShowEvent,BeforeShowEvent>>和<<screen_AfterShowEvent,AfterShowEvent>>事件之间，框架会自动在界面应用属性访问限制。如果不想在特定界面中使用，可以在界面控制器类添加 `@DisableAttributeAccessControl` 注解。
+
+可能希望在界面打开时重新计算并应用限制，以响应用户操作。您可以使用 `AttributeAccessSupport` bean 来完成它，传递当前界面和状态已更改的实体。例如：
+
+[source, java]
+----
+include::{sourcesdir}/common/attr_access_2.java[]
+----
+
+`applyAttributeAccess()` 方法的第二个参数是一个布尔值，它指定在应用新限制之前是否将组件访问权限重置为默认值。如果参数值为 true，则程序中对组件状态的更改（如果有）将丢失。在界面打开时自动调用该方法时，此参数的值为 false。但是在响应 UI 事件时调用该方法时，将其设置为 true，否则对组件的限制将被累加而不是替换。
+
+[WARNING]
+====
+属性访问限制仅适用于绑定到单个实体属性的组件，如 <<gui_TextField,TextField>> 或 <<gui_LookupField,LookupField>>。<<gui_Table,Table>> 和实现 `ListComponent` 接口的其它组件不受影响。因此，如果要编写可以隐藏多个实体实例的一个属性的规则，建议直接不要在表格中显示此属性。
+====
+--
+

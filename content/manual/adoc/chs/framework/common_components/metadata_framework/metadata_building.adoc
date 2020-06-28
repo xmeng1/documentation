@@ -1,0 +1,22 @@
+:sourcesdir: ../../../../../source
+
+[[metadata_building]]
+===== 元数据构建
+
+元数据结构生成的主要来源是<<entity_annotations,带注解的>>实体类。
+
+实体类满足以下情况将出现在元数据中：
+
+* 带 `@Entity`、`@Embeddable`、`@MappedSuperclass` 注解并且位于 <<metadata.xml,metadata.xml>> 中指定的根包中的持久化实体类。
+
+* 带 `@MetaClass` 注解且位于 `metadata.xml` 中指定的根包中的非持久化实体类。
+
+同一根包中的所有实体都放在同一个 `MetaModel` 实例中，该实例被赋予该包的名称。同一个 `MetaModel` 中的实体可以包含任意彼此的引用。可以按 <<cuba.metadataConfig,cuba.metadataConfig>> 属性中的 `metadata.xml` 文件的声明顺序创建来自不同元模型的实体之间的引用。
+
+实体属性满足以下条件时将出现在元数据中：
+
+* 使用 `@Column`、 `@OneToOne` 、 `@OneToMany` 、 `@ManyToOne` 、 `@ManyToMany`、 `@Embedded` 注解的类字段。
+
+* 使用 `@MetaProperty` 注解的类字段或字段访问方法(getter)。
+
+Metaclass 和 metaproperty 参数是基于上面列出的<<entity_annotations,注解>>参数以及字段类型和类方法确定的。但是，如果属性没有写设置方法(setter)，那么该属性将是只读的。

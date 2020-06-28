@@ -1,0 +1,28 @@
+:sourcesdir: ../../../../../source
+
+[[screen_types]]
+===== 界面类型
+
+[WARNING]
+====
+这是旧版本的 API。对于从 7.0 开始的新 API，请参阅 <<screen_controllers>>。
+====
+
+本章节描述以下几种基本的界面类型：
+
+* <<frame,界面子框架>>
+* <<screen_simple,简单界面>>
+* <<screen_lookup,查找界面>>
+* <<screen_edit,编辑界面>>
+* <<screen_combined,组合界面>>
+
+include::screen_types/frame.adoc[]
+
+include::screen_types/screen_simple.adoc[]
+
+include::screen_types/screen_lookup.adoc[]
+
+include::screen_types/screen_edit.adoc[]
+
+include::screen_types/screen_combined.adoc[]
+
